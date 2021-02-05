@@ -1,15 +1,10 @@
 
 var gamepad = require('./gamepad.js');
 
-const gamepadLeftPressedEvent = new Event('leftPressed'); 
-//const gamepadRightPressedEvent = new Event('rightPressed');
-//const gamepadUpPressedEvent = new Event('upPressed');
-//const gamepadPressedEvent = new Event('leftPressed');
-
 var UserInputs = {
     init() {
-        //document.addEventListener('keydown', this.keyDown.bind(this));
-        //document.addEventListener('keyup', this.keyUp.bind(this));
+        document.addEventListener('keydown', this.keyDown.bind(this));
+        document.addEventListener('keyup', this.keyUp.bind(this));
     },
 
 	updateGamepad() {
@@ -41,18 +36,28 @@ var UserInputs = {
 		//this.gamepadButtonsDown("Y");
 		return;
 	},
+	
+	//  X, Y, A, B , RB, LB Buttons
 	gamepadButtonsDown(finds) {
-		var deciDAS = 3;
-		var deciARR = 12;
+		var deciDAS = 10;
+		var deciARR = 10;
 		var isContained = this.gpButtons.includes(finds);
-				
+		var isPrevContained = this.prevGpButtons.includes(finds);
+
+		if(isPrevContained != isContained ) {
+			this.isGamepadButtonDown = false;
+			// Do once
+			if(isContained)
+				this.gamepadQueue.push(finds);
+		}
+		
 		if (!this.isGamepadButtonDown) {
+
 				if (this.nDeciframes >= deciDAS) {
 					this.nDeciframes = 0;
 					this.isGamepadButtonDown = true;
-					//if(isContained)
-					//	this.gamepadQueue.push(finds);
 				}
+				
 		} else {
 			if (this.nDeciframes >= deciARR && isContained) {
 				this.gamepadQueue.push(finds);
@@ -61,15 +66,20 @@ var UserInputs = {
 		}
 			
 	},
+	
+	// Direction Pad
 	gamepadDown(finds) {
 		var DAS = 5;
-		var ARR = 4;
+		var ARR = 2;
 		var isContained = this.gpButtons.includes(finds);
-		var isDas = true; //this.gpButtons.includes("DPad-Left") || this.gpButtons.includes("DPad-Right") || 
-		//this.gpButtons.includes("DPad-Up") || this.gpButtons.includes("DPad-Down");
-		
-	
-		if(isDas) {
+		var isPrevContained = this.prevGpButtons.includes(finds);
+
+		if(isPrevContained != isContained ) {
+			this.isGamepadDown = false;
+			// Do once
+			//if(isContainted)
+			//	this.gamepadQueue.push(finds);
+		}
 			if (!this.isGamepadDown) {
 					if (this.nframe >= DAS) {
 						this.nframe = 0;
@@ -81,7 +91,7 @@ var UserInputs = {
 					this.nframe = 0;
 				}
 			}
-		}
+		
 		
 		return;
 	},
@@ -97,7 +107,7 @@ var UserInputs = {
 	},
 	processKeyDown(key)
 	{
-		var deciDAS = 2;
+		var deciDAS = 4;
 		var deciARR = 8;
 
 
@@ -122,15 +132,6 @@ var UserInputs = {
 		var DAS = 1;
 		var ARR = 4;
 
-		
-       /* if (this.isDown.key == 88 || this.isDown.key == 90 || this.isDown.key == 32) {
-            //this.processKeys();
-			return;
-        }*/
-		
-       // if (this.isDown) {
-            //this.frames++;
-
             if (!this.held) {
                 if (this.frames >= DAS) {
                     this.frames = 0;
@@ -154,8 +155,15 @@ var UserInputs = {
     },
 	gamepadButtonClear() {
 		gpButtons = [];
+		nDeciframes = 0;
 		isGamepadDown = false;
 		isGamepadButtonDown = false;
+		gamepadQueue = [];
+	},
+	saveButtons() {
+		//console.log(this.gpButtons);
+	this.prevGpButtons = this.gpButtons;
+	//console.log("prev:  " + preGpButtons);
 	},
     isDown: false,
 	isKeyDown: false,
@@ -167,6 +175,7 @@ var UserInputs = {
 	nDeciframes: 0,
 	nDeciframesKey: 0,
 	gpButtons: [],
+	prevGpButtons:[],
 	keyboardKeys: [],
     inputqueue: [],
 	gamepadQueue: []

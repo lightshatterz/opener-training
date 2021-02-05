@@ -271,17 +271,62 @@ Tetris.prototype = {
         this.currentTime = new Date().getTime();
 		var deltaTime = this.currentTime - this.prevTime;
 		
-		
-		if(deltaTime >= 1) {	//  600hz
-			inputs.incDeciframes();
-			inputs.processGamepadInput();
-		}
-		if(deltaTime >= 10)
+				if(deltaTime >= 10)
 		{
 			inputs.incFrame();
 			
 			//inputs.processKeyShift();
-		}	
+		}
+		
+		if(deltaTime >= 1) {	//  600hz
+			inputs.incDeciframes();
+			inputs.updateGamepad();
+			inputs.processButtons();
+			inputs.processGamepadInput();
+			
+		}
+
+
+
+		// drain gamepad queue
+		if(deltaTime > 5)
+		{
+			while((inputs.gamepadQueue != undefined && inputs.gamepadQueue.length >= 1)){
+				var curkey = inputs.gamepadQueue.pop();
+				if(curkey == "DPad-Left") {
+					this.shape.goLeft(this.matrix);
+					this._draw();
+				}
+				if(curkey == "DPad-Right") {
+					this.shape.goRight(this.matrix);
+					this._draw();
+				}
+				if(curkey == "A") {
+					this.shape.rotate(this.matrix);
+					this._draw();
+				}
+				if(curkey == "B") {
+					this.shape.rotateClockwise(this.matrix);;
+					this._draw();
+				}
+				if(curkey == "DPad-Down") {
+					 this.shape.goDown(this.matrix);
+					 this._draw();
+				}
+				if(curkey == "RB") {
+					this.shape.goBottom(this.matrix);
+					this._update();
+				}
+				
+			}
+			
+			inputs.gamepadQueue = [];
+		}
+		
+		if(deltaTime >= 1)
+			inputs.saveButtons();
+		
+		//inputs.gamepadButtonClear();
 		/*
 		if(deltaTime > 5)		// 120hz
 		{
@@ -328,46 +373,7 @@ Tetris.prototype = {
 		
 */
 		
-		inputs.updateGamepad();
-		
-		if(deltaTime >= 5)
-		{
-			inputs.processButtons();
-		}
-		// drain gamepad queue
-		if(deltaTime > 10)
-		{
-			while((inputs.gamepadQueue != undefined && inputs.gamepadQueue.length >= 1)){
-				var curkey = inputs.gamepadQueue.pop();
-				if(curkey == "DPad-Left") {
-					this.shape.goLeft(this.matrix);
-					this._draw();
-				}
-				if(curkey == "DPad-Right") {
-					this.shape.goRight(this.matrix);
-					this._draw();
-				}
-				if(curkey == "A") {
-					this.shape.rotate(this.matrix);
-					this._draw();
-				}
-				if(curkey == "B") {
-					this.shape.rotateClockwise(this.matrix);;
-					this._draw();
-				}
-				if(curkey == "DPad-Down") {
-					 this.shape.goDown(this.matrix);
-					 this._draw();
-				}
-				if(curkey == "RB") {
-					this.shape.goBottom(this.matrix);
-					this._update();
-				}
-			
-			}
-			inputs.gamepadQueue = [];
-			inputs.gamepadButtonClear();
-		}
+	
 
         if (deltaTime > this.interval) {
             this._update();
