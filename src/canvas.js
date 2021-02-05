@@ -77,7 +77,7 @@ var tetrisCanvas = {
 		this.previewContext = preview.getContext('2d');
 		this.gridSize = scene.width / consts.COLUMN_COUNT;
 
-		this.previewGridSize = preview.width / consts.PREVIEW_COUNT;
+		this.previewGridSize = preview.width / 4;//consts.PREVIEW_COUNT;
 
 		this.drawScene();
 		
@@ -133,26 +133,50 @@ var tetrisCanvas = {
 			}
 		}
 	},
-	//Draw preview shape in preview canvas
-	drawPreviewShape:function(shape){
+	drawGhostShape:function(shape, bottomY){
 		if (!shape){
 			return;
 		}
-		this.clearPreview();
 		var matrix = shape.matrix();
-		var gsize = this.previewGridSize;
-		var startX = (this.preview.width - gsize*shape.getColumnCount()) / 2;
-		var startY = (this.preview.height - gsize*shape.getRowCount()) / 2;
+		var gsize = this.gridSize;
 		for(var i = 0;i<matrix.length;i++){
 			for(var j = 0;j<matrix[i].length;j++){
 				var value = matrix[i][j];
 				if (value === 1){
-					var x = startX + gsize * j;
-					var y = startY + gsize * i;
-					drawBox(this.previewContext,shape.color,x,y,gsize);
+					var x = gsize *(shape.x + j);
+					var y = gsize *(bottomY + i); //(shape.y + i);
+					drawBox(this.sceneContext,shape.color,x,y,gsize);
 				}
 			}
 		}
+	},
+	//Draw preview shape in preview canvas
+	drawPreviewShape:function(shapeQueue){
+		if (!shapeQueue){
+			return;
+		}
+		this.clearPreview();
+
+		shapeQueue.forEach( (shape, index) => {
+			if(shape != undefined)
+			{
+				var matrix = shape.matrix();
+				var gsize = this.previewGridSize;
+				var startX = (this.preview.width - gsize*shape.getColumnCount()) / 2;
+				var startY = ((this.preview.height - gsize*shape.getRowCount()) / 2 / 4)*(index*2+1);
+				for(var i = 0;i<matrix.length;i++){
+					for(var j = 0;j<matrix[i].length;j++){
+						var value = matrix[i][j];
+						if (value === 1){
+							var x = startX + gsize * j;
+							var y = startY + gsize * i;
+							drawBox(this.previewContext,shape.color,x,y,gsize);
+						}
+					}
+				}
+			}
+		});
+		
 	}
 
 };

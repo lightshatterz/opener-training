@@ -165,6 +165,7 @@ Tetris.prototype = {
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
+		this.shapeQueue = [];
         clearMatrix(this.matrix);
         views.setLevel(this.level);
         views.setScore(this.score);
@@ -251,16 +252,27 @@ Tetris.prototype = {
 
     // Fire a new random shape
     _fireShape: function() {
-        this.shape = this.preparedShape || shapes.randomShape();
-        this.preparedShape = shapes.randomShape();
+		this.shape = this.shapeQueue.shift() || shapes.randomShape();
+		while( this.shapeQueue.length < 4 )
+		{
+			this.preparedShape = shapes.randomShape();
+			this.shapeQueue.push(this.preparedShape);
+		}
         this._draw();
-        canvas.drawPreviewShape(this.preparedShape);
+        canvas.drawPreviewShape(this.shapeQueue);
     },
 
     // Draw game data
     _draw: function() {
         canvas.drawScene();
         canvas.drawShape(this.shape);
+		if(this.shape != undefined) {
+
+		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
+		var bottomY = clone.bottomAt(this.matrix);
+		clone.color = "#ffffff";
+		canvas.drawGhostShape(clone, bottomY);
+		}
         canvas.drawMatrix(this.matrix);
     },
     // Refresh game canvas
@@ -271,11 +283,11 @@ Tetris.prototype = {
         this.currentTime = new Date().getTime();
 		var deltaTime = this.currentTime - this.prevTime;
 		
-				if(deltaTime >= 10)
+		if(deltaTime >= 10)
 		{
 			inputs.incFrame();
 			
-			//inputs.processKeyShift();
+			inputs.processKeyShift();
 		}
 		
 		if(deltaTime >= 1) {	//  600hz
@@ -323,18 +335,18 @@ Tetris.prototype = {
 			inputs.gamepadQueue = [];
 		}
 		
-		if(deltaTime >= 1)
-			inputs.saveButtons();
+
 		
 		//inputs.gamepadButtonClear();
-		/*
-		if(deltaTime > 5)		// 120hz
+		
+		
+		// Do keyboard
+		if(deltaTime > 1)		// 120hz
 		{
 			inputs.processKeys();
-			
 		}
 		
-		if (deltaTime > 10) {  // 60hz
+		if (deltaTime > 5) {  // 60hz
 
 			// Keyboard inputs
 			
@@ -371,9 +383,11 @@ Tetris.prototype = {
 
 		}
 		
-*/
+		if(deltaTime >= 1)
+			inputs.saveButtons();
 		
-	
+		if(deltaTime >= 10)
+			inputs.saveKeyboardKeys();
 
         if (deltaTime > this.interval) {
             this._update();

@@ -78,7 +78,7 @@ var tetrisCanvas = {
 		this.previewContext = preview.getContext('2d');
 		this.gridSize = scene.width / consts.COLUMN_COUNT;
 
-		this.previewGridSize = preview.width / consts.PREVIEW_COUNT;
+		this.previewGridSize = preview.width / 4;//consts.PREVIEW_COUNT;
 
 		this.drawScene();
 		
@@ -134,26 +134,50 @@ var tetrisCanvas = {
 			}
 		}
 	},
-	//Draw preview shape in preview canvas
-	drawPreviewShape:function(shape){
+	drawGhostShape:function(shape, bottomY){
 		if (!shape){
 			return;
 		}
-		this.clearPreview();
 		var matrix = shape.matrix();
-		var gsize = this.previewGridSize;
-		var startX = (this.preview.width - gsize*shape.getColumnCount()) / 2;
-		var startY = (this.preview.height - gsize*shape.getRowCount()) / 2;
+		var gsize = this.gridSize;
 		for(var i = 0;i<matrix.length;i++){
 			for(var j = 0;j<matrix[i].length;j++){
 				var value = matrix[i][j];
 				if (value === 1){
-					var x = startX + gsize * j;
-					var y = startY + gsize * i;
-					drawBox(this.previewContext,shape.color,x,y,gsize);
+					var x = gsize *(shape.x + j);
+					var y = gsize *(bottomY + i); //(shape.y + i);
+					drawBox(this.sceneContext,shape.color,x,y,gsize);
 				}
 			}
 		}
+	},
+	//Draw preview shape in preview canvas
+	drawPreviewShape:function(shapeQueue){
+		if (!shapeQueue){
+			return;
+		}
+		this.clearPreview();
+
+		shapeQueue.forEach( (shape, index) => {
+			if(shape != undefined)
+			{
+				var matrix = shape.matrix();
+				var gsize = this.previewGridSize;
+				var startX = (this.preview.width - gsize*shape.getColumnCount()) / 2;
+				var startY = ((this.preview.height - gsize*shape.getRowCount()) / 2 / 4)*(index*2+1);
+				for(var i = 0;i<matrix.length;i++){
+					for(var j = 0;j<matrix[i].length;j++){
+						var value = matrix[i][j];
+						if (value === 1){
+							var x = startX + gsize * j;
+							var y = startY + gsize * i;
+							drawBox(this.previewContext,shape.color,x,y,gsize);
+						}
+					}
+				}
+			}
+		});
+		
 	}
 
 };
@@ -386,8 +410,8 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDown(finds) {
-		var DAS = 5;
-		var ARR = 2;
+		var DAS = 7;
+		var ARR = 3;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
 
@@ -422,18 +446,23 @@ var UserInputs = {
 		this.processInput(37);	// left
 		this.processInput(40);  // down
 	},
+	// keyboard keys z,x,space
 	processKeyDown(key)
 	{
-		var deciDAS = 4;
-		var deciARR = 8;
+		var deciDAS = 10;
+		var deciARR = 9;
 
 
+	if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
+		this.isKeyDown = false;
+		if(this.keyboardKeys[key] == true)
+			this.inputqueue.push(key);
+	}
+	
 		if (!this.isKeyDown) {
 				if (this.nDeciframesKey >= deciDAS) {
 					this.nDeciframesKey = 0;
 					this.isKeyDown = true;
-					if(this.keyboardKeys[key] == true)
-						this.inputqueue.push(key);
 				}
 		} else {
 			if (this.nDeciframesKey >= deciARR && this.keyboardKeys[key] == true) {
@@ -445,10 +474,17 @@ var UserInputs = {
 		
 		
 	},
+	// Direction arrows
     processInput(key) {
-		var DAS = 1;
-		var ARR = 4;
+		var DAS = 10;
+		var ARR = 3;
 
+		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
+			this.held = false;
+			if(this.keyboardKeys[key] == true)
+				this.inputqueue.push(key);
+		}
+		
             if (!this.held) {
                 if (this.frames >= DAS) {
                     this.frames = 0;
@@ -480,7 +516,11 @@ var UserInputs = {
 	saveButtons() {
 		//console.log(this.gpButtons);
 	this.prevGpButtons = this.gpButtons;
+	this.prevKeyboardKeys = this.keyboardKeys;
 	//console.log("prev:  " + preGpButtons);
+	},
+	saveKeyboardKeys() {
+		this.prevKeyboardKeys = {...this.keyboardKeys};
 	},
     isDown: false,
 	isKeyDown: false,
@@ -494,6 +534,7 @@ var UserInputs = {
 	gpButtons: [],
 	prevGpButtons:[],
 	keyboardKeys: [],
+	prevKeyboardKeys: [],
     inputqueue: [],
 	gamepadQueue: []
 };
@@ -667,6 +708,7 @@ Tetris.prototype = {
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
+		this.shapeQueue = [];
         clearMatrix(this.matrix);
         views.setLevel(this.level);
         views.setScore(this.score);
@@ -753,16 +795,27 @@ Tetris.prototype = {
 
     // Fire a new random shape
     _fireShape: function() {
-        this.shape = this.preparedShape || shapes.randomShape();
-        this.preparedShape = shapes.randomShape();
+		this.shape = this.shapeQueue.shift() || shapes.randomShape();
+		while( this.shapeQueue.length < 4 )
+		{
+			this.preparedShape = shapes.randomShape();
+			this.shapeQueue.push(this.preparedShape);
+		}
         this._draw();
-        canvas.drawPreviewShape(this.preparedShape);
+        canvas.drawPreviewShape(this.shapeQueue);
     },
 
     // Draw game data
     _draw: function() {
         canvas.drawScene();
         canvas.drawShape(this.shape);
+		if(this.shape != undefined) {
+
+		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
+		var bottomY = clone.bottomAt(this.matrix);
+		clone.color = "#ffffff";
+		canvas.drawGhostShape(clone, bottomY);
+		}
         canvas.drawMatrix(this.matrix);
     },
     // Refresh game canvas
@@ -773,11 +826,11 @@ Tetris.prototype = {
         this.currentTime = new Date().getTime();
 		var deltaTime = this.currentTime - this.prevTime;
 		
-				if(deltaTime >= 10)
+		if(deltaTime >= 10)
 		{
 			inputs.incFrame();
 			
-			//inputs.processKeyShift();
+			inputs.processKeyShift();
 		}
 		
 		if(deltaTime >= 1) {	//  600hz
@@ -825,18 +878,18 @@ Tetris.prototype = {
 			inputs.gamepadQueue = [];
 		}
 		
-		if(deltaTime >= 1)
-			inputs.saveButtons();
+
 		
 		//inputs.gamepadButtonClear();
-		/*
-		if(deltaTime > 5)		// 120hz
+		
+		
+		// Do keyboard
+		if(deltaTime > 1)		// 120hz
 		{
 			inputs.processKeys();
-			
 		}
 		
-		if (deltaTime > 10) {  // 60hz
+		if (deltaTime > 5) {  // 60hz
 
 			// Keyboard inputs
 			
@@ -873,9 +926,11 @@ Tetris.prototype = {
 
 		}
 		
-*/
+		if(deltaTime >= 1)
+			inputs.saveButtons();
 		
-	
+		if(deltaTime >= 10)
+			inputs.saveKeyboardKeys();
 
         if (deltaTime > this.interval) {
             this._update();
@@ -1274,6 +1329,17 @@ ShapeZR.prototype = {
 		}
 	},
 	//Move the shape to the Bottommost
+	bottomAt: function(matrix) {
+		var save = this.y;
+		var ret;
+		while (isShapeCanMove(this, matrix, 'down')) {
+			this.y += 1;
+		}
+		ret = this.y;
+		this.y = save;
+		return ret;
+	},
+	//Move the shape to the Bottommost
 	goBottom: function(matrix) {
 		while (isShapeCanMove(this, matrix, 'down')) {
 			this.y += 1;
@@ -1550,7 +1616,7 @@ var layoutView = function(container,maxW,maxH){
 		info.style.width = side.style.width;
 	}
 	preview.width = 80;
-	preview.height = 80;
+	preview.height = 380;
 
 	gameOver.style.width = scene.width +'px';
 

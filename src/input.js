@@ -69,8 +69,8 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDown(finds) {
-		var DAS = 5;
-		var ARR = 2;
+		var DAS = 7;
+		var ARR = 3;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
 
@@ -105,18 +105,23 @@ var UserInputs = {
 		this.processInput(37);	// left
 		this.processInput(40);  // down
 	},
+	// keyboard keys z,x,space
 	processKeyDown(key)
 	{
-		var deciDAS = 4;
-		var deciARR = 8;
+		var deciDAS = 10;
+		var deciARR = 9;
 
 
+	if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
+		this.isKeyDown = false;
+		if(this.keyboardKeys[key] == true)
+			this.inputqueue.push(key);
+	}
+	
 		if (!this.isKeyDown) {
 				if (this.nDeciframesKey >= deciDAS) {
 					this.nDeciframesKey = 0;
 					this.isKeyDown = true;
-					if(this.keyboardKeys[key] == true)
-						this.inputqueue.push(key);
 				}
 		} else {
 			if (this.nDeciframesKey >= deciARR && this.keyboardKeys[key] == true) {
@@ -128,10 +133,17 @@ var UserInputs = {
 		
 		
 	},
+	// Direction arrows
     processInput(key) {
-		var DAS = 1;
-		var ARR = 4;
+		var DAS = 10;
+		var ARR = 3;
 
+		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
+			this.held = false;
+			if(this.keyboardKeys[key] == true)
+				this.inputqueue.push(key);
+		}
+		
             if (!this.held) {
                 if (this.frames >= DAS) {
                     this.frames = 0;
@@ -163,7 +175,11 @@ var UserInputs = {
 	saveButtons() {
 		//console.log(this.gpButtons);
 	this.prevGpButtons = this.gpButtons;
+	this.prevKeyboardKeys = this.keyboardKeys;
 	//console.log("prev:  " + preGpButtons);
+	},
+	saveKeyboardKeys() {
+		this.prevKeyboardKeys = {...this.keyboardKeys};
 	},
     isDown: false,
 	isKeyDown: false,
@@ -177,6 +193,7 @@ var UserInputs = {
 	gpButtons: [],
 	prevGpButtons:[],
 	keyboardKeys: [],
+	prevKeyboardKeys: [],
     inputqueue: [],
 	gamepadQueue: []
 };

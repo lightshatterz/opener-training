@@ -66,7 +66,7 @@ var layoutView = function(container,maxW,maxH){
 		info.style.width = side.style.width;
 	}
 	preview.width = 80;
-	preview.height = 80;
+	preview.height = 380;
 
 	gameOver.style.width = scene.width +'px';
 

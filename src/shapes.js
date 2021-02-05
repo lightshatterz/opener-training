@@ -334,6 +334,17 @@ ShapeZR.prototype = {
 		}
 	},
 	//Move the shape to the Bottommost
+	bottomAt: function(matrix) {
+		var save = this.y;
+		var ret;
+		while (isShapeCanMove(this, matrix, 'down')) {
+			this.y += 1;
+		}
+		ret = this.y;
+		this.y = save;
+		return ret;
+	},
+	//Move the shape to the Bottommost
 	goBottom: function(matrix) {
 		while (isShapeCanMove(this, matrix, 'down')) {
 			this.y += 1;
