@@ -135,7 +135,7 @@ var tetrisCanvas = {
 		}
 	},
 	//Draw preview shape in preview canvas
-	drawPreviewShape:function(shape,deltaHeight){
+	drawPreviewShape:function(shape){
 		if (!shape){
 			return;
 		}
@@ -143,7 +143,7 @@ var tetrisCanvas = {
 		var matrix = shape.matrix();
 		var gsize = this.previewGridSize;
 		var startX = (this.preview.width - gsize*shape.getColumnCount()) / 2;
-		var startY = (this.preview.height - deltaHeight - gsize*shape.getRowCount()) / 2;
+		var startY = (this.preview.height - gsize*shape.getRowCount()) / 2;
 		for(var i = 0;i<matrix.length;i++){
 			for(var j = 0;j<matrix[i].length;j++){
 				var value = matrix[i][j];
@@ -322,8 +322,8 @@ const gamepadLeftPressedEvent = new Event('leftPressed');
 
 var UserInputs = {
     init() {
-        document.addEventListener('keydown', this.keyDown.bind(this));
-        document.addEventListener('keyup', this.keyUp.bind(this));
+        //document.addEventListener('keydown', this.keyDown.bind(this));
+        //document.addEventListener('keyup', this.keyUp.bind(this));
     },
 
 	updateGamepad() {
@@ -331,10 +331,12 @@ var UserInputs = {
 	},
 	
 	incFrame() {
+		this.frames++;
 		this.nframe++;
 	},
 	incDeciframes() {
 		this.nDeciframes++;
+		this.nDeciframesKey++;
 	},
 	processGamepadInput() {
 		
@@ -354,17 +356,19 @@ var UserInputs = {
 		return;
 	},
 	gamepadButtonsDown(finds) {
+		var deciDAS = 3;
+		var deciARR = 12;
 		var isContained = this.gpButtons.includes(finds);
 				
 		if (!this.isGamepadButtonDown) {
-				if (this.nDeciframes >= 20) {
+				if (this.nDeciframes >= deciDAS) {
 					this.nDeciframes = 0;
 					this.isGamepadButtonDown = true;
+					if(isContained)
+						this.gamepadQueue.push(finds);
 				}
 		} else {
-			if (this.nDeciframes >= 40 && isContained) {
-					
-					//console.log("Pushdown: " + finds);
+			if (this.nDeciframes >= deciARR && isContained) {
 				this.gamepadQueue.push(finds);
 				this.nDeciframes = 0;
 			}
@@ -372,19 +376,15 @@ var UserInputs = {
 			
 	},
 	gamepadDown(finds) {
-
-		var DAS = 8;
-		var ARR = 5;
+		var DAS = 6;
+		var ARR = 3;
 		var isContained = this.gpButtons.includes(finds);
 		
 		var isDas = true; //this.gpButtons.includes("DPad-Left") || this.gpButtons.includes("DPad-Right") || 
-		this.gpButtons.includes("DPad-Up") || this.gpButtons.includes("DPad-Down");
+		//this.gpButtons.includes("DPad-Up") || this.gpButtons.includes("DPad-Down");
 		
-		
-
 	
 		if(isDas) {
-			//console.log("frame no.: " + this.nframe + this.isGamepadDown);
 			if (!this.isGamepadDown) {
 					if (this.nframe >= DAS) {
 						this.nframe = 0;
@@ -400,56 +400,85 @@ var UserInputs = {
 		
 		return;
 	},
-    processInput() {
+	processKeys() {
+		this.processKeyDown(32);  // Space
+		this.processKeyDown(88);  // X
+		this.processKeyDown(90);  // Z
+	},
+	processKeyShift() {
+		this.processInput(39);  // right
+		this.processInput(37);	// left
+		this.processInput(40);  // down
+	},
+	processKeyDown(key)
+	{
+		var deciDAS = 2;
+		var deciARR = 8;
 
-		var DAS = 4;
-		var ARR = 2;
 
-        if (this.isDown.key == 65 || this.isDown.key == 68 || this.keyDown.key == 38) {
-            return;
-        }
-			//console.log("Henlo: " + this.isDown.frames);
-        if (this.isDown) {
-			console.log("Henlo: " + this.isDown.key);
-            this.isDown.frames++;
+		if (!this.isKeyDown) {
+				if (this.nDeciframesKey >= deciDAS) {
+					this.nDeciframesKey = 0;
+					this.isKeyDown = true;
+					if(this.keyboardKeys[key] == true)
+						this.inputqueue.push(key);
+				}
+		} else {
+			if (this.nDeciframesKey >= deciARR && this.keyboardKeys[key] == true) {
+				this.inputqueue.push(key);
+				this.nDeciframesKey = 0;
+			}
+		}
+		
+		
+		
+	},
+    processInput(key) {
+		var DAS = 1;
+		var ARR = 4;
 
-            if (!this.isDown.held) {
-                if (this.isDown.frames == DAS) {
-                    this.isDown.frames = 0;
-                    this.isDown.held = true;
+		
+       /* if (this.isDown.key == 88 || this.isDown.key == 90 || this.isDown.key == 32) {
+            //this.processKeys();
+			return;
+        }*/
+		
+       // if (this.isDown) {
+            //this.frames++;
+
+            if (!this.held) {
+                if (this.frames >= DAS) {
+                    this.frames = 0;
+                    this.held = true;
                 }
             } else {
-                if (this.isDown.frames == ARR) {
-						
-                    this.inputqueue.push(this.isDown.key);
-                    this.isDown.frames = 0;
+                if (this.frames >= ARR && this.keyboardKeys[key] == true) {
+                    this.inputqueue.push(key);
+                    this.frames = 0;
                 }
             }
-        }
+        //}
     },
     keyDown(event) {
-        if (this.isDown == false) {
-            var key = {
-                key: event.keyCode,
-                held: false,
-                frames: 0
-            }
-            this.isDown = key;
-            this.inputqueue.push(this.isDown.key);
-			
-        }
+		this.keyboardKeys[event.keyCode] = true;
     },
     keyUp(event) {
-        this.isDown = false;
+		this.nDeciframesKey = 0;
+		this.isKeyDown = false;
+		this.keyboardKeys[event.keyCode] = false;
     },
     isDown: false,
+	isKeyDown: false,
 	isGamepadDown: false,
 	isGamepadButtonDown: false,
+	held: false,
 	nframe: 0,
+	frames: 0,
 	nDeciframes: 0,
+	nDeciframesKey: 0,
 	gpButtons: [],
+	keyboardKeys: [],
     inputqueue: [],
-	prevButton: "",
 	gamepadQueue: []
 };
 
@@ -655,7 +684,7 @@ Tetris.prototype = {
         if (this.isGameOver || !this.shape) {
             return;
         }
-
+/*
         switch (e.keyCode) {
 		case 37: {
 			//this.shape.goLeft(matrix);
@@ -693,6 +722,7 @@ Tetris.prototype = {
         }
         break;
         }
+		*/
     },
     // Restart game
     _restartHandler: function() {
@@ -710,7 +740,7 @@ Tetris.prototype = {
         this.shape = this.preparedShape || shapes.randomShape();
         this.preparedShape = shapes.randomShape();
         this._draw();
-        canvas.drawPreviewShape(this.preparedShape ,80);
+        canvas.drawPreviewShape(this.preparedShape);
     },
 
     // Draw game data
@@ -727,17 +757,30 @@ Tetris.prototype = {
         this.currentTime = new Date().getTime();
 		var deltaTime = this.currentTime - this.prevTime;
 		
+		
+		if(deltaTime >= 1)	//  600hz
+			inputs.incDeciframes();
+		
 		if(deltaTime > 10)
 		{
 			inputs.incFrame();
 			inputs.processGamepadInput();
+			//inputs.processKeyShift();
 		}	
-		if (deltaTime > 10) {  // 60hz DAS
+		/*
+		if(deltaTime > 5)		// 120hz
+		{
+			inputs.processKeys();
+			
+		}
+		
+		if (deltaTime > 10) {  // 60hz
 
 			// Keyboard inputs
-			inputs.processInput();
+			
 			while((inputs.inputqueue != undefined && inputs.inputqueue.length >= 1)){
 				var curkey = inputs.inputqueue.pop();
+				console.log("cur key: " + curkey);
 				if(curkey == 37) {
 					this.shape.goLeft(this.matrix);
 					this._draw();
@@ -746,13 +789,32 @@ Tetris.prototype = {
 					this.shape.goRight(this.matrix);
 					this._draw();
 				}
+				if(curkey == 40) {
+					 this.shape.goDown(this.matrix);
+					 this._draw();
+				}
+				if(curkey == 90) {
+					this.shape.rotate(this.matrix);
+					this._draw();
+				}
+				if(curkey == 88){
+					this.shape.rotateClockwise(this.matrix);;
+					this._draw();
+				}
+
+				if(curkey == 32) {
+					this.shape.goBottom(this.matrix);
+					this._update();
+				}
 			}
+			inputs.inputqueue = [];
 
 		}
 		
-		if(deltaTime > 1)
-			inputs.incDeciframes();
+*/
+		
 		inputs.updateGamepad();
+		
 		if(deltaTime > 5)
 		{
 			inputs.processButtons();
@@ -1464,7 +1526,7 @@ var layoutView = function(container,maxW,maxH){
 		info.style.width = side.style.width;
 	}
 	preview.width = 80;
-	preview.height = 360;
+	preview.height = 80;
 
 	gameOver.style.width = scene.width +'px';
 

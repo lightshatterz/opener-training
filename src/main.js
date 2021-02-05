@@ -198,7 +198,7 @@ Tetris.prototype = {
         if (this.isGameOver || !this.shape) {
             return;
         }
-
+/*
         switch (e.keyCode) {
 		case 37: {
 			//this.shape.goLeft(matrix);
@@ -236,6 +236,7 @@ Tetris.prototype = {
         }
         break;
         }
+		*/
     },
     // Restart game
     _restartHandler: function() {
@@ -270,17 +271,30 @@ Tetris.prototype = {
         this.currentTime = new Date().getTime();
 		var deltaTime = this.currentTime - this.prevTime;
 		
+		
+		if(deltaTime >= 1)	//  600hz
+			inputs.incDeciframes();
+		
 		if(deltaTime > 10)
 		{
 			inputs.incFrame();
 			inputs.processGamepadInput();
+			//inputs.processKeyShift();
 		}	
-		if (deltaTime > 10) {  // 60hz DAS
+		/*
+		if(deltaTime > 5)		// 120hz
+		{
+			inputs.processKeys();
+			
+		}
+		
+		if (deltaTime > 10) {  // 60hz
 
 			// Keyboard inputs
-			inputs.processInput();
+			
 			while((inputs.inputqueue != undefined && inputs.inputqueue.length >= 1)){
 				var curkey = inputs.inputqueue.pop();
+				console.log("cur key: " + curkey);
 				if(curkey == 37) {
 					this.shape.goLeft(this.matrix);
 					this._draw();
@@ -289,13 +303,32 @@ Tetris.prototype = {
 					this.shape.goRight(this.matrix);
 					this._draw();
 				}
+				if(curkey == 40) {
+					 this.shape.goDown(this.matrix);
+					 this._draw();
+				}
+				if(curkey == 90) {
+					this.shape.rotate(this.matrix);
+					this._draw();
+				}
+				if(curkey == 88){
+					this.shape.rotateClockwise(this.matrix);;
+					this._draw();
+				}
+
+				if(curkey == 32) {
+					this.shape.goBottom(this.matrix);
+					this._update();
+				}
 			}
+			inputs.inputqueue = [];
 
 		}
 		
-		if(deltaTime > 1)
-			inputs.incDeciframes();
+*/
+		
 		inputs.updateGamepad();
+		
 		if(deltaTime > 5)
 		{
 			inputs.processButtons();
