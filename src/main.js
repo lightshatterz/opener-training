@@ -272,13 +272,14 @@ Tetris.prototype = {
 		var deltaTime = this.currentTime - this.prevTime;
 		
 		
-		if(deltaTime >= 1)	//  600hz
+		if(deltaTime >= 1) {	//  600hz
 			inputs.incDeciframes();
-		
-		if(deltaTime > 10)
+			inputs.processGamepadInput();
+		}
+		if(deltaTime >= 10)
 		{
 			inputs.incFrame();
-			inputs.processGamepadInput();
+			
 			//inputs.processKeyShift();
 		}	
 		/*
@@ -329,7 +330,7 @@ Tetris.prototype = {
 		
 		inputs.updateGamepad();
 		
-		if(deltaTime > 5)
+		if(deltaTime >= 5)
 		{
 			inputs.processButtons();
 		}
@@ -365,6 +366,7 @@ Tetris.prototype = {
 			
 			}
 			inputs.gamepadQueue = [];
+			inputs.gamepadButtonClear();
 		}
 
         if (deltaTime > this.interval) {

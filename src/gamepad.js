@@ -13,6 +13,9 @@ var gamepadAPI = {
         console.log('Gamepad disconnected.');
     },
     update: function() {
+		var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+		if(!isFirefox)
+			gamepadAPI.controller = window.navigator.getGamepads()[0];
         gamepadAPI.buttonsCache = [];
         for (var k = 0; k < gamepadAPI.buttonsStatus.length; k++) {
             gamepadAPI.buttonsCache[k] = gamepadAPI.buttonsStatus[k];
