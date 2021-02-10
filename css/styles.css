@@ -22,6 +22,31 @@ body{
 	height:100%;
 	position: absolute;
 	background: #2f2f2f;
+	left:120px;
+}
+
+
+#leftSide {
+	height:100%;
+	position: absolute;
+	top:0px;
+	left:0px;
+	width:120px;
+	text-align: center;
+}
+
+#leftInfo{
+	height:100%;
+	width:120px;
+	margin:0 auto;
+}
+
+#hold{
+	position:relative;
+	width:80px;
+	height:360px;
+	background: #2f2f2f;
+	margin:10px auto;
 }
 
 #gameOver{
@@ -63,9 +88,11 @@ body{
 #preview{
 	width:80px;
 	height:360px;
+	top:0px;
 	background: #2f2f2f;
 	margin:10px auto;
 }
+
 
 #levelInfo{
 	color:#fff;
@@ -86,8 +113,17 @@ body{
 #score{
 	color:orange;
 	font-family: 'Chalkboard SE';
+	
+}#linesInfo{
+	color:#fff;
+	font-size: 18px;
+	margin-top:0;
 }
 
+#lines{
+	color:orange;
+	font-family: 'Chalkboard SE';
+}
 #rewardInfo{
 	color:yellow;
 	font-weight: bold;

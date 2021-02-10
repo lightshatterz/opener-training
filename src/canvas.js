@@ -70,15 +70,18 @@ var drawBox = function(ctx,color,x,y,gridSize){
 */
 var tetrisCanvas = {
 
-	init:function(scene,preview){
+	init:function(scene,preview,hold){
 		this.scene = scene;
 		this.preview = preview;
+		this.hold = hold;
 		this.sceneContext = scene.getContext('2d');
 		this.previewContext = preview.getContext('2d');
+		this.holdContext = hold.getContext('2d');
 		this.gridSize = scene.width / consts.COLUMN_COUNT;
 
 		this.previewGridSize = preview.width / 4;//consts.PREVIEW_COUNT;
-
+		this.holdGridSize = preview.width / 4;//consts.PREVIEW_COUNT;
+		
 		this.drawScene();
 		
 	},
@@ -90,6 +93,9 @@ var tetrisCanvas = {
 	//Clear preview canvas
 	clearPreview:function(){
 		this.previewContext.clearRect(0,0,this.preview.width,this.preview.height);
+	},	//Clear preview canvas
+	clearHold:function(){
+		this.holdContext.clearRect(0,0,this.hold.width,this.hold.height);
 	},
 	//Draw game scene, grids
 	drawScene:function(){
@@ -112,6 +118,12 @@ var tetrisCanvas = {
 	//Draw preview data
 	drawPreview:function(){
 		drawGrids(this.preview,this.previewGridSize,
+			consts.PREVIEW_COUNT,consts.PREVIEW_COUNT,
+			consts.PREVIEW_BG,consts.PREVIEW_BG);
+	},
+	//Draw hold data
+	drawHold:function(){
+		drawGrids(this.hold,this.holdGridSize,
 			consts.PREVIEW_COUNT,consts.PREVIEW_COUNT,
 			consts.PREVIEW_BG,consts.PREVIEW_BG);
 	},
@@ -177,7 +189,38 @@ var tetrisCanvas = {
 			}
 		});
 		
+	},
+			//Draw preview shape in preview canvas
+	drawHoldShape:function(holdQueue){
+		if (!holdQueue){
+			return;
+		}
+		this.clearHold();
+		q = holdQueue.reverse();
+		q.forEach( (shape, index) => {
+			if(shape != undefined)
+			{
+				var matrix = shape.matrix();
+				var gsize = this.holdGridSize;
+				var startX = (this.hold.width - gsize*shape.getColumnCount()) / 2;
+				var startY = ((this.hold.height - gsize*shape.getRowCount()) / 2 / 4)*(index*2+1);
+				for(var i = 0;i<matrix.length;i++){
+					for(var j = 0;j<matrix[i].length;j++){
+						var value = matrix[i][j];
+						if (value === 1){
+							var x = startX + gsize * j;
+							var y = startY + gsize * i;
+							drawBox(this.holdContext,shape.color,x,y,gsize);
+						}
+					}
+				}
+			}
+		});
+		holdQueue.reverse();
+		
 	}
+	
+
 
 };
 

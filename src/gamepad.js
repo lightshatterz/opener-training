@@ -14,8 +14,12 @@ var gamepadAPI = {
     },
     update: function() {
 		var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-		if(!isFirefox)
-			gamepadAPI.controller = window.navigator.getGamepads()[0];
+		if(!isFirefox) {
+			for(var i = 0; i < 4; i++)
+				if((gp = window.navigator.getGamepads()[i]) != undefined)				// dumb gamepad update. fix.
+					gamepadAPI.controller = gp;
+		}
+		
         gamepadAPI.buttonsCache = [];
         for (var k = 0; k < gamepadAPI.buttonsStatus.length; k++) {
             gamepadAPI.buttonsCache[k] = gamepadAPI.buttonsStatus[k];

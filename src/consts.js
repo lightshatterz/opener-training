@@ -1,6 +1,8 @@
 
-//colors for shapes
-var colors = ['#00af9d','#ffb652','#cd66cc','#66bc29','#0096db','#3a7dda','#ffe100'];
+//colors for shapes  L, O, Z, T, J, S, I
+var colors = ['#ef7a21','#f7d308','#ef2029','#ad4d9c','#5a658f','#42b642','#31c7ef'];
+//['#ef7a21','#f7d308','#42b642','#ef2029','#ad4d9c','#5a658f','#31c7ef'];
+//['#00af9d','#ffb652','#cd66cc','#66bc29','#0096db','#3a7dda','#ffe100'];
 
 //sidebar width
 var sideWidth = 120;
@@ -19,10 +21,12 @@ var entryRowCount = 3;
 var previewCount = 6;
 
 //scene gradient start color 
-var sceneBgStart = '#8e9ba6';
+var sceneBgStart = "#000000"
+//'#8e9ba6';
 
 //scene gradient end color 
-var sceneBgEnd = '#5c6975';
+var sceneBgEnd = '#000000'
+//'#5c6975';
 
 //preview background color
 var previewBg = '#2f2f2f';

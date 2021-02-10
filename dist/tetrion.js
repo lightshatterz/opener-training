@@ -71,15 +71,18 @@ var drawBox = function(ctx,color,x,y,gridSize){
 */
 var tetrisCanvas = {
 
-	init:function(scene,preview){
+	init:function(scene,preview,hold){
 		this.scene = scene;
 		this.preview = preview;
+		this.hold = hold;
 		this.sceneContext = scene.getContext('2d');
 		this.previewContext = preview.getContext('2d');
+		this.holdContext = hold.getContext('2d');
 		this.gridSize = scene.width / consts.COLUMN_COUNT;
 
 		this.previewGridSize = preview.width / 4;//consts.PREVIEW_COUNT;
-
+		this.holdGridSize = preview.width / 4;//consts.PREVIEW_COUNT;
+		
 		this.drawScene();
 		
 	},
@@ -91,6 +94,9 @@ var tetrisCanvas = {
 	//Clear preview canvas
 	clearPreview:function(){
 		this.previewContext.clearRect(0,0,this.preview.width,this.preview.height);
+	},	//Clear preview canvas
+	clearHold:function(){
+		this.holdContext.clearRect(0,0,this.hold.width,this.hold.height);
 	},
 	//Draw game scene, grids
 	drawScene:function(){
@@ -113,6 +119,12 @@ var tetrisCanvas = {
 	//Draw preview data
 	drawPreview:function(){
 		drawGrids(this.preview,this.previewGridSize,
+			consts.PREVIEW_COUNT,consts.PREVIEW_COUNT,
+			consts.PREVIEW_BG,consts.PREVIEW_BG);
+	},
+	//Draw hold data
+	drawHold:function(){
+		drawGrids(this.hold,this.holdGridSize,
 			consts.PREVIEW_COUNT,consts.PREVIEW_COUNT,
 			consts.PREVIEW_BG,consts.PREVIEW_BG);
 	},
@@ -178,7 +190,38 @@ var tetrisCanvas = {
 			}
 		});
 		
+	},
+			//Draw preview shape in preview canvas
+	drawHoldShape:function(holdQueue){
+		if (!holdQueue){
+			return;
+		}
+		this.clearHold();
+		q = holdQueue.reverse();
+		q.forEach( (shape, index) => {
+			if(shape != undefined)
+			{
+				var matrix = shape.matrix();
+				var gsize = this.holdGridSize;
+				var startX = (this.hold.width - gsize*shape.getColumnCount()) / 2;
+				var startY = ((this.hold.height - gsize*shape.getRowCount()) / 2 / 4)*(index*2+1);
+				for(var i = 0;i<matrix.length;i++){
+					for(var j = 0;j<matrix[i].length;j++){
+						var value = matrix[i][j];
+						if (value === 1){
+							var x = startX + gsize * j;
+							var y = startY + gsize * i;
+							drawBox(this.holdContext,shape.color,x,y,gsize);
+						}
+					}
+				}
+			}
+		});
+		holdQueue.reverse();
+		
 	}
+	
+
 
 };
 
@@ -187,8 +230,10 @@ var tetrisCanvas = {
 module.exports = tetrisCanvas;
 },{"./consts.js":2,"./utils.js":7}],2:[function(require,module,exports){
 
-//colors for shapes
-var colors = ['#00af9d','#ffb652','#cd66cc','#66bc29','#0096db','#3a7dda','#ffe100'];
+//colors for shapes  L, O, Z, T, J, S, I
+var colors = ['#ef7a21','#f7d308','#ef2029','#ad4d9c','#5a658f','#42b642','#31c7ef'];
+//['#ef7a21','#f7d308','#42b642','#ef2029','#ad4d9c','#5a658f','#31c7ef'];
+//['#00af9d','#ffb652','#cd66cc','#66bc29','#0096db','#3a7dda','#ffe100'];
 
 //sidebar width
 var sideWidth = 120;
@@ -207,10 +252,12 @@ var entryRowCount = 3;
 var previewCount = 6;
 
 //scene gradient start color 
-var sceneBgStart = '#8e9ba6';
+var sceneBgStart = "#000000"
+//'#8e9ba6';
 
 //scene gradient end color 
-var sceneBgEnd = '#5c6975';
+var sceneBgEnd = '#000000'
+//'#5c6975';
 
 //preview background color
 var previewBg = '#2f2f2f';
@@ -274,8 +321,12 @@ var gamepadAPI = {
     },
     update: function() {
 		var isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
-		if(!isFirefox)
-			gamepadAPI.controller = window.navigator.getGamepads()[0];
+		if(!isFirefox) {
+			for(var i = 0; i < 4; i++)
+				if((gp = window.navigator.getGamepads()[i]) != undefined)				// dumb gamepad update. fix.
+					gamepadAPI.controller = gp;
+		}
+		
         gamepadAPI.buttonsCache = [];
         for (var k = 0; k < gamepadAPI.buttonsStatus.length; k++) {
             gamepadAPI.buttonsCache[k] = gamepadAPI.buttonsStatus[k];
@@ -373,6 +424,7 @@ var UserInputs = {
 		this.gamepadButtonsDown("LB");
 		this.gamepadButtonsDown("A");
 		this.gamepadButtonsDown("B");
+		this.gamepadButtonsDown("DPad-Up");
 		//this.gamepadButtonsDown("X");
 		//this.gamepadButtonsDown("Y");
 		return;
@@ -380,7 +432,7 @@ var UserInputs = {
 	
 	//  X, Y, A, B , RB, LB Buttons
 	gamepadButtonsDown(finds) {
-		var deciDAS = 10;
+		var deciDAS = 50;
 		var deciARR = 10;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
@@ -476,8 +528,8 @@ var UserInputs = {
 	},
 	// Direction arrows
     processInput(key) {
-		var DAS = 10;
-		var ARR = 3;
+		var DAS = 13;
+		var ARR = 5;
 
 		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
 			this.held = false;
@@ -514,10 +566,7 @@ var UserInputs = {
 		gamepadQueue = [];
 	},
 	saveButtons() {
-		//console.log(this.gpButtons);
 	this.prevGpButtons = this.gpButtons;
-	this.prevKeyboardKeys = this.keyboardKeys;
-	//console.log("prev:  " + preGpButtons);
 	},
 	saveKeyboardKeys() {
 		this.prevKeyboardKeys = {...this.keyboardKeys};
@@ -688,11 +737,12 @@ Tetris.prototype = {
 
 
         views.init(this.id, cfg.maxWidth, cfg.maxHeight);
-        canvas.init(views.scene, views.preview);
+        canvas.init(views.scene, views.preview, views.hold);
 		inputs.init();
 		
         this.matrix = initMatrix(consts.ROW_COUNT, consts.COLUMN_COUNT);
         this.reset();
+		
 
         this._initEvents();
         this._fireShape();
@@ -704,11 +754,14 @@ Tetris.prototype = {
         this.isGameOver = false;
         this.level = 1;
         this.score = 0;
+		this.lines = 0;
         this.startTime = new Date().getTime();
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
 		this.shapeQueue = [];
+		this.holdQueue = [];
+		this.canPullFromHoldQueue = false;
         clearMatrix(this.matrix);
         views.setLevel(this.level);
         views.setScore(this.score);
@@ -726,6 +779,28 @@ Tetris.prototype = {
         this.currentTime = new Date().getTime();
         this.prevTime = this.currentTime;
     },
+	pushHoldStack: function()
+	{
+		if(this.holdQueue.length <= 4) {
+			this.holdQueue.push(this.shape);
+			this.shape = this.shapeQueue.shift();
+			this.canPullFromHoldQueue = false;
+			//canvas.drawHoldShape(this.holdQueue);
+			this._draw(); // update?
+		}
+	},
+	popHoldStack: function()
+	{
+		if(this.holdQueue.length >= 1 && this.canPullFromHoldQueue)
+		{
+			
+			this.canPullFromHoldQueue = false;
+			this.shapeQueue.unshift(this.shape);
+			this.shape = this.holdQueue.pop();
+			//canvas.drawHoldShape(this.holdQueue);
+			this._draw();
+		}
+	},
     //Game over
     gamveOver: function() {
 
@@ -735,14 +810,14 @@ Tetris.prototype = {
     _keydownHandler: function(e) {
 
         var matrix = this.matrix;
-
+/*
         if (!e) {
             var e = window.event;
         }
         if (this.isGameOver || !this.shape) {
             return;
         }
-/*
+
         switch (e.keyCode) {
 		case 37: {
 			//this.shape.goLeft(matrix);
@@ -789,7 +864,7 @@ Tetris.prototype = {
     },
     // Bind game events
     _initEvents: function() {
-        //window.addEventListener('keydown', utils.proxy(this._keydownHandler, this), false);
+        window.addEventListener('keydown', utils.proxy(this._keydownHandler, this), false);
         views.btnRestart.addEventListener('click', utils.proxy(this._restartHandler, this), false);
     },
 
@@ -801,14 +876,17 @@ Tetris.prototype = {
 			this.preparedShape = shapes.randomShape();
 			this.shapeQueue.push(this.preparedShape);
 		}
+		//canvas.drawPreviewShape(this.shapeQueue);
         this._draw();
-        canvas.drawPreviewShape(this.shapeQueue);
+        
     },
 
     // Draw game data
     _draw: function() {
         canvas.drawScene();
         canvas.drawShape(this.shape);
+		canvas.drawHoldShape(this.holdQueue);
+		canvas.drawPreviewShape(this.shapeQueue);
 		if(this.shape != undefined) {
 
 		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
@@ -830,7 +908,6 @@ Tetris.prototype = {
 		{
 			inputs.incFrame();
 			
-			inputs.processKeyShift();
 		}
 		
 		if(deltaTime >= 1) {	//  600hz
@@ -841,13 +918,11 @@ Tetris.prototype = {
 			
 		}
 
-
-
 		// drain gamepad queue
 		if(deltaTime > 5)
 		{
 			while((inputs.gamepadQueue != undefined && inputs.gamepadQueue.length >= 1)){
-				var curkey = inputs.gamepadQueue.pop();
+				var curkey = inputs.gamepadQueue.shift();
 				if(curkey == "DPad-Left") {
 					this.shape.goLeft(this.matrix);
 					this._draw();
@@ -872,16 +947,19 @@ Tetris.prototype = {
 					this.shape.goBottom(this.matrix);
 					this._update();
 				}
-				
+				if(curkey == "LB") {
+					this.pushHoldStack();
+					this._update();
+				}				
+				if(curkey == "DPad-Up") {
+					this.popHoldStack();
+					this._update();
+				}
 			}
 			
 			inputs.gamepadQueue = [];
 		}
-		
-
-		
 		//inputs.gamepadButtonClear();
-		
 		
 		// Do keyboard
 		if(deltaTime > 1)		// 120hz
@@ -890,12 +968,10 @@ Tetris.prototype = {
 		}
 		
 		if (deltaTime > 5) {  // 60hz
-
+			inputs.processKeyShift();
 			// Keyboard inputs
-			
 			while((inputs.inputqueue != undefined && inputs.inputqueue.length >= 1)){
-				var curkey = inputs.inputqueue.pop();
-				console.log("cur key: " + curkey);
+				var curkey = inputs.inputqueue.shift();
 				if(curkey == 37) {
 					this.shape.goLeft(this.matrix);
 					this._draw();
@@ -916,22 +992,32 @@ Tetris.prototype = {
 					this.shape.rotateClockwise(this.matrix);;
 					this._draw();
 				}
-
 				if(curkey == 32) {
 					this.shape.goBottom(this.matrix);
 					this._update();
+				}
+				if(curkey == 16) {
+					 //holdQueue.push(this.shape);
+					 
+					 this._update();
+				}
+					if(curkey == 16) {
+					 //holdQueue.pop(this.shape);
+					 
+					 this._update();
 				}
 			}
 			inputs.inputqueue = [];
 
 		}
 		
-		if(deltaTime >= 1)
-			inputs.saveButtons();
 		
 		if(deltaTime >= 10)
 			inputs.saveKeyboardKeys();
-
+		
+		if(deltaTime >= 1)
+			inputs.saveButtons();
+		
         if (deltaTime > this.interval) {
             this._update();
 		
@@ -949,9 +1035,11 @@ Tetris.prototype = {
         if (this.shape.canDown(this.matrix)) {
             this.shape.goDown(this.matrix);
         } else {
+			this.canPullFromHoldQueue = true;
             this.shape.copyTo(this.matrix);
             this._check();
             this._fireShape();
+			new Audio('./dist/Blop.ogg').play();
         }
         this._draw();
         this.isGameOver = checkGameOver(this.matrix);
@@ -968,13 +1056,14 @@ Tetris.prototype = {
         var rows = checkFullRows(this.matrix);
         if (rows.length) {
             removeRows(this.matrix, rows);
-
             var score = calcScore(rows);
             var reward = calcRewards(rows);
             this.score += score + reward;
-
+			this.lines += rows.length;
+			
             views.setScore(this.score);
             views.setReward(reward);
+			views.setLines(this.lines);
 
         }
     },
@@ -1561,8 +1650,11 @@ var scene = $('scene');
 var side = $('side');
 var info = $('info');
 var preview = $('preview');
+var hold = $('hold');
+var leftSide = $('leftSide');
 var level = $('level');
 var score = $('score');
+var lines = $('lines');
 var rewardInfo = $('rewardInfo');
 var reward = $('reward');
 var gameOver = $('gameOver');
@@ -1585,7 +1677,7 @@ var getContainerSize = function(maxW,maxH){
 	var size = {};
 	if (dw>dh){
 		size.height = Math.min(maxH,dh);
-		size.width = Math.min(size.height /2 + SIDE_WIDTH,maxW);
+		size.width = Math.min(size.height /*/ 2*/ + SIDE_WIDTH,maxW);
 	}else{
 		size.width = Math.min(maxW,dw);
 		size.height =  Math.min(maxH,dh);
@@ -1599,6 +1691,8 @@ var getContainerSize = function(maxW,maxH){
 	Layout game elements
 */
 var layoutView = function(container,maxW,maxH){
+	console.log("container: " + container  + " W: " + maxW);
+
 	var size = getContainerSize(maxW,maxH);
 	var st = container.style;
 	st.height = size.height + 'px';
@@ -1607,18 +1701,33 @@ var layoutView = function(container,maxW,maxH){
 	st.marginLeft = (-(size.width/2)) + 'px';
 
 	//layout scene
+	
+	//hold.width = 80;
+	//hold.height = 380;
+	
+	
 	scene.height = size.height;
+	
 	scene.width = scene.height / 2;
-
-	var sideW = size.width - scene.width;
-	side.style.width = sideW+ 'px';
-	if (sideW< SIDE_WIDTH ){
+	
+	
+	var sideW = size.width - scene.width + leftSide.width;
+	side.style.width = sideW + 'px';
+	if (sideW < SIDE_WIDTH ){
 		info.style.width = side.style.width;
 	}
+	
+	hold.style.top = 200+'px';//preview.top + 10px pad
+
+	
 	preview.width = 80;
 	preview.height = 380;
-
+	
+	hold.width = 80;
+	hold.height = 380;
+	
 	gameOver.style.width = scene.width +'px';
+
 
 }
 
@@ -1632,6 +1741,7 @@ var tetrisView = {
 	  this.container = $(id);
 	  this.scene = scene;
 	  this.preview = preview;
+	  this.hold = hold;
 	  this.btnRestart = btnRestart;
 	  layoutView(this.container,maxW,maxH);
 	  this.scene.focus();
@@ -1653,6 +1763,10 @@ var tetrisView = {
 		level.innerHTML = levelNumber;
 	},
 	// Update the extra reward score
+	setLines:function(setlines){
+		lines.innerHTML = setlines;
+	
+	},
 	setReward:function(rewardScore){
 		if (rewardScore>0){
 			reward.innerHTML = rewardScore;

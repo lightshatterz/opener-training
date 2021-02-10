@@ -11,8 +11,11 @@ var scene = $('scene');
 var side = $('side');
 var info = $('info');
 var preview = $('preview');
+var hold = $('hold');
+var leftSide = $('leftSide');
 var level = $('level');
 var score = $('score');
+var lines = $('lines');
 var rewardInfo = $('rewardInfo');
 var reward = $('reward');
 var gameOver = $('gameOver');
@@ -35,7 +38,7 @@ var getContainerSize = function(maxW,maxH){
 	var size = {};
 	if (dw>dh){
 		size.height = Math.min(maxH,dh);
-		size.width = Math.min(size.height /2 + SIDE_WIDTH,maxW);
+		size.width = Math.min(size.height /*/ 2*/ + SIDE_WIDTH,maxW);
 	}else{
 		size.width = Math.min(maxW,dw);
 		size.height =  Math.min(maxH,dh);
@@ -49,6 +52,8 @@ var getContainerSize = function(maxW,maxH){
 	Layout game elements
 */
 var layoutView = function(container,maxW,maxH){
+	console.log("container: " + container  + " W: " + maxW);
+
 	var size = getContainerSize(maxW,maxH);
 	var st = container.style;
 	st.height = size.height + 'px';
@@ -57,18 +62,33 @@ var layoutView = function(container,maxW,maxH){
 	st.marginLeft = (-(size.width/2)) + 'px';
 
 	//layout scene
+	
+	//hold.width = 80;
+	//hold.height = 380;
+	
+	
 	scene.height = size.height;
+	
 	scene.width = scene.height / 2;
-
-	var sideW = size.width - scene.width;
-	side.style.width = sideW+ 'px';
-	if (sideW< SIDE_WIDTH ){
+	
+	
+	var sideW = size.width - scene.width + leftSide.width;
+	side.style.width = sideW + 'px';
+	if (sideW < SIDE_WIDTH ){
 		info.style.width = side.style.width;
 	}
+	
+	hold.style.top = 200+'px';//preview.top + 10px pad
+
+	
 	preview.width = 80;
 	preview.height = 380;
-
+	
+	hold.width = 80;
+	hold.height = 380;
+	
 	gameOver.style.width = scene.width +'px';
+
 
 }
 
@@ -82,6 +102,7 @@ var tetrisView = {
 	  this.container = $(id);
 	  this.scene = scene;
 	  this.preview = preview;
+	  this.hold = hold;
 	  this.btnRestart = btnRestart;
 	  layoutView(this.container,maxW,maxH);
 	  this.scene.focus();
@@ -103,6 +124,10 @@ var tetrisView = {
 		level.innerHTML = levelNumber;
 	},
 	// Update the extra reward score
+	setLines:function(setlines){
+		lines.innerHTML = setlines;
+	
+	},
 	setReward:function(rewardScore){
 		if (rewardScore>0){
 			reward.innerHTML = rewardScore;

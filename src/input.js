@@ -32,6 +32,7 @@ var UserInputs = {
 		this.gamepadButtonsDown("LB");
 		this.gamepadButtonsDown("A");
 		this.gamepadButtonsDown("B");
+		this.gamepadButtonsDown("DPad-Up");
 		//this.gamepadButtonsDown("X");
 		//this.gamepadButtonsDown("Y");
 		return;
@@ -39,7 +40,7 @@ var UserInputs = {
 	
 	//  X, Y, A, B , RB, LB Buttons
 	gamepadButtonsDown(finds) {
-		var deciDAS = 10;
+		var deciDAS = 50;
 		var deciARR = 10;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
@@ -135,8 +136,8 @@ var UserInputs = {
 	},
 	// Direction arrows
     processInput(key) {
-		var DAS = 10;
-		var ARR = 3;
+		var DAS = 13;
+		var ARR = 5;
 
 		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
 			this.held = false;
@@ -173,10 +174,7 @@ var UserInputs = {
 		gamepadQueue = [];
 	},
 	saveButtons() {
-		//console.log(this.gpButtons);
 	this.prevGpButtons = this.gpButtons;
-	this.prevKeyboardKeys = this.keyboardKeys;
-	//console.log("prev:  " + preGpButtons);
 	},
 	saveKeyboardKeys() {
 		this.prevKeyboardKeys = {...this.keyboardKeys};
