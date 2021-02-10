@@ -1055,6 +1055,8 @@ Tetris.prototype = {
     _check: function() {
         var rows = checkFullRows(this.matrix);
         if (rows.length) {
+			if(rows.length >= 4)
+				new Audio('./dist/Tetris.ogg').play();
             removeRows(this.matrix, rows);
             var score = calcScore(rows);
             var reward = calcRewards(rows);
