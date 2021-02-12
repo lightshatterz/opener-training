@@ -158,7 +158,7 @@ var tetrisCanvas = {
 				if (value === 1){
 					var x = gsize *(shape.x + j);
 					var y = gsize *(bottomY + i); //(shape.y + i);
-					drawBox(this.sceneContext,shape.color,x,y,gsize);
+					drawBox(this.sceneContext,"rgba(255, 255, 255, 0.4)",x,y,gsize);
 				}
 			}
 		}
@@ -402,24 +402,16 @@ var UserInputs = {
 	updateGamepad() {
 		this.gpButtons = gamepad.update();
 	},
-	
-	incFrame() {
-		this.frames++;
-		this.nframe++;
-	},
+
 	incDeciframes() {
 		this.nDeciframes++;
 		this.nDeciframesKey++;
+		this.keyboardButtonsDeciframes++;
+		this.keyboardDirectionArrowsDeciframes++;
+		this.gamepadButtonsDeciFrames++;
+		this.gamepadDirectionPadDeciFrames++;
 	},
 	processGamepadInput() {
-		
-		this.gamepadDown("DPad-Left");
-		this.gamepadDown("DPad-Right");
-		this.gamepadDown("DPad-Down");
-		
-		return;
-	},
-	processButtons() {
 		this.gamepadButtonsDown("RB");
 		this.gamepadButtonsDown("LB");
 		this.gamepadButtonsDown("A");
@@ -427,13 +419,24 @@ var UserInputs = {
 		this.gamepadButtonsDown("DPad-Up");
 		//this.gamepadButtonsDown("X");
 		//this.gamepadButtonsDown("Y");
+		
+		this.gamepadDPadDown("DPad-Left");
+		this.gamepadDPadDown("DPad-Right");
+		this.gamepadDPadDown("DPad-Down");
+		
 		return;
 	},
+	/*
+	processButtons() {
+
+		return;
+	},
+	*/
 	
 	//  X, Y, A, B , RB, LB Buttons
 	gamepadButtonsDown(finds) {
-		var deciDAS = 50;
-		var deciARR = 10;
+		var deciDAS = 50.0;
+		var deciARR = 10.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
 
@@ -443,25 +446,26 @@ var UserInputs = {
 			if(isContained)
 				this.gamepadQueue.push(finds);
 		}
+		var gamepadDASFrames = this.gamepadButtonsDeciFrames / 1.0;
 		
 		if (!this.isGamepadButtonDown) {
 
-				if (this.nDeciframes >= deciDAS) {
-					this.nDeciframes = 0;
+				if (gamepadDASFrames >= deciDAS) {
+					this.gamepadButtonsDeciFrames = 0;
 					this.isGamepadButtonDown = true;
 				}
 				
 		} else {
-			if (this.nDeciframes >= deciARR && isContained) {
+			if (gamepadDASFrames >= deciARR && isContained) {
 				this.gamepadQueue.push(finds);
-				this.nDeciframes = 0;
+				this.gamepadButtonsDeciFrames = 0;
 			}
 		}
 			
 	},
 	
 	// Direction Pad
-	gamepadDown(finds) {
+	gamepadDPadDown(finds) {
 		var DAS = 7;
 		var ARR = 3;
 		var isContained = this.gpButtons.includes(finds);
@@ -493,59 +497,68 @@ var UserInputs = {
 		this.processKeyDown(88);  // X
 		this.processKeyDown(90);  // Z
 	},
-	processKeyShift() {
-		this.processInput(39);  // right
-		this.processInput(37);	// left
-		this.processInput(40);  // down
-	},
+
 	// keyboard keys z,x,space
 	processKeyDown(key)
 	{
 		var deciDAS = 10;
-		var deciARR = 9;
+		var deciARR = 15
+		
 
+		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
+			this.isKeyboardKeyDown = false;
+			if(this.keyboardKeys[key] == true)
+				this.inputqueue.push(key);
+		}
+		
+		var keyboardDASFrames = this.keyboardButtonsDeciframes;
 
-	if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
-		this.isKeyDown = false;
-		if(this.keyboardKeys[key] == true)
-			this.inputqueue.push(key);
-	}
-	
-		if (!this.isKeyDown) {
-				if (this.nDeciframesKey >= deciDAS) {
-					this.nDeciframesKey = 0;
-					this.isKeyDown = true;
+		if (!this.isKeyboardKeyDown) {
+				if (keyboardDASFrames >= deciDAS) {
+					this.keyboardButtonsDeciframes = 0;
+					this.isKeyboardKeyDown = true;
 				}
 		} else {
-			if (this.nDeciframesKey >= deciARR && this.keyboardKeys[key] == true) {
+			if (keyboardDASFrames >= deciARR && this.keyboardKeys[key] == true) {
 				this.inputqueue.push(key);
-				this.nDeciframesKey = 0;
+				this.keyboardButtonsDeciframes = 0;
 			}
 		}
 		
 		
 		
 	},
+	
+	processKeyShift() {
+		this.processKeyboardArrowKeys(39);  // right
+		this.processKeyboardArrowKeys(37);	// left
+		this.processKeyboardArrowKeys(40);  // down
+	},
 	// Direction arrows
-    processInput(key) {
+    processKeyboardArrowKeys(key) {		
 		var DAS = 13;
-		var ARR = 5;
+		var ARR = 3.0;
 
+	/*  do once?
 		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
-			this.held = false;
+			this.isDirectionArrowDown = false;
 			if(this.keyboardKeys[key] == true)
 				this.inputqueue.push(key);
 		}
-		
-            if (!this.held) {
-                if (this.frames >= DAS) {
-                    this.frames = 0;
-                    this.held = true;
+		*/
+		//console.log(key + " " + this.held
+		var keyboardDASFrames = this.keyboardDirectionArrowsDeciframes / 1.0; // why isnt this 10?
+		//console.log(keyboardDASFrames + " " + this.held);
+            if (!this.isDirectionArrowDown) {
+				
+                if (keyboardDASFrames >= DAS) {
+                    this.keyboardDirectionArrowsDeciframes = 0;
+                    this.isDirectionArrowDown = true;
                 }
             } else {
-                if (this.frames >= ARR && this.keyboardKeys[key] == true) {
+                if (keyboardDASFrames >= ARR && this.keyboardKeys[key] == true) {
                     this.inputqueue.push(key);
-                    this.frames = 0;
+                    this.keyboardDirectionArrowsDeciframes = 0;
                 }
             }
         //}
@@ -554,13 +567,11 @@ var UserInputs = {
 		this.keyboardKeys[event.keyCode] = true;
     },
     keyUp(event) {
-		this.nDeciframesKey = 0;
 		this.isKeyDown = false;
 		this.keyboardKeys[event.keyCode] = false;
     },
 	gamepadButtonClear() {
 		gpButtons = [];
-		nDeciframes = 0;
 		isGamepadDown = false;
 		isGamepadButtonDown = false;
 		gamepadQueue = [];
@@ -571,20 +582,26 @@ var UserInputs = {
 	saveKeyboardKeys() {
 		this.prevKeyboardKeys = {...this.keyboardKeys};
 	},
-    isDown: false,
-	isKeyDown: false,
+	// button states
+    isDirectionArrowDown: false,
+	isKeyboardKeyDown: false,
 	isGamepadDown: false,
 	isGamepadButtonDown: false,
-	held: false,
-	nframe: 0,
-	frames: 0,
-	nDeciframes: 0,
-	nDeciframesKey: 0,
+	
+	// das frame counters 
+	keyboardButtonsDeciframes: 0,				// DAS controlled frames/10 for non-shifted keys
+	keyboardDirectionArrowsDeciframes: 0, 		// DAS controlled frames/10 for mino shifting keys
+	gamepadButtonsDeciFrames: 0,				// DAS controlled frames/10 for non-shifted keys
+	gamepadDirectionPadDeciFrames: 0,			// DAS controlled frames/10 for mino shifting keys
+	
+	// buttons state contatiners
 	gpButtons: [],
 	prevGpButtons:[],
 	keyboardKeys: [],
 	prevKeyboardKeys: [],
-    inputqueue: [],
+    
+	// button pressed containers
+	inputqueue: [],
 	gamepadQueue: []
 };
 
@@ -785,6 +802,7 @@ Tetris.prototype = {
 			this.holdQueue.push(this.shape);
 			this.shape = this.shapeQueue.shift();
 			this.canPullFromHoldQueue = false;
+			this.shape.resetOrigin();
 			//canvas.drawHoldShape(this.holdQueue);
 			this._draw(); // update?
 		}
@@ -793,10 +811,10 @@ Tetris.prototype = {
 	{
 		if(this.holdQueue.length >= 1 && this.canPullFromHoldQueue)
 		{
-			
 			this.canPullFromHoldQueue = false;
 			this.shapeQueue.unshift(this.shape);
 			this.shape = this.holdQueue.pop();
+			this.shape.resetOrigin();
 			//canvas.drawHoldShape(this.holdQueue);
 			this._draw();
 		}
@@ -903,21 +921,25 @@ Tetris.prototype = {
         }
         this.currentTime = new Date().getTime();
 		var deltaTime = this.currentTime - this.prevTime;
-		
+	
+/*	
 		if(deltaTime >= 10)
 		{
 			inputs.incFrame();
 			
 		}
-		
+*/
+	
 		if(deltaTime >= 1) {	//  600hz
 			inputs.incDeciframes();
-			inputs.updateGamepad();
-			inputs.processButtons();
-			inputs.processGamepadInput();
-			
 		}
-
+		
+		if(deltaTime >= 1) {
+			inputs.updateGamepad();
+			//inputs.processButtons();
+			inputs.processGamepadInput();
+		}
+		
 		// drain gamepad queue
 		if(deltaTime > 5)
 		{
@@ -997,14 +1019,14 @@ Tetris.prototype = {
 					this._update();
 				}
 				if(curkey == 16) {
-					 //holdQueue.push(this.shape);
+					 this.pullHoldQueue();
 					 
-					 this._update();
+					 //this._update();
 				}
 					if(curkey == 16) {
-					 //holdQueue.pop(this.shape);
+					 this.pushHoldQueue();
 					 
-					 this._update();
+					 //this._update();
 				}
 			}
 			inputs.inputqueue = [];
@@ -1120,6 +1142,7 @@ function ShapeL() {
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -3;
+	this.originY = -3;
     this.flag = 'L';
 }
 
@@ -1150,6 +1173,7 @@ function ShapeLR() {
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -3;
+	this.originY = -3;
     this.flag = 'LR';
 }
 
@@ -1164,6 +1188,7 @@ function ShapeO() {
     this.states = [state1];
     this.x = 4;
     this.y = -2;
+	this.originY = -2;
     this.flag = 'O';
 }
 
@@ -1183,6 +1208,7 @@ function ShapeI() {
 
     this.x = 5;
     this.y = -4;
+	this.originY = -4;
     this.flag = 'I';
 }
 
@@ -1212,6 +1238,7 @@ function ShapeT() {
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -2;
+	this.originY = -2;
     this.flag = 'T';
 }
 
@@ -1230,6 +1257,7 @@ function ShapeZ() {
     this.states = [state1, state2];
     this.x = 4;
     this.y = -2;
+	this.originY = -2;
     this.flag = 'Z';
 }
 
@@ -1247,7 +1275,8 @@ function ShapeZR() {
 
     this.states = [state1, state2];
     this.x = 4;
-    this.y = -2;
+    this.y = -2
+	this.originY = -2;
     this.flag = 'ZR';
 }
 
@@ -1463,6 +1492,9 @@ ShapeZR.prototype = {
 				}
 			}
 		}
+	},
+	resetOrigin: function() {
+		this.y = this.originY + 1;
 	}
 }
 

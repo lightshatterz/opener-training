@@ -193,6 +193,7 @@ Tetris.prototype = {
 			this.holdQueue.push(this.shape);
 			this.shape = this.shapeQueue.shift();
 			this.canPullFromHoldQueue = false;
+			this.shape.resetOrigin();
 			//canvas.drawHoldShape(this.holdQueue);
 			this._draw(); // update?
 		}
@@ -201,10 +202,10 @@ Tetris.prototype = {
 	{
 		if(this.holdQueue.length >= 1 && this.canPullFromHoldQueue)
 		{
-			
 			this.canPullFromHoldQueue = false;
 			this.shapeQueue.unshift(this.shape);
 			this.shape = this.holdQueue.pop();
+			this.shape.resetOrigin();
 			//canvas.drawHoldShape(this.holdQueue);
 			this._draw();
 		}
@@ -311,21 +312,25 @@ Tetris.prototype = {
         }
         this.currentTime = new Date().getTime();
 		var deltaTime = this.currentTime - this.prevTime;
-		
+	
+/*	
 		if(deltaTime >= 10)
 		{
 			inputs.incFrame();
 			
 		}
-		
+*/
+	
 		if(deltaTime >= 1) {	//  600hz
 			inputs.incDeciframes();
-			inputs.updateGamepad();
-			inputs.processButtons();
-			inputs.processGamepadInput();
-			
 		}
-
+		
+		if(deltaTime >= 1) {
+			inputs.updateGamepad();
+			//inputs.processButtons();
+			inputs.processGamepadInput();
+		}
+		
 		// drain gamepad queue
 		if(deltaTime > 5)
 		{
@@ -405,14 +410,14 @@ Tetris.prototype = {
 					this._update();
 				}
 				if(curkey == 16) {
-					 //holdQueue.push(this.shape);
+					 this.pullHoldQueue();
 					 
-					 this._update();
+					 //this._update();
 				}
 					if(curkey == 16) {
-					 //holdQueue.pop(this.shape);
+					 this.pushHoldQueue();
 					 
-					 this._update();
+					 //this._update();
 				}
 			}
 			inputs.inputqueue = [];

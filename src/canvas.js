@@ -157,7 +157,7 @@ var tetrisCanvas = {
 				if (value === 1){
 					var x = gsize *(shape.x + j);
 					var y = gsize *(bottomY + i); //(shape.y + i);
-					drawBox(this.sceneContext,shape.color,x,y,gsize);
+					drawBox(this.sceneContext,"rgba(255, 255, 255, 0.4)",x,y,gsize);
 				}
 			}
 		}

@@ -34,6 +34,7 @@ function ShapeL() {
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -3;
+	this.originY = -3;
     this.flag = 'L';
 }
 
@@ -64,6 +65,7 @@ function ShapeLR() {
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -3;
+	this.originY = -3;
     this.flag = 'LR';
 }
 
@@ -78,6 +80,7 @@ function ShapeO() {
     this.states = [state1];
     this.x = 4;
     this.y = -2;
+	this.originY = -2;
     this.flag = 'O';
 }
 
@@ -97,6 +100,7 @@ function ShapeI() {
 
     this.x = 5;
     this.y = -4;
+	this.originY = -4;
     this.flag = 'I';
 }
 
@@ -126,6 +130,7 @@ function ShapeT() {
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -2;
+	this.originY = -2;
     this.flag = 'T';
 }
 
@@ -144,6 +149,7 @@ function ShapeZ() {
     this.states = [state1, state2];
     this.x = 4;
     this.y = -2;
+	this.originY = -2;
     this.flag = 'Z';
 }
 
@@ -161,7 +167,8 @@ function ShapeZR() {
 
     this.states = [state1, state2];
     this.x = 4;
-    this.y = -2;
+    this.y = -2
+	this.originY = -2;
     this.flag = 'ZR';
 }
 
@@ -377,6 +384,9 @@ ShapeZR.prototype = {
 				}
 			}
 		}
+	},
+	resetOrigin: function() {
+		this.y = this.originY + 1;
 	}
 }
 
