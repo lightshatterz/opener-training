@@ -385,10 +385,10 @@ Tetris.prototype = {
 					this._update();
 				}
 				if(curkey == 81) {
-					if(document.getElementById("bg").style.display == "none")
-						document.getElementById("bg").style.display =  "initial";
-					else
-						document.getElementById("bg").style.display="none";
+					//if(document.getElementById("bg").style.display == "none")
+					//	document.getElementById("bg").style.display =  "initial";
+					//else
+					//	document.getElementById("bg").style.display="none";
 				}
 			}
 			inputs.inputqueue = [];
