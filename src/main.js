@@ -175,7 +175,7 @@ Tetris.prototype = {
         this.levelTime = this.startTime;
 		this.shapeQueue = this.shapeQueue || [];
 		this.hintQueue = this.hintQueue || [];
-		this.holdQueue = this.holdQueue || [];
+		this.holdQueue = [];
 		this.canPullFromHoldQueue = false;
         clearMatrix(this.matrix);
         views.setLevel(this.level);
@@ -242,16 +242,17 @@ Tetris.prototype = {
     _fireShape: function() {
 		//this.shape = this.shapeQueue.shift() || shapes.randomShape();
 
+
 		while(this.shapeQueue.length <= 4)
 		{
-			this.preparedShape = shapes.randomShape();//openers.getNextMino();
+			this.preparedShape = openers.getNextMino();
 			this.shapeQueue.push(this.preparedShape);
 		}
-		/*while(this.hintQueue.length <= 4)
+		while(this.hintQueue.length <= 4)
 		{
 			this.preparedShape = openers.getNextHint(this.matrix);
 			this.hintQueue.push(this.preparedShape);
-		}*/
+		}
 		
 		//this.hintMino = this.hintQueue.shift();
 		this.shape = this.shapeQueue.shift();// shapes.randomShape();
@@ -385,10 +386,10 @@ Tetris.prototype = {
 					this._update();
 				}
 				if(curkey == 81) {
-					//if(document.getElementById("bg").style.display == "none")
-					//	document.getElementById("bg").style.display =  "initial";
-					//else
-					//	document.getElementById("bg").style.display="none";
+					if(document.getElementById("bg").style.display == "none")
+						document.getElementById("bg").style.display =  "initial";
+					else
+						document.getElementById("bg").style.display="none";
 				}
 			}
 			inputs.inputqueue = [];
@@ -422,7 +423,7 @@ Tetris.prototype = {
             this.shape.copyTo(this.matrix);
             this._check();
             this._fireShape();
-			new Audio('./dist/Blop.ogg').play();
+			new Audio('./dist/Blop2.ogg').play();
         }
         this._draw();
         this.isGameOver = checkGameOver(this.matrix);

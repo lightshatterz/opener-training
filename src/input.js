@@ -66,7 +66,7 @@ var UserInputs = {
 				
 		} else {
 			if (gamepadDASFrames >= deciARR && isContained) {
-				this.gamepadQueue.push(finds);
+				//this.gamepadQueue.push(finds);
 				this.gamepadButtonsDeciFrames = 0;
 			}
 		}
@@ -75,16 +75,16 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDPadDown(finds) {
-		var DAS = 7.0;
-		var ARR = 3.0;
+		var DAS = 10.0;
+		var ARR = 5.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
 		//console.log("but: " + this.gpButtons +  " prev but:" + this.prevGpButtons);
 		if(isPrevContained != isContained ) {
 			this.isGamepadDown = false;
 			// Do once
-			//if(isContained)
-			//	this.gamepadQueue.push(finds);
+			if(isContained)
+				this.gamepadQueue.push(finds);
 		}
 		var gamepadDirectionDasFrames = this.gamepadDirectionPadDeciFrames / 1.0;
 			if (!this.isGamepadDown) {
@@ -136,7 +136,7 @@ var UserInputs = {
 				}
 		} else {
 			if (keyboardDASFrames >= deciARR && this.keyboardKeys[key] == true) {
-				this.inputqueue.push(key);
+				//this.inputqueue.push(key);
 				this.keyboardButtonsDeciframes = 0;
 			}
 		}
@@ -152,16 +152,16 @@ var UserInputs = {
 	},
 	// Direction arrows
     processKeyboardArrowKeys(key) {		
-		var DAS = 8.0;
+		var DAS = 30.0;
 		var ARR = 0.0;
 
-	/*  do once?
+	
 		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
 			this.isDirectionArrowDown = false;
 			if(this.keyboardKeys[key] == true)
 				this.inputqueue.push(key);
 		}
-		*/
+		
 		//console.log(key + " " + this.held
 		var keyboardDASFrames = this.keyboardDirectionArrowsDeciframes / 1.0; // why isnt this 10?
 		//console.log(keyboardDASFrames + " " + this.held);
