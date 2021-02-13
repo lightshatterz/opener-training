@@ -175,7 +175,7 @@ var tetrisCanvas = {
 			return;
 		}
 		var colorRGB = this.hexToRgb(shape.color);
-		var color = "rgba(" + colorRGB.r + "," + colorRGB.g + "," + colorRGB.b + "," + "0.4)";
+		var color = "rgba(" + colorRGB.r + "," + colorRGB.g + "," + colorRGB.b + "," + "0.2)";
 		
 		var matrix = shape.matrix();
 		var gsize = this.gridSize;

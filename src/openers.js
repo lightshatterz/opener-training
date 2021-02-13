@@ -106,16 +106,20 @@ var OpenerGenerator = {
 		this.hintQueue[2].x = 8;
 		this.hintQueue[2].y = 18;
 		// S
-		this.hintQueue[3].x = 4;
-		this.hintQueue[3].y = 18;
-		//this.hintQueue[3].states++;
+		this.hintQueue[3].x = 6;
+		this.hintQueue[3].y = 17;
+		this.hintQueue[3].state = this.hintQueue[3].nextState(1);
 		// Z
 		this.hintQueue[4].x = 3;
 		this.hintQueue[4].y = 17;
-		this.hintQueue[5].x = 4;
-		this.hintQueue[5].y = 4;
-		this.hintQueue[6].x = 4;
-		this.hintQueue[6].y = 4;
+		// J
+		this.hintQueue[5].x = 7;
+		this.hintQueue[5].y = 16;
+		this.hintQueue[5].state = this.hintQueue[5].nextState(3);
+		
+		// T
+		this.hintQueue[6].x = 1;
+		this.hintQueue[6].y = 18;
 	
 		
 		}

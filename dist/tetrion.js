@@ -176,7 +176,7 @@ var tetrisCanvas = {
 			return;
 		}
 		var colorRGB = this.hexToRgb(shape.color);
-		var color = "rgba(" + colorRGB.r + "," + colorRGB.g + "," + colorRGB.b + "," + "0.4)";
+		var color = "rgba(" + colorRGB.r + "," + colorRGB.g + "," + colorRGB.b + "," + "0.2)";
 		
 		var matrix = shape.matrix();
 		var gsize = this.gridSize;
@@ -444,6 +444,7 @@ var UserInputs = {
 		this.gamepadButtonsDown("A");
 		this.gamepadButtonsDown("B");
 		this.gamepadButtonsDown("DPad-Up");
+		this.gamepadButtonsDown("Back");
 		//this.gamepadButtonsDown("X");
 		//this.gamepadButtonsDown("Y");
 		
@@ -532,6 +533,7 @@ var UserInputs = {
 		this.processKeyDown(16);  // shift
 		this.processKeyDown(17);  // ctrl
 		this.processKeyDown(81);  // q
+		this.processKeyDown(82);  // r
 	},
 
 	// keyboard keys z,x,space
@@ -818,8 +820,8 @@ Tetris.prototype = {
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
-		this.shapeQueue = this.shapeQueue || [];
-		this.hintQueue = this.hintQueue || [];
+		this.shapeQueue = [];
+		this.hintQueue = [];
 		this.holdQueue = [];
 		this.canPullFromHoldQueue = false;
         clearMatrix(this.matrix);
@@ -899,7 +901,7 @@ Tetris.prototype = {
 			this.hintQueue.push(this.preparedShape);
 		}
 		
-		//this.hintMino = this.hintQueue.shift();
+		this.hintMino = this.hintQueue.shift();
 		this.shape = this.shapeQueue.shift();// shapes.randomShape();
        
 		this._draw();
@@ -912,7 +914,7 @@ Tetris.prototype = {
         canvas.drawShape(this.shape);
 		canvas.drawHoldShape(this.holdQueue);
 		canvas.drawPreviewShape(this.shapeQueue);
-		//canvas.drawHintShape(this.hintMino);
+		canvas.drawHintShape(this.hintMino);
 		if(this.shape != undefined) {
 
 
@@ -932,7 +934,7 @@ Tetris.prototype = {
         this.currentTime = new Date().getTime();
 		var deltaTime = this.currentTime - this.prevTime;
 
-	// todo: put in web worker
+		// TODO: put in web worker--limited to 60fps here
 		if(deltaTime >= 1) {	//  needs to be 600hz
 			inputs.incDeciframes();
 			//console.log(deltaTime / 600.0);
@@ -980,6 +982,10 @@ Tetris.prototype = {
 				if(curkey == "DPad-Up") {
 					this.popHoldStack();
 					this._update();
+				}
+				if(curkey == "Back") {
+					this._restartHandler();
+					return;
 				}
 			}
 			
@@ -1036,6 +1042,12 @@ Tetris.prototype = {
 					else
 						document.getElementById("bg").style.display="none";
 				}
+				if(curkey == 82) {
+					views.setGameOver(true);
+					this._restartHandler();
+					return;
+				}
+					
 			}
 			inputs.inputqueue = [];
 		}
@@ -1221,16 +1233,20 @@ var OpenerGenerator = {
 		this.hintQueue[2].x = 8;
 		this.hintQueue[2].y = 18;
 		// S
-		this.hintQueue[3].x = 4;
-		this.hintQueue[3].y = 18;
-		//this.hintQueue[3].states++;
+		this.hintQueue[3].x = 6;
+		this.hintQueue[3].y = 17;
+		this.hintQueue[3].state = this.hintQueue[3].nextState(1);
 		// Z
 		this.hintQueue[4].x = 3;
 		this.hintQueue[4].y = 17;
-		this.hintQueue[5].x = 4;
-		this.hintQueue[5].y = 4;
-		this.hintQueue[6].x = 4;
-		this.hintQueue[6].y = 4;
+		// J
+		this.hintQueue[5].x = 7;
+		this.hintQueue[5].y = 16;
+		this.hintQueue[5].state = this.hintQueue[5].nextState(3);
+		
+		// T
+		this.hintQueue[6].x = 1;
+		this.hintQueue[6].y = 18;
 	
 		
 		}

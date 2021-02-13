@@ -173,8 +173,8 @@ Tetris.prototype = {
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
-		this.shapeQueue = this.shapeQueue || [];
-		this.hintQueue = this.hintQueue || [];
+		this.shapeQueue = [];
+		this.hintQueue = [];
 		this.holdQueue = [];
 		this.canPullFromHoldQueue = false;
         clearMatrix(this.matrix);
@@ -254,7 +254,7 @@ Tetris.prototype = {
 			this.hintQueue.push(this.preparedShape);
 		}
 		
-		//this.hintMino = this.hintQueue.shift();
+		this.hintMino = this.hintQueue.shift();
 		this.shape = this.shapeQueue.shift();// shapes.randomShape();
        
 		this._draw();
@@ -267,7 +267,7 @@ Tetris.prototype = {
         canvas.drawShape(this.shape);
 		canvas.drawHoldShape(this.holdQueue);
 		canvas.drawPreviewShape(this.shapeQueue);
-		//canvas.drawHintShape(this.hintMino);
+		canvas.drawHintShape(this.hintMino);
 		if(this.shape != undefined) {
 
 
@@ -287,7 +287,7 @@ Tetris.prototype = {
         this.currentTime = new Date().getTime();
 		var deltaTime = this.currentTime - this.prevTime;
 
-	// todo: put in web worker
+		// TODO: put in web worker--limited to 60fps here
 		if(deltaTime >= 1) {	//  needs to be 600hz
 			inputs.incDeciframes();
 			//console.log(deltaTime / 600.0);
@@ -335,6 +335,10 @@ Tetris.prototype = {
 				if(curkey == "DPad-Up") {
 					this.popHoldStack();
 					this._update();
+				}
+				if(curkey == "Back") {
+					this._restartHandler();
+					return;
 				}
 			}
 			
@@ -391,6 +395,12 @@ Tetris.prototype = {
 					else
 						document.getElementById("bg").style.display="none";
 				}
+				if(curkey == 82) {
+					views.setGameOver(true);
+					this._restartHandler();
+					return;
+				}
+					
 			}
 			inputs.inputqueue = [];
 		}

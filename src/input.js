@@ -24,6 +24,7 @@ var UserInputs = {
 		this.gamepadButtonsDown("A");
 		this.gamepadButtonsDown("B");
 		this.gamepadButtonsDown("DPad-Up");
+		this.gamepadButtonsDown("Back");
 		//this.gamepadButtonsDown("X");
 		//this.gamepadButtonsDown("Y");
 		
@@ -112,6 +113,7 @@ var UserInputs = {
 		this.processKeyDown(16);  // shift
 		this.processKeyDown(17);  // ctrl
 		this.processKeyDown(81);  // q
+		this.processKeyDown(82);  // r
 	},
 
 	// keyboard keys z,x,space
