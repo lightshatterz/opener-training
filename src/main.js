@@ -164,20 +164,20 @@ Tetris.prototype = {
         this.level = 1;
         this.score = 0;
 		this.lines = 0;
-		this.shapeNumber = 0;
+		this.currentMinoInx = 0;
         this.startTime = new Date().getTime();
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
-		//this.opener = openers.OpenerGenerator.;
 		this.shapeQueue = [];
-		//console.log("opener: " + this.opener);
+		this.hintQueue = [];
 		this.holdQueue = [];
 		this.canPullFromHoldQueue = false;
         clearMatrix(this.matrix);
         views.setLevel(this.level);
         views.setScore(this.score);
         views.setGameOver(this.isGameOver);
+		openers.reset();
         this._draw();
     },
     //Start game
@@ -236,35 +236,20 @@ Tetris.prototype = {
     // Fire a new random shape
     _fireShape: function() {
 		//this.shape = this.shapeQueue.shift() || shapes.randomShape();
-		/*while( this.shapeQueue.length <= 4 )
-		{
-			this.preparedShape = shapes.randomShape();
-			this.shapeQueue.push(this.preparedShape);
-		}*/
-		//canvas.drawPreviewShape(this.shapeQueue);
-		
 
-		/*while(this.shapeQueue == undefined)
-		{
-			this.shapeQueue = opener.getOpener();//[];();
-			console.log("console: " + this.shapeQueue);
-		}
-		console.log("console: " + this.shapeQueue);
-		*/
-		
 		while(this.shapeQueue.length <= 4)
 		{
-
-			
-			this.preparedShape = openers.getNextMino();//shapes.getShape(this.shapeNumber);
-			this.shapeNumber++;
-			
+			this.preparedShape = openers.getNextMino();
 			this.shapeQueue.push(this.preparedShape);
-			this.shapeNumber = this.shapeNumber % 7;
+		}
+		while(this.hintQueue.length <= 4)
+		{
+			this.preparedShape = openers.getNextHint(this.matrix);
+			this.hintQueue.push(this.preparedShape);
 		}
 		
-		this.shape = this.shapeQueue.shift();
-//		this.shape  || shapes.getShape(this.shapeNumber);
+		this.hintMino = this.hintQueue.shift();
+		this.shape = this.shapeQueue.shift();// shapes.randomShape();
        
 		this._draw();
         
@@ -276,10 +261,12 @@ Tetris.prototype = {
         canvas.drawShape(this.shape);
 		canvas.drawHoldShape(this.holdQueue);
 		canvas.drawPreviewShape(this.shapeQueue);
+		canvas.drawHintShape(this.hintMino);
 		if(this.shape != undefined) {
 
 
 		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
+		
 		var bottomY = clone.bottomAt(this.matrix);
 		//clone.color = "#ffffff";
 		canvas.drawGhostShape(clone, bottomY);

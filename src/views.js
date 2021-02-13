@@ -52,7 +52,6 @@ var getContainerSize = function(maxW,maxH){
 	Layout game elements
 */
 var layoutView = function(container,maxW,maxH){
-	console.log("container: " + container  + " W: " + maxW);
 
 	var size = getContainerSize(maxW,maxH);
 	var st = container.style;

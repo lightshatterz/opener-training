@@ -158,7 +158,35 @@ var tetrisCanvas = {
 				if (value === 1){
 					var x = gsize *(shape.x + j);
 					var y = gsize *(bottomY + i); //(shape.y + i);
-					drawBox(this.sceneContext,"rgba(255, 255, 255, 0.4)",x,y,gsize);
+					drawBox(this.sceneContext,"rgba(255, 255, 255, 0.2)",x,y,gsize);
+				}
+			}
+		}
+	},
+	hexToRgb: function(hex) {
+		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		return result ? {
+		r: parseInt(result[1], 16),
+		g: parseInt(result[2], 16),
+		b: parseInt(result[3], 16)
+		} : null;
+	},
+	drawHintShape:function(shape){
+		if (!shape){
+			return;
+		}
+		var colorRGB = this.hexToRgb(shape.color);
+		var color = "rgba(" + colorRGB.r + "," + colorRGB.g + "," + colorRGB.b + "," + "0.4)";
+		
+		var matrix = shape.matrix();
+		var gsize = this.gridSize;
+		for(var i = 0;i<matrix.length;i++){
+			for(var j = 0;j<matrix[i].length;j++){
+				var value = matrix[i][j];
+				if (value === 1){
+					var x = gsize *(shape.x + j);
+					var y = gsize *(shape.y + i);
+					drawBox(this.sceneContext, color, x, y, gsize);
 				}
 			}
 		}
@@ -780,20 +808,20 @@ Tetris.prototype = {
         this.level = 1;
         this.score = 0;
 		this.lines = 0;
-		this.shapeNumber = 0;
+		this.currentMinoInx = 0;
         this.startTime = new Date().getTime();
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
-		//this.opener = openers.OpenerGenerator.;
 		this.shapeQueue = [];
-		//console.log("opener: " + this.opener);
+		this.hintQueue = [];
 		this.holdQueue = [];
 		this.canPullFromHoldQueue = false;
         clearMatrix(this.matrix);
         views.setLevel(this.level);
         views.setScore(this.score);
         views.setGameOver(this.isGameOver);
+		openers.reset();
         this._draw();
     },
     //Start game
@@ -852,35 +880,20 @@ Tetris.prototype = {
     // Fire a new random shape
     _fireShape: function() {
 		//this.shape = this.shapeQueue.shift() || shapes.randomShape();
-		/*while( this.shapeQueue.length <= 4 )
-		{
-			this.preparedShape = shapes.randomShape();
-			this.shapeQueue.push(this.preparedShape);
-		}*/
-		//canvas.drawPreviewShape(this.shapeQueue);
-		
 
-		/*while(this.shapeQueue == undefined)
-		{
-			this.shapeQueue = opener.getOpener();//[];();
-			console.log("console: " + this.shapeQueue);
-		}
-		console.log("console: " + this.shapeQueue);
-		*/
-		
 		while(this.shapeQueue.length <= 4)
 		{
-
-			
-			this.preparedShape = openers.getNextMino();//shapes.getShape(this.shapeNumber);
-			this.shapeNumber++;
-			
+			this.preparedShape = openers.getNextMino();
 			this.shapeQueue.push(this.preparedShape);
-			this.shapeNumber = this.shapeNumber % 7;
+		}
+		while(this.hintQueue.length <= 4)
+		{
+			this.preparedShape = openers.getNextHint(this.matrix);
+			this.hintQueue.push(this.preparedShape);
 		}
 		
-		this.shape = this.shapeQueue.shift();
-//		this.shape  || shapes.getShape(this.shapeNumber);
+		this.hintMino = this.hintQueue.shift();
+		this.shape = this.shapeQueue.shift();// shapes.randomShape();
        
 		this._draw();
         
@@ -892,10 +905,12 @@ Tetris.prototype = {
         canvas.drawShape(this.shape);
 		canvas.drawHoldShape(this.holdQueue);
 		canvas.drawPreviewShape(this.shapeQueue);
+		canvas.drawHintShape(this.hintMino);
 		if(this.shape != undefined) {
 
 
 		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
+		
 		var bottomY = clone.bottomAt(this.matrix);
 		//clone.color = "#ffffff";
 		canvas.drawGhostShape(clone, bottomY);
@@ -1137,12 +1152,13 @@ var OpenerGenerator = {
 	shapeQueue: [],
 	hintQueue: [],
 	idx: 0,
-	hindIdx: 0,
+	hintIdx: 0,
 	isInit: 0,
 	isHintInit: 0,
 	init() {
 		if(!this.isInit || this.shapeQueue == undefined) {
-		this.shapeQueue = new Array(shapes.getShape(0),
+		this.shapeQueue = new Array(
+		shapes.getShape(0),
 		shapes.getShape(6),
 		shapes.getShape(1),
 		shapes.getShape(5),
@@ -1159,7 +1175,7 @@ var OpenerGenerator = {
 		this.init();
 		var mino = this.shapeQueue[this.idx];
 		this.idx++;
-		if(this.idx == 6) {
+		if(this.idx == 7) {
 			this.idx = 0;
 			this.isInit = 0;
 		}
@@ -1167,46 +1183,87 @@ var OpenerGenerator = {
 		return mino;
 		//return this.shapeQueue[this.idx%=6];
 	},
-	initHint() {
+	// L O Z T LR ZR I 
+	initHint(matrix) {
 		if(!this.isHintInit || this.hintQueue == undefined) {
-		this.hintQueue = new Array(shapes.getShape(0),
+		this.hintQueue = new Array(
+		shapes.getShape(0),
 		shapes.getShape(6),
 		shapes.getShape(1),
 		shapes.getShape(5),
 		shapes.getShape(2),
 		shapes.getShape(4),
 		shapes.getShape(3));
+		
+		//console.log("matrix: " + matrix);
+		// L
+		this.hintQueue[0].x = 0;
+		this.hintQueue[0].y = 17;
+		// I
+		this.hintQueue[1].x = 3;
+		this.hintQueue[1].y = 19;
+		this.hintQueue[1].state = this.hintQueue[1].nextState(1);
+		//this.hintQueue[1].matrix = 
+		// O
+		this.hintQueue[2].x = 8;
+		this.hintQueue[2].y = 18;
+		// S
+		this.hintQueue[3].x = 4;
+		this.hintQueue[3].y = 18;
+		//this.hintQueue[3].states++;
+		// Z
+		this.hintQueue[4].x = 3;
+		this.hintQueue[4].y = 17;
+		this.hintQueue[5].x = 4;
+		this.hintQueue[5].y = 4;
+		this.hintQueue[6].x = 4;
+		this.hintQueue[6].y = 4;
+	
+		
 		}
+		
 		this.isHintInit = 1;
 		
 		return;// this.shapeQueue;
 	},
-	getNextHint() {
-		this.initHint();
+	getNextHint(matrix) {
+		this.initHint(matrix);
+		console.log("hint " + this.hintIdx);
 		var mino = this.hintQueue[this.hintIdx];
 		this.hintIdx++;
-		if(this.hintIdx == 6) {
+		if(this.hintIdx == 7) {
 			this.hintIdx = 0;
 			this.isHintInit = 0;
 		}
-
+	console.log("hintmino: " + mino)
 		return mino;
 		//return this.shapeQueue[this.idx%=6];
+	},
+	reset() {
+		this.shapeQueue = [];
+		this.hintQueue = [];
+		this.idx = 0;
+		this.hintIdx = 0;
 	}
 };
+
+function reset() {
+	OpenerGenerator.reset();
+}
 
 function getNextMino() {
 	var mino = OpenerGenerator.getNextMino();
 	//console.log("Mino: " + mino);
 	return mino;
 }
-function getNextHint() {
-	var mino = OpenerGenerator.getNextMino();
+function getNextHint(matrix) {
+	var mino = OpenerGenerator.getNextHint(matrix);
 	//console.log("Mino: " + mino);
 	return mino;
 }
 module.exports.getNextMino = getNextMino;
-
+module.exports.getNextHint = getNextHint;
+module.exports.reset = reset;
 
 
 },{"./shapes.js":7}],7:[function(require,module,exports){
@@ -1865,7 +1922,6 @@ var getContainerSize = function(maxW,maxH){
 	Layout game elements
 */
 var layoutView = function(container,maxW,maxH){
-	console.log("container: " + container  + " W: " + maxW);
 
 	var size = getContainerSize(maxW,maxH);
 	var st = container.style;

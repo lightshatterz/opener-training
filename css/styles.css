@@ -15,6 +15,7 @@ body{
 	top:50%;
 	position: absolute;
 	background: #555;
+	background:rgba(0.2,0.2,0.2,.70);
 	
 }
 
@@ -23,6 +24,7 @@ body{
 	position: absolute;
 	background: #2f2f2f;
 	left:120px;
+	background:rgba(.9,.9,.9,.50);
 }
 
 
@@ -33,12 +35,14 @@ body{
 	left:0px;
 	width:120px;
 	text-align: center;
+	background:rgba(.9,.9,.9,.80);
 }
 
 #leftInfo{
 	height:100%;
 	width:120px;
 	margin:0 auto;
+	background:rgba(.9,.9,.9,.80);
 }
 
 #hold{
@@ -47,6 +51,7 @@ body{
 	height:360px;
 	background: #2f2f2f;
 	margin:10px auto;
+	background:rgba(.9,.9,.9,.80);
 }
 
 #gameOver{
@@ -79,19 +84,22 @@ body{
 	top:0;
 	right:0;
 	text-align: center;
+	background:rgba(.9,.9,.9,.70);
 }
 
 #info{
 	width:120px;
 	margin:0 auto;
+	background:rgba(.9,.9,.9,.70);
 }
 
 #preview{
 	width:80px;
 	height:360px;
 	top:0px;
-	background: #2f2f2f;
+	background: #ffffff;
 	margin:10px auto;
+	background:rgba(.9,.9,.9,.90);
 }
 
 
@@ -99,31 +107,37 @@ body{
 	color:#fff;
 	font-size:18px;
 	margin:10px 0;
+	background:rgba(.9,.9,.9,.70);
 }
 #level{
 	color:orange;
 	font-size:32px;
+	background:rgba(.9,.9,.9,.70);
 }
 
 #scoreInfo{
 	color:#fff;
 	font-size: 18px;
 	margin-top:0;
+	background:rgba(.9,.9,.9,.70);
 }
 
 #score{
 	color:orange;
 	font-family: 'Chalkboard SE';
+	background:rgba(.9,.9,.9,.70);
 	
 }#linesInfo{
 	color:#fff;
 	font-size: 18px;
 	margin-top:0;
+	background:rgba(.9,.9,.9,.70);
 }
 
 #lines{
 	color:orange;
 	font-family: 'Chalkboard SE';
+	background:rgba(.9,.9,.9,.70);
 }
 #rewardInfo{
 	color:yellow;

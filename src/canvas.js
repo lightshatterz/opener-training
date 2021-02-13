@@ -157,7 +157,35 @@ var tetrisCanvas = {
 				if (value === 1){
 					var x = gsize *(shape.x + j);
 					var y = gsize *(bottomY + i); //(shape.y + i);
-					drawBox(this.sceneContext,"rgba(255, 255, 255, 0.4)",x,y,gsize);
+					drawBox(this.sceneContext,"rgba(255, 255, 255, 0.2)",x,y,gsize);
+				}
+			}
+		}
+	},
+	hexToRgb: function(hex) {
+		var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+		return result ? {
+		r: parseInt(result[1], 16),
+		g: parseInt(result[2], 16),
+		b: parseInt(result[3], 16)
+		} : null;
+	},
+	drawHintShape:function(shape){
+		if (!shape){
+			return;
+		}
+		var colorRGB = this.hexToRgb(shape.color);
+		var color = "rgba(" + colorRGB.r + "," + colorRGB.g + "," + colorRGB.b + "," + "0.4)";
+		
+		var matrix = shape.matrix();
+		var gsize = this.gridSize;
+		for(var i = 0;i<matrix.length;i++){
+			for(var j = 0;j<matrix[i].length;j++){
+				var value = matrix[i][j];
+				if (value === 1){
+					var x = gsize *(shape.x + j);
+					var y = gsize *(shape.y + i);
+					drawBox(this.sceneContext, color, x, y, gsize);
 				}
 			}
 		}

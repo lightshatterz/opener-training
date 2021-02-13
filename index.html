@@ -9,8 +9,20 @@
 	<link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-<div id="tetris">
 
+
+<iframe id="bg" width="640" height="360" frameborder="0" src="https://www.shadertoy.com/embed/4lBGDh?gui=false&t=10&paused=false&muted=false" allowfullscreen></iframe>
+<script>
+var txt = "";
+<!--txt += "<p>innerWidth: " + window.innerWidth + "</p>";
+<!--txt += "<p>innerHeight: " + window.innerHeight + "</p>";-->
+<!--txt += "<p>outerWidth: " + window.outerWidth + "</p>";-->
+<!--txt += "<p>outerHeight: " + window.outerHeight + "</p>";-->
+
+document.getElementById("bg").width = window.innerWidth;
+document.getElementById("bg").height = window.innerHeight;
+</script>
+<div id="tetris">
 	<canvas id="scene"></canvas>
 	<div id="leftSide">
 
