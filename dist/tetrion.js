@@ -531,6 +531,7 @@ var UserInputs = {
 		this.processKeyDown(90);  // Z
 		this.processKeyDown(16);  // shift
 		this.processKeyDown(17);  // ctrl
+		this.processKeyDown(81);  // q
 	},
 
 	// keyboard keys z,x,space
@@ -801,6 +802,10 @@ Tetris.prototype = {
         this._fireShape();
 
     },
+	setTKIFonzieVar: function()
+	{
+		this.reset();
+	},
     //Reset game
     reset: function() {
         this.running = false;
@@ -813,15 +818,16 @@ Tetris.prototype = {
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
-		this.shapeQueue = [];
-		this.hintQueue = [];
-		this.holdQueue = [];
+		this.shapeQueue = this.shapeQueue || [];
+		this.hintQueue = this.hintQueue || [];
+		this.holdQueue = this.holdQueue || [];
 		this.canPullFromHoldQueue = false;
         clearMatrix(this.matrix);
         views.setLevel(this.level);
         views.setScore(this.score);
         views.setGameOver(this.isGameOver);
-		openers.reset();
+		//openers.reset();
+
         this._draw();
     },
     //Start game
@@ -883,16 +889,16 @@ Tetris.prototype = {
 
 		while(this.shapeQueue.length <= 4)
 		{
-			this.preparedShape = openers.getNextMino();
+			this.preparedShape = shapes.randomShape();//openers.getNextMino();
 			this.shapeQueue.push(this.preparedShape);
 		}
-		while(this.hintQueue.length <= 4)
+		/*while(this.hintQueue.length <= 4)
 		{
 			this.preparedShape = openers.getNextHint(this.matrix);
 			this.hintQueue.push(this.preparedShape);
-		}
+		}*/
 		
-		this.hintMino = this.hintQueue.shift();
+		//this.hintMino = this.hintQueue.shift();
 		this.shape = this.shapeQueue.shift();// shapes.randomShape();
        
 		this._draw();
@@ -905,7 +911,7 @@ Tetris.prototype = {
         canvas.drawShape(this.shape);
 		canvas.drawHoldShape(this.holdQueue);
 		canvas.drawPreviewShape(this.shapeQueue);
-		canvas.drawHintShape(this.hintMino);
+		//canvas.drawHintShape(this.hintMino);
 		if(this.shape != undefined) {
 
 
@@ -1023,6 +1029,12 @@ Tetris.prototype = {
 					this.popHoldStack();
 					this._update();
 				}
+				if(curkey == 81) {
+					if(document.getElementById("bg").style.display == "none")
+						document.getElementById("bg").style.display =  "initial";
+					else
+						document.getElementById("bg").style.display="none";
+				}
 			}
 			inputs.inputqueue = [];
 		}
@@ -1048,7 +1060,6 @@ Tetris.prototype = {
     // Update game data
     _update: function() {
 		
-		if(this.shape != undefined) //TODO delete
         if (this.shape.canDown(this.matrix)) {
             this.shape.goDown(this.matrix);
         } else {
@@ -1179,6 +1190,7 @@ var OpenerGenerator = {
 			this.idx = 0;
 			this.isInit = 0;
 		}
+		console.log("mino: " + mino);
 
 		return mino;
 		//return this.shapeQueue[this.idx%=6];
@@ -1946,8 +1958,8 @@ var layoutView = function(container,maxW,maxH){
 	if (sideW < SIDE_WIDTH ){
 		info.style.width = side.style.width;
 	}
-	
-	hold.style.top = 200+'px';//preview.top + 10px pad
+	side.style.height = 500 + 'px';
+	hold.style.top = 10+'px';//preview.top + 10px pad
 
 	
 	preview.width = 80;
@@ -1955,7 +1967,7 @@ var layoutView = function(container,maxW,maxH){
 	
 	hold.width = 80;
 	hold.height = 380;
-	
+		
 	gameOver.style.width = scene.width +'px';
 
 

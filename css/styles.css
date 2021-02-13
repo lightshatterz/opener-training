@@ -2,12 +2,16 @@ html,body{
 	height:100%;
 }
 
+nav ul{height:200px; width:80%;}
+nav ul{overflow:hidden; overflow-y:scroll;}
+
 body{
 	background: #3f3f3f;
 	margin:0;
 	padding:0;
 	position: relative;
 	font-family: 'American Typewriter','Marker Felt';
+	
 }
 
 #tetris{
@@ -15,7 +19,7 @@ body{
 	top:50%;
 	position: absolute;
 	background: #555;
-	background:rgba(0.2,0.2,0.2,.70);
+	background:rgba(.9,.9,.9,.60);
 	
 }
 
@@ -23,8 +27,8 @@ body{
 	height:100%;
 	position: absolute;
 	background: #2f2f2f;
-	left:120px;
-	background:rgba(.9,.9,.9,.50);
+	left:210px;
+	background:rgba(.9,.9,.9,.80);
 }
 
 
@@ -33,31 +37,32 @@ body{
 	position: absolute;
 	top:0px;
 	left:0px;
-	width:120px;
+	width:210px;
 	text-align: center;
-	background:rgba(.9,.9,.9,.80);
+	background:rgba(.9,.9,.9,.60);
 }
 
 #leftInfo{
 	height:100%;
-	width:120px;
+	width:210px;
 	margin:0 auto;
-	background:rgba(.9,.9,.9,.80);
+	background:rgba(.9,.9,.9,.60);
 }
 
 #hold{
 	position:relative;
 	width:80px;
-	height:360px;
+	height:435px;
 	background: #2f2f2f;
 	margin:10px auto;
-	background:rgba(.9,.9,.9,.80);
+	background:rgba(.9,.9,.9,.60);
 }
 
 #gameOver{
 	height:100%;
 	position: absolute;
 	right:120px;
+	left:210px;
 	background:rgba(0,0,0,.75);
 	z-index:999;
 	color:#ffe100;
@@ -83,20 +88,23 @@ body{
 	position: absolute;
 	top:0;
 	right:0;
+	left:560px;
 	text-align: center;
 	background:rgba(.9,.9,.9,.70);
 }
 
 #info{
-	width:120px;
+	width:210px;
+	left:210px;
 	margin:0 auto;
 	background:rgba(.9,.9,.9,.70);
 }
 
 #preview{
 	width:80px;
-	height:360px;
+	height:468px;
 	top:0px;
+	
 	background: #ffffff;
 	margin:10px auto;
 	background:rgba(.9,.9,.9,.90);

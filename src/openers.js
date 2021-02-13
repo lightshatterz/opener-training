@@ -76,6 +76,7 @@ var OpenerGenerator = {
 			this.idx = 0;
 			this.isInit = 0;
 		}
+		console.log("mino: " + mino);
 
 		return mino;
 		//return this.shapeQueue[this.idx%=6];

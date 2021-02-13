@@ -76,8 +76,8 @@ var layoutView = function(container,maxW,maxH){
 	if (sideW < SIDE_WIDTH ){
 		info.style.width = side.style.width;
 	}
-	
-	hold.style.top = 200+'px';//preview.top + 10px pad
+	side.style.height = 500 + 'px';
+	hold.style.top = 10+'px';//preview.top + 10px pad
 
 	
 	preview.width = 80;
@@ -85,7 +85,7 @@ var layoutView = function(container,maxW,maxH){
 	
 	hold.width = 80;
 	hold.height = 380;
-	
+		
 	gameOver.style.width = scene.width +'px';
 
 

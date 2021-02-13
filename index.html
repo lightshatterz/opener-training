@@ -4,28 +4,76 @@
 	<meta charset="utf-8">
 	<meta http-equiv="x-ua-compatible" content="ie=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<style>
+
+	::-webkit-scrollbar {
+	width: 5px;
+	}
+	::-webkit-scrollbar-track {
+	  background: #f1f1f1; 
+	}
+	 
+	/* Handle */
+	::-webkit-scrollbar-thumb {
+	  background: #888; 
+	}
+
+	/* Handle on hover */
+	::-webkit-scrollbar-thumb:hover {
+	  background: #555; 
+	}
+	</style>
 	<title>Tetrion Opening Trainer</title>
 
 	<link rel="stylesheet" href="css/styles.css">
+	<script>
+	function setOpener() {
+	document.getElementById("demo").innerHTML = "Paragraph changed.";
+	}
+	</script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 </head>
 <body>
 
 
-<iframe id="bg" width="640" height="360" frameborder="0" src="https://www.shadertoy.com/embed/4lBGDh?gui=false&t=10&paused=false&muted=false" allowfullscreen></iframe>
+
+<iframe id="bg" width="640" height="360" frameborder="0" src="https://www.shadertoy.com/embed/4lBGDh?gui=&t=10&paused=false&muted=false" allowfullscreen></iframe>
 <script>
-var txt = "";
-<!--txt += "<p>innerWidth: " + window.innerWidth + "</p>";
-<!--txt += "<p>innerHeight: " + window.innerHeight + "</p>";-->
-<!--txt += "<p>outerWidth: " + window.outerWidth + "</p>";-->
-<!--txt += "<p>outerHeight: " + window.outerHeight + "</p>";-->
+
 
 document.getElementById("bg").width = window.innerWidth;
 document.getElementById("bg").height = window.innerHeight;
 </script>
 <div id="tetris">
+
 	<canvas id="scene"></canvas>
 	<div id="leftSide">
 
+        <!--<header>header area</header>-->
+        <nav>
+            <ul>
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">TKI 3 (Fonzie variation) </a></li>
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">TKI 3 (Flat Top variation) </a></li>
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">TKI 3 (Castle Top variation) </a></li>
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Ajanba TSD </a></li> 
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">DT Cannon (LS / JZ base)</a></li> 
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">MKO Stacking</a></li> 
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Pokemino's STD </a></li> 
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Mr. T-Spin's STD (reversed) </a></li>
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Hachispin</a></li>
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Albatross</a></li>
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Number One </a></li>
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Pelican</a></li>
+                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">DT Cannon (TSZ base) </a></li>
+				<li style="font-size:12px";><a href="#" id="setTKIFonzieVar">BT Cannon </a></li>
+				<li style="font-size:12px";><a href="#" id="setTKIFonzieVar">C-Spin </a></li>
+				<li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Hummingbird</a></li>
+
+            </ul>
+        </nav>
+        
+       <!-- <footer>footer area</footer>-->
 		<canvas id="hold"></canvas>
 	</div>
 	<div id="gameOver">

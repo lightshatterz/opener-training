@@ -157,6 +157,10 @@ Tetris.prototype = {
         this._fireShape();
 
     },
+	setTKIFonzieVar: function()
+	{
+		this.reset();
+	},
     //Reset game
     reset: function() {
         this.running = false;
@@ -169,15 +173,16 @@ Tetris.prototype = {
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
-		this.shapeQueue = [];
-		this.hintQueue = [];
-		this.holdQueue = [];
+		this.shapeQueue = this.shapeQueue || [];
+		this.hintQueue = this.hintQueue || [];
+		this.holdQueue = this.holdQueue || [];
 		this.canPullFromHoldQueue = false;
         clearMatrix(this.matrix);
         views.setLevel(this.level);
         views.setScore(this.score);
         views.setGameOver(this.isGameOver);
-		openers.reset();
+		//openers.reset();
+
         this._draw();
     },
     //Start game
@@ -239,16 +244,16 @@ Tetris.prototype = {
 
 		while(this.shapeQueue.length <= 4)
 		{
-			this.preparedShape = openers.getNextMino();
+			this.preparedShape = shapes.randomShape();//openers.getNextMino();
 			this.shapeQueue.push(this.preparedShape);
 		}
-		while(this.hintQueue.length <= 4)
+		/*while(this.hintQueue.length <= 4)
 		{
 			this.preparedShape = openers.getNextHint(this.matrix);
 			this.hintQueue.push(this.preparedShape);
-		}
+		}*/
 		
-		this.hintMino = this.hintQueue.shift();
+		//this.hintMino = this.hintQueue.shift();
 		this.shape = this.shapeQueue.shift();// shapes.randomShape();
        
 		this._draw();
@@ -261,7 +266,7 @@ Tetris.prototype = {
         canvas.drawShape(this.shape);
 		canvas.drawHoldShape(this.holdQueue);
 		canvas.drawPreviewShape(this.shapeQueue);
-		canvas.drawHintShape(this.hintMino);
+		//canvas.drawHintShape(this.hintMino);
 		if(this.shape != undefined) {
 
 
@@ -379,6 +384,12 @@ Tetris.prototype = {
 					this.popHoldStack();
 					this._update();
 				}
+				if(curkey == 81) {
+					if(document.getElementById("bg").style.display == "none")
+						document.getElementById("bg").style.display =  "initial";
+					else
+						document.getElementById("bg").style.display="none";
+				}
 			}
 			inputs.inputqueue = [];
 		}
@@ -404,7 +415,6 @@ Tetris.prototype = {
     // Update game data
     _update: function() {
 		
-		if(this.shape != undefined) //TODO delete
         if (this.shape.canDown(this.matrix)) {
             this.shape.goDown(this.matrix);
         } else {
