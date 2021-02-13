@@ -152,8 +152,8 @@ var UserInputs = {
 	},
 	// Direction arrows
     processKeyboardArrowKeys(key) {		
-		var DAS = 13;
-		var ARR = 3.0;
+		var DAS = 8.0;
+		var ARR = 0.0;
 
 	/*  do once?
 		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
