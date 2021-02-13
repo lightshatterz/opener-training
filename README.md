@@ -1,6 +1,9 @@
-# Tetrion Opening Trainer   PolicyChanges (2021) MIT Liecense
+# Tetrion Opening Trainer   
+# PolicyChanges (2021) 
 
-[Tetrion](http://policychanges.github.io/
+# MIT Liecense
+
+[Tetrion](http://policychanges.github.io)
 
 # Tetris
 
