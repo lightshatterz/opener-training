@@ -984,6 +984,8 @@ Tetris.prototype = {
 					this._update();
 				}
 				if(curkey == "Back") {
+					// this.hintMino = [] ?
+					// this.shape = []
 					this._restartHandler();
 					return;
 				}
