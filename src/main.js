@@ -4,7 +4,7 @@ var shapes = require('./shapes.js');
 var views = require('./views.js');
 var canvas = require('./canvas.js');
 var inputs = require('./input.js');
-
+var openers = require('./openers.js');
 
 
 /**
@@ -147,6 +147,7 @@ Tetris.prototype = {
         views.init(this.id, cfg.maxWidth, cfg.maxHeight);
         canvas.init(views.scene, views.preview, views.hold);
 		inputs.init();
+		//openers.init();
 		
         this.matrix = initMatrix(consts.ROW_COUNT, consts.COLUMN_COUNT);
         this.reset();
@@ -163,11 +164,14 @@ Tetris.prototype = {
         this.level = 1;
         this.score = 0;
 		this.lines = 0;
+		this.shapeNumber = 0;
         this.startTime = new Date().getTime();
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
+		//this.opener = openers.OpenerGenerator.;
 		this.shapeQueue = [];
+		//console.log("opener: " + this.opener);
 		this.holdQueue = [];
 		this.canPullFromHoldQueue = false;
         clearMatrix(this.matrix);
@@ -189,7 +193,7 @@ Tetris.prototype = {
     },
 	pushHoldStack: function()
 	{
-		if(this.holdQueue.length <= 4) {
+		if(this.holdQueue.length < 4) {
 			this.holdQueue.push(this.shape);
 			this.shape = this.shapeQueue.shift();
 			this.canPullFromHoldQueue = false;
@@ -217,54 +221,6 @@ Tetris.prototype = {
 	  
     // All key event handlers
     _keydownHandler: function(e) {
-
-        var matrix = this.matrix;
-/*
-        if (!e) {
-            var e = window.event;
-        }
-        if (this.isGameOver || !this.shape) {
-            return;
-        }
-
-        switch (e.keyCode) {
-		case 37: {
-			//this.shape.goLeft(matrix);
-			this._draw();
-		}
-            break;
-
-        case 39: {
-            //this.shape.goRight(matrix);
-            this._draw();
-        }
-        break;
-
-        case 90: {
-            this.shape.rotate(matrix);
-            this._draw();
-        }
-        break;
-		
-		case 88: {
-            this.shape.rotateClockwise(matrix);
-            this._draw();
-        }
-        break;
-
-        case 40: {
-            this.shape.goDown(matrix);
-            this._draw();
-        }
-        break;
-
-        case 32: {
-            this.shape.goBottom(matrix);
-            this._update();
-        }
-        break;
-        }
-		*/
     },
     // Restart game
     _restartHandler: function() {
@@ -279,14 +235,38 @@ Tetris.prototype = {
 
     // Fire a new random shape
     _fireShape: function() {
-		this.shape = this.shapeQueue.shift() || shapes.randomShape();
-		while( this.shapeQueue.length < 4 )
+		//this.shape = this.shapeQueue.shift() || shapes.randomShape();
+		/*while( this.shapeQueue.length <= 4 )
 		{
 			this.preparedShape = shapes.randomShape();
 			this.shapeQueue.push(this.preparedShape);
-		}
+		}*/
 		//canvas.drawPreviewShape(this.shapeQueue);
-        this._draw();
+		
+
+		/*while(this.shapeQueue == undefined)
+		{
+			this.shapeQueue = opener.getOpener();//[];();
+			console.log("console: " + this.shapeQueue);
+		}
+		console.log("console: " + this.shapeQueue);
+		*/
+		
+		while(this.shapeQueue.length <= 4)
+		{
+
+			
+			this.preparedShape = openers.getNextMino();//shapes.getShape(this.shapeNumber);
+			this.shapeNumber++;
+			
+			this.shapeQueue.push(this.preparedShape);
+			this.shapeNumber = this.shapeNumber % 7;
+		}
+		
+		this.shape = this.shapeQueue.shift();
+//		this.shape  || shapes.getShape(this.shapeNumber);
+       
+		this._draw();
         
     },
 
@@ -298,9 +278,10 @@ Tetris.prototype = {
 		canvas.drawPreviewShape(this.shapeQueue);
 		if(this.shape != undefined) {
 
+
 		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
 		var bottomY = clone.bottomAt(this.matrix);
-		clone.color = "#ffffff";
+		//clone.color = "#ffffff";
 		canvas.drawGhostShape(clone, bottomY);
 		}
         canvas.drawMatrix(this.matrix);
@@ -312,22 +293,16 @@ Tetris.prototype = {
         }
         this.currentTime = new Date().getTime();
 		var deltaTime = this.currentTime - this.prevTime;
-	
-/*	
-		if(deltaTime >= 10)
-		{
-			inputs.incFrame();
-			
-		}
-*/
-	
-		if(deltaTime >= 1) {	//  600hz
+
+	// todo: put in web worker
+		if(deltaTime >= 1) {	//  needs to be 600hz
 			inputs.incDeciframes();
+			//console.log(deltaTime / 600.0);
 		}
 		
 		if(deltaTime >= 1) {
 			inputs.updateGamepad();
-			//inputs.processButtons();
+			inputs.processGamepadDPad();
 			inputs.processGamepadInput();
 		}
 		
@@ -380,7 +355,7 @@ Tetris.prototype = {
 			inputs.processKeys();
 		}
 		
-		if (deltaTime > 5) {  // 60hz
+		if (deltaTime > 1) {  // 60hz
 			inputs.processKeyShift();
 			// Keyboard inputs
 			while((inputs.inputqueue != undefined && inputs.inputqueue.length >= 1)){
@@ -410,18 +385,15 @@ Tetris.prototype = {
 					this._update();
 				}
 				if(curkey == 16) {
-					 this.pullHoldQueue();
-					 
-					 //this._update();
+					this.pushHoldStack();
+					this._update();
 				}
-					if(curkey == 16) {
-					 this.pushHoldQueue();
-					 
-					 //this._update();
+				if(curkey == 17) {
+					this.popHoldStack();
+					this._update();
 				}
 			}
 			inputs.inputqueue = [];
-
 		}
 		
 		
@@ -445,6 +417,7 @@ Tetris.prototype = {
     // Update game data
     _update: function() {
 		
+		if(this.shape != undefined) //TODO delete
         if (this.shape.canDown(this.matrix)) {
             this.shape.goDown(this.matrix);
         } else {

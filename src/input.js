@@ -12,13 +12,12 @@ var UserInputs = {
 	},
 
 	incDeciframes() {
-		this.nDeciframes++;
-		this.nDeciframesKey++;
 		this.keyboardButtonsDeciframes++;
 		this.keyboardDirectionArrowsDeciframes++;
 		this.gamepadButtonsDeciFrames++;
 		this.gamepadDirectionPadDeciFrames++;
 	},
+	
 	processGamepadInput() {
 		this.gamepadButtonsDown("RB");
 		this.gamepadButtonsDown("LB");
@@ -28,18 +27,20 @@ var UserInputs = {
 		//this.gamepadButtonsDown("X");
 		//this.gamepadButtonsDown("Y");
 		
+
+		
+		return;
+	},
+	
+	processGamepadDPad() 
+	{
 		this.gamepadDPadDown("DPad-Left");
 		this.gamepadDPadDown("DPad-Right");
 		this.gamepadDPadDown("DPad-Down");
 		
 		return;
 	},
-	/*
-	processButtons() {
-
-		return;
-	},
-	*/
+	
 	
 	//  X, Y, A, B , RB, LB Buttons
 	gamepadButtonsDown(finds) {
@@ -74,26 +75,30 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDPadDown(finds) {
-		var DAS = 7;
-		var ARR = 3;
+		var DAS = 7.0;
+		var ARR = 3.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
-
+		//console.log("but: " + this.gpButtons +  " prev but:" + this.prevGpButtons);
 		if(isPrevContained != isContained ) {
 			this.isGamepadDown = false;
 			// Do once
-			//if(isContainted)
+			//if(isContained)
 			//	this.gamepadQueue.push(finds);
 		}
+		var gamepadDirectionDasFrames = this.gamepadDirectionPadDeciFrames / 1.0;
 			if (!this.isGamepadDown) {
-					if (this.nframe >= DAS) {
-						this.nframe = 0;
+					if (gamepadDirectionDasFrames >= DAS) {
+						this.gamepadDirectionPadDeciFrames = 0;
 						this.isGamepadDown = true;
+						//console.log(this.isGamepadDown + " " + this.gam);
 					}
-			} else {
-				if (this.nframe >= ARR && isContained) {
+			} 
+			else 
+		{
+				if (gamepadDirectionDasFrames >= ARR && isContained) {
 					this.gamepadQueue.push(finds);
-					this.nframe = 0;
+					this.gamepadDirectionPadDeciFrames = 0;
 				}
 			}
 		
@@ -104,6 +109,8 @@ var UserInputs = {
 		this.processKeyDown(32);  // Space
 		this.processKeyDown(88);  // X
 		this.processKeyDown(90);  // Z
+		this.processKeyDown(16);  // shift
+		this.processKeyDown(17);  // ctrl
 	},
 
 	// keyboard keys z,x,space

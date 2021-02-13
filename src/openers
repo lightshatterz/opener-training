@@ -1,0 +1,31 @@
+shapes = require(./shapes.js);
+
+
+function TKI3FonzieVariation {
+		
+	this.shapeQueue: [],
+
+}
+
+TKI3FonzieVariation.prototype = {
+	init: function () {
+		this.shapeQueue.push(new ShapeL());
+		this.shapeQueue.push(new ShapeI());
+		this.shapeQueue.push(new ShapeO());
+		this.shapeQueue.push(new ShapeS());
+		this.shapeQueue.push(new ShapeZ());
+		this.shapeQueue.push(new ShapeJ());
+		this.shapeQueue.push(new ShapeT());
+	}
+	
+	//hintShape
+}
+
+function getNewOpener()
+{
+	var opener = new TKI3FonzieVariation()
+	opener.init();
+	return opener;
+}
+//var Openers =  { 
+

@@ -228,7 +228,7 @@ var tetrisCanvas = {
 
 
 module.exports = tetrisCanvas;
-},{"./consts.js":2,"./utils.js":7}],2:[function(require,module,exports){
+},{"./consts.js":2,"./utils.js":8}],2:[function(require,module,exports){
 
 //colors for shapes  L, O, Z, T, J, S, I
 var colors = ['#ef7a21','#f7d308','#ef2029','#ad4d9c','#5a658f','#42b642','#31c7ef'];
@@ -404,13 +404,12 @@ var UserInputs = {
 	},
 
 	incDeciframes() {
-		this.nDeciframes++;
-		this.nDeciframesKey++;
 		this.keyboardButtonsDeciframes++;
 		this.keyboardDirectionArrowsDeciframes++;
 		this.gamepadButtonsDeciFrames++;
 		this.gamepadDirectionPadDeciFrames++;
 	},
+	
 	processGamepadInput() {
 		this.gamepadButtonsDown("RB");
 		this.gamepadButtonsDown("LB");
@@ -420,18 +419,20 @@ var UserInputs = {
 		//this.gamepadButtonsDown("X");
 		//this.gamepadButtonsDown("Y");
 		
+
+		
+		return;
+	},
+	
+	processGamepadDPad() 
+	{
 		this.gamepadDPadDown("DPad-Left");
 		this.gamepadDPadDown("DPad-Right");
 		this.gamepadDPadDown("DPad-Down");
 		
 		return;
 	},
-	/*
-	processButtons() {
-
-		return;
-	},
-	*/
+	
 	
 	//  X, Y, A, B , RB, LB Buttons
 	gamepadButtonsDown(finds) {
@@ -466,26 +467,30 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDPadDown(finds) {
-		var DAS = 7;
-		var ARR = 3;
+		var DAS = 7.0;
+		var ARR = 3.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
-
+		//console.log("but: " + this.gpButtons +  " prev but:" + this.prevGpButtons);
 		if(isPrevContained != isContained ) {
 			this.isGamepadDown = false;
 			// Do once
-			//if(isContainted)
+			//if(isContained)
 			//	this.gamepadQueue.push(finds);
 		}
+		var gamepadDirectionDasFrames = this.gamepadDirectionPadDeciFrames / 1.0;
 			if (!this.isGamepadDown) {
-					if (this.nframe >= DAS) {
-						this.nframe = 0;
+					if (gamepadDirectionDasFrames >= DAS) {
+						this.gamepadDirectionPadDeciFrames = 0;
 						this.isGamepadDown = true;
+						//console.log(this.isGamepadDown + " " + this.gam);
 					}
-			} else {
-				if (this.nframe >= ARR && isContained) {
+			} 
+			else 
+		{
+				if (gamepadDirectionDasFrames >= ARR && isContained) {
 					this.gamepadQueue.push(finds);
-					this.nframe = 0;
+					this.gamepadDirectionPadDeciFrames = 0;
 				}
 			}
 		
@@ -496,6 +501,8 @@ var UserInputs = {
 		this.processKeyDown(32);  // Space
 		this.processKeyDown(88);  // X
 		this.processKeyDown(90);  // Z
+		this.processKeyDown(16);  // shift
+		this.processKeyDown(17);  // ctrl
 	},
 
 	// keyboard keys z,x,space
@@ -613,7 +620,7 @@ var shapes = require('./shapes.js');
 var views = require('./views.js');
 var canvas = require('./canvas.js');
 var inputs = require('./input.js');
-
+var openers = require('./openers.js');
 
 
 /**
@@ -756,6 +763,7 @@ Tetris.prototype = {
         views.init(this.id, cfg.maxWidth, cfg.maxHeight);
         canvas.init(views.scene, views.preview, views.hold);
 		inputs.init();
+		//openers.init();
 		
         this.matrix = initMatrix(consts.ROW_COUNT, consts.COLUMN_COUNT);
         this.reset();
@@ -772,11 +780,14 @@ Tetris.prototype = {
         this.level = 1;
         this.score = 0;
 		this.lines = 0;
+		this.shapeNumber = 0;
         this.startTime = new Date().getTime();
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
+		//this.opener = openers.OpenerGenerator.;
 		this.shapeQueue = [];
+		//console.log("opener: " + this.opener);
 		this.holdQueue = [];
 		this.canPullFromHoldQueue = false;
         clearMatrix(this.matrix);
@@ -798,7 +809,7 @@ Tetris.prototype = {
     },
 	pushHoldStack: function()
 	{
-		if(this.holdQueue.length <= 4) {
+		if(this.holdQueue.length < 4) {
 			this.holdQueue.push(this.shape);
 			this.shape = this.shapeQueue.shift();
 			this.canPullFromHoldQueue = false;
@@ -826,54 +837,6 @@ Tetris.prototype = {
 	  
     // All key event handlers
     _keydownHandler: function(e) {
-
-        var matrix = this.matrix;
-/*
-        if (!e) {
-            var e = window.event;
-        }
-        if (this.isGameOver || !this.shape) {
-            return;
-        }
-
-        switch (e.keyCode) {
-		case 37: {
-			//this.shape.goLeft(matrix);
-			this._draw();
-		}
-            break;
-
-        case 39: {
-            //this.shape.goRight(matrix);
-            this._draw();
-        }
-        break;
-
-        case 90: {
-            this.shape.rotate(matrix);
-            this._draw();
-        }
-        break;
-		
-		case 88: {
-            this.shape.rotateClockwise(matrix);
-            this._draw();
-        }
-        break;
-
-        case 40: {
-            this.shape.goDown(matrix);
-            this._draw();
-        }
-        break;
-
-        case 32: {
-            this.shape.goBottom(matrix);
-            this._update();
-        }
-        break;
-        }
-		*/
     },
     // Restart game
     _restartHandler: function() {
@@ -888,14 +851,38 @@ Tetris.prototype = {
 
     // Fire a new random shape
     _fireShape: function() {
-		this.shape = this.shapeQueue.shift() || shapes.randomShape();
-		while( this.shapeQueue.length < 4 )
+		//this.shape = this.shapeQueue.shift() || shapes.randomShape();
+		/*while( this.shapeQueue.length <= 4 )
 		{
 			this.preparedShape = shapes.randomShape();
 			this.shapeQueue.push(this.preparedShape);
-		}
+		}*/
 		//canvas.drawPreviewShape(this.shapeQueue);
-        this._draw();
+		
+
+		/*while(this.shapeQueue == undefined)
+		{
+			this.shapeQueue = opener.getOpener();//[];();
+			console.log("console: " + this.shapeQueue);
+		}
+		console.log("console: " + this.shapeQueue);
+		*/
+		
+		while(this.shapeQueue.length <= 4)
+		{
+
+			
+			this.preparedShape = openers.getNextMino();//shapes.getShape(this.shapeNumber);
+			this.shapeNumber++;
+			
+			this.shapeQueue.push(this.preparedShape);
+			this.shapeNumber = this.shapeNumber % 7;
+		}
+		
+		this.shape = this.shapeQueue.shift();
+//		this.shape  || shapes.getShape(this.shapeNumber);
+       
+		this._draw();
         
     },
 
@@ -907,9 +894,10 @@ Tetris.prototype = {
 		canvas.drawPreviewShape(this.shapeQueue);
 		if(this.shape != undefined) {
 
+
 		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
 		var bottomY = clone.bottomAt(this.matrix);
-		clone.color = "#ffffff";
+		//clone.color = "#ffffff";
 		canvas.drawGhostShape(clone, bottomY);
 		}
         canvas.drawMatrix(this.matrix);
@@ -921,22 +909,16 @@ Tetris.prototype = {
         }
         this.currentTime = new Date().getTime();
 		var deltaTime = this.currentTime - this.prevTime;
-	
-/*	
-		if(deltaTime >= 10)
-		{
-			inputs.incFrame();
-			
-		}
-*/
-	
-		if(deltaTime >= 1) {	//  600hz
+
+	// todo: put in web worker
+		if(deltaTime >= 1) {	//  needs to be 600hz
 			inputs.incDeciframes();
+			//console.log(deltaTime / 600.0);
 		}
 		
 		if(deltaTime >= 1) {
 			inputs.updateGamepad();
-			//inputs.processButtons();
+			inputs.processGamepadDPad();
 			inputs.processGamepadInput();
 		}
 		
@@ -989,7 +971,7 @@ Tetris.prototype = {
 			inputs.processKeys();
 		}
 		
-		if (deltaTime > 5) {  // 60hz
+		if (deltaTime > 1) {  // 60hz
 			inputs.processKeyShift();
 			// Keyboard inputs
 			while((inputs.inputqueue != undefined && inputs.inputqueue.length >= 1)){
@@ -1019,18 +1001,15 @@ Tetris.prototype = {
 					this._update();
 				}
 				if(curkey == 16) {
-					 this.pullHoldQueue();
-					 
-					 //this._update();
+					this.pushHoldStack();
+					this._update();
 				}
-					if(curkey == 16) {
-					 this.pushHoldQueue();
-					 
-					 //this._update();
+				if(curkey == 17) {
+					this.popHoldStack();
+					this._update();
 				}
 			}
 			inputs.inputqueue = [];
-
 		}
 		
 		
@@ -1054,6 +1033,7 @@ Tetris.prototype = {
     // Update game data
     _update: function() {
 		
+		if(this.shape != undefined) //TODO delete
         if (this.shape.canDown(this.matrix)) {
             this.shape.goDown(this.matrix);
         } else {
@@ -1105,7 +1085,131 @@ Tetris.prototype = {
 
 
 window.Tetris = Tetris;
-},{"./canvas.js":1,"./consts.js":2,"./input.js":4,"./shapes.js":6,"./utils.js":7,"./views.js":8}],6:[function(require,module,exports){
+},{"./canvas.js":1,"./consts.js":2,"./input.js":4,"./openers.js":6,"./shapes.js":7,"./utils.js":8,"./views.js":9}],6:[function(require,module,exports){
+var shapes = require("./shapes.js");
+
+/*
+function TKI3FonzieVariation() {
+		
+		this.shapeQueue = new Array(7);
+		this.shapeQueue.push(new shapes.ShapeL());
+		this.shapeQueue.push(new shapes.ShapeI());
+		this.shapeQueue.push(new shapes.ShapeO());
+		this.shapeQueue.push(new shapes.ShapeZR());
+		this.shapeQueue.push(new shapes.ShapeZ());
+		this.shapeQueue.push(new shapes.ShapeLR());
+		this.shapeQueue.push(new shapes.ShapeT());
+	//this.hintShapeQueue = [];
+
+}
+
+TKI3FonzieVariation.prototype = {
+	getShapeQueue: function () {
+
+		return this.shapeQueue;
+	}
+
+		getHintQueue: function() {
+		this.hintShapeQueue.push(new shapes.ShapeL());
+		this.hintShapeQueue.push(new shapes.ShapeI());
+		this.hintShapeQueue.push(new shapes.ShapeO());
+		this.hintShapeQueue.push(new shapes.ShapeZR());
+		this.hintShapeQueue.push(new shapes.ShapeZ());
+		this.hintShapeQueue.push(new shapes.ShapeLR());
+		this.hintShapeQueue.push(new shapes.ShapeT());
+		return this.hintShapeQueue;
+		
+	},
+	init: function () {
+		//todo: switch to queue builder
+		//this.getShapeQueue();
+		//this.getHintQueue();
+	}
+
+
+
+	//hintShape
+}
+
+*/
+// L O Z T LR ZR I 
+var OpenerGenerator = {
+	shapeQueue: [],
+	hintQueue: [],
+	idx: 0,
+	hindIdx: 0,
+	isInit: 0,
+	isHintInit: 0,
+	init() {
+		if(!this.isInit || this.shapeQueue == undefined) {
+		this.shapeQueue = new Array(shapes.getShape(0),
+		shapes.getShape(6),
+		shapes.getShape(1),
+		shapes.getShape(5),
+		shapes.getShape(2),
+		shapes.getShape(4),
+		shapes.getShape(3));
+		}
+		this.isInit = 1;
+		
+		return;// this.shapeQueue;
+	},
+		
+	getNextMino() {
+		this.init();
+		var mino = this.shapeQueue[this.idx];
+		this.idx++;
+		if(this.idx == 6) {
+			this.idx = 0;
+			this.isInit = 0;
+		}
+
+		return mino;
+		//return this.shapeQueue[this.idx%=6];
+	},
+	initHint() {
+		if(!this.isHintInit || this.hintQueue == undefined) {
+		this.hintQueue = new Array(shapes.getShape(0),
+		shapes.getShape(6),
+		shapes.getShape(1),
+		shapes.getShape(5),
+		shapes.getShape(2),
+		shapes.getShape(4),
+		shapes.getShape(3));
+		}
+		this.isHintInit = 1;
+		
+		return;// this.shapeQueue;
+	},
+	getNextHint() {
+		this.initHint();
+		var mino = this.hintQueue[this.hintIdx];
+		this.hintIdx++;
+		if(this.hintIdx == 6) {
+			this.hintIdx = 0;
+			this.isHintInit = 0;
+		}
+
+		return mino;
+		//return this.shapeQueue[this.idx%=6];
+	}
+};
+
+function getNextMino() {
+	var mino = OpenerGenerator.getNextMino();
+	//console.log("Mino: " + mino);
+	return mino;
+}
+function getNextHint() {
+	var mino = OpenerGenerator.getNextMino();
+	//console.log("Mino: " + mino);
+	return mino;
+}
+module.exports.getNextMino = getNextMino;
+
+
+
+},{"./shapes.js":7}],7:[function(require,module,exports){
 var consts = require('./consts.js');
 var COLORS = consts.COLORS;
 var COLUMN_COUNT = consts.COLUMN_COUNT;
@@ -1526,6 +1630,7 @@ var RandomGenerator = {
         return bag;
     }
 };
+
 function randomShape() {
     var result = parseInt(RandomGenerator.getTetrimino(),10);//Math.floor(Math.random() * 7);
     var shape;
@@ -1557,8 +1662,43 @@ function randomShape() {
     return shape;
 }
 
+
+
+function getShape(shapei) {
+    var result = shapei
+    var shape;
+
+    switch (result) {
+        case 0:
+            shape = new ShapeL();
+            break;
+        case 1:
+            shape = new ShapeO();
+            break;
+        case 2:
+            shape = new ShapeZ();
+            break;
+        case 3:
+            shape = new ShapeT();
+            break;
+        case 4:
+            shape = new ShapeLR();
+            break;
+        case 5:
+            shape = new ShapeZR();
+            break;
+        case 6:
+            shape = new ShapeI();
+            break;
+    }
+    shape.init(result);
+    return shape;
+}
 module.exports.randomShape = randomShape;
-},{"./consts.js":2}],7:[function(require,module,exports){
+module.exports.getShape = getShape;
+//module.exports.newOpenerShapeQueue = newOpenerShapeQueue;		queue.push(new ShapeL());
+
+},{"./consts.js":2}],8:[function(require,module,exports){
 
 var exports = module.exports = {};
 
@@ -1670,7 +1810,7 @@ exports.$ = $;
 exports.extend = extend;
 exports.proxy = proxy;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 /**
  All dom definitions and actions
 */
@@ -1816,4 +1956,4 @@ var tetrisView = {
 };
 
 module.exports = tetrisView;
-},{"./consts.js":2,"./utils.js":7}]},{},[5]);
+},{"./consts.js":2,"./utils.js":8}]},{},[5]);
