@@ -500,7 +500,7 @@ var UserInputs = {
 		var ARR = 20.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
-		//console.log("but: " + this.gpButtons +  " prev but:" + this.prevGpButtons);
+		
 		if(isPrevContained != isContained ) {
 			this.isGamepadDown = false;
 			// Do once
@@ -512,7 +512,7 @@ var UserInputs = {
 					if (gamepadDirectionDasFrames >= DAS) {
 						this.gamepadDirectionPadDeciFrames = 0;
 						this.isGamepadDown = true;
-						//console.log(this.isGamepadDown + " " + this.gam);
+						
 					}
 			} 
 			else 
@@ -586,9 +586,9 @@ var UserInputs = {
 				this.inputqueue.push(key);
 		}
 		
-		//console.log(key + " " + this.held
+		
 		var keyboardDASFrames = this.keyboardDirectionArrowsDeciframes / 1.0; // why isnt this 10?
-		//console.log(keyboardDASFrames + " " + this.held);
+		
             if (!this.isDirectionArrowDown) {
 				
                 if (keyboardDASFrames >= DAS) {
@@ -833,7 +833,8 @@ Tetris.prototype = {
         views.setLevel(this.level);
         views.setScore(this.score);
         views.setGameOver(this.isGameOver);
-
+		openers.reset();
+		
         this._draw();
     },
     //Start game
@@ -950,7 +951,6 @@ Tetris.prototype = {
 		// TODO: put in web worker--limited to 60fps here
 		if(deltaTime >= tenthOfFrame) {	//  needs to be 600hz // 16 / 10
 			inputs.incDeciframes();
-			//console.log(deltaTime / 600.0);
 		}
 		
 		if(deltaTime >= tenthOfFrame) {
@@ -1133,6 +1133,11 @@ Tetris.prototype = {
 		
 
     },
+	_checkHint: function() {
+		if(this.shape.y != this.hintMino.y || this.shape.x != this.hintMino.x)
+			//1console.log("success!");
+		this._restartHandler();
+	},
     // Update game data
     _update: function() {
 		
@@ -1142,6 +1147,7 @@ Tetris.prototype = {
 			this.canPullFromHoldQueue = true;
             this.shape.copyTo(this.matrix);
             this._check();
+			this._checkHint();
             this._fireShape();
 			new Audio('./dist/Blop2.ogg').play();
         }
@@ -1255,7 +1261,7 @@ var OpenerGenerator = {
 		}
 		this.isInit = 1;
 		
-		return;// this.shapeQueue;
+		return;
 	},
 		
 	getNextMino() {
@@ -1266,10 +1272,8 @@ var OpenerGenerator = {
 			this.idx = 0;
 			this.isInit = 0;
 		}
-		console.log("mino: " + mino);
 
 		return mino;
-		//return this.shapeQueue[this.idx%=6];
 	},
 	// L O Z T LR ZR I 
 	initHint(matrix) {
@@ -1283,7 +1287,6 @@ var OpenerGenerator = {
 		shapes.getShape(4),
 		shapes.getShape(3));
 		
-		//console.log("matrix: " + matrix);
 		// L
 		this.hintQueue[0].x = 0;
 		this.hintQueue[0].y = 17;
@@ -1291,7 +1294,6 @@ var OpenerGenerator = {
 		this.hintQueue[1].x = 3;
 		this.hintQueue[1].y = 19;
 		this.hintQueue[1].state = this.hintQueue[1].nextState(1);
-		//this.hintQueue[1].matrix = 
 		// O
 		this.hintQueue[2].x = 8;
 		this.hintQueue[2].y = 18;
@@ -1316,26 +1318,25 @@ var OpenerGenerator = {
 		
 		this.isHintInit = 1;
 		
-		return;// this.shapeQueue;
+		return;
 	},
 	getNextHint(matrix) {
 		this.initHint(matrix);
-		console.log("hint " + this.hintIdx);
 		var mino = this.hintQueue[this.hintIdx];
 		this.hintIdx++;
 		if(this.hintIdx == 7) {
 			this.hintIdx = 0;
 			this.isHintInit = 0;
 		}
-	console.log("hintmino: " + mino)
 		return mino;
-		//return this.shapeQueue[this.idx%=6];
 	},
 	reset() {
 		this.shapeQueue = [];
 		this.hintQueue = [];
 		this.idx = 0;
 		this.hintIdx = 0;
+		this.isInit = 0;
+		this.isHintInit = 0;
 	}
 };
 
@@ -1345,12 +1346,10 @@ function reset() {
 
 function getNextMino() {
 	var mino = OpenerGenerator.getNextMino();
-	//console.log("Mino: " + mino);
 	return mino;
 }
 function getNextHint(matrix) {
 	var mino = OpenerGenerator.getNextHint(matrix);
-	//console.log("Mino: " + mino);
 	return mino;
 }
 module.exports.getNextMino = getNextMino;

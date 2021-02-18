@@ -3,7 +3,7 @@
 
 # MIT Liecense
 
-[Tetrion](http://policychanges.github.io)
+#[Tetrion](http://policychanges.github.io)
 
 # Tetris
 
@@ -14,7 +14,7 @@ Just a practice, if  you are interested in writing html5 games,check the code an
 
 # Demo
 
-# [Tetris Game](http://sandywalker.github.io/Tetris/)
+[Tetris Game](http://sandywalker.github.io/Tetris/)
 
 # License
 

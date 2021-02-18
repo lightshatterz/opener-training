@@ -80,7 +80,7 @@ var UserInputs = {
 		var ARR = 20.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
-		//console.log("but: " + this.gpButtons +  " prev but:" + this.prevGpButtons);
+		
 		if(isPrevContained != isContained ) {
 			this.isGamepadDown = false;
 			// Do once
@@ -92,7 +92,7 @@ var UserInputs = {
 					if (gamepadDirectionDasFrames >= DAS) {
 						this.gamepadDirectionPadDeciFrames = 0;
 						this.isGamepadDown = true;
-						//console.log(this.isGamepadDown + " " + this.gam);
+						
 					}
 			} 
 			else 
@@ -166,9 +166,9 @@ var UserInputs = {
 				this.inputqueue.push(key);
 		}
 		
-		//console.log(key + " " + this.held
+		
 		var keyboardDASFrames = this.keyboardDirectionArrowsDeciframes / 1.0; // why isnt this 10?
-		//console.log(keyboardDASFrames + " " + this.held);
+		
             if (!this.isDirectionArrowDown) {
 				
                 if (keyboardDASFrames >= DAS) {

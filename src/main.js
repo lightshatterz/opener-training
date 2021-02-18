@@ -182,7 +182,8 @@ Tetris.prototype = {
         views.setLevel(this.level);
         views.setScore(this.score);
         views.setGameOver(this.isGameOver);
-
+		openers.reset();
+		
         this._draw();
     },
     //Start game
@@ -299,7 +300,6 @@ Tetris.prototype = {
 		// TODO: put in web worker--limited to 60fps here
 		if(deltaTime >= tenthOfFrame) {	//  needs to be 600hz // 16 / 10
 			inputs.incDeciframes();
-			//console.log(deltaTime / 600.0);
 		}
 		
 		if(deltaTime >= tenthOfFrame) {
@@ -482,6 +482,11 @@ Tetris.prototype = {
 		
 
     },
+	_checkHint: function() {
+		if(this.shape.y != this.hintMino.y || this.shape.x != this.hintMino.x)
+			//1console.log("success!");
+		this._restartHandler();
+	},
     // Update game data
     _update: function() {
 		
@@ -491,6 +496,7 @@ Tetris.prototype = {
 			this.canPullFromHoldQueue = true;
             this.shape.copyTo(this.matrix);
             this._check();
+			this._checkHint();
             this._fireShape();
 			new Audio('./dist/Blop2.ogg').play();
         }

@@ -65,7 +65,7 @@ var OpenerGenerator = {
 		}
 		this.isInit = 1;
 		
-		return;// this.shapeQueue;
+		return;
 	},
 		
 	getNextMino() {
@@ -76,10 +76,8 @@ var OpenerGenerator = {
 			this.idx = 0;
 			this.isInit = 0;
 		}
-		console.log("mino: " + mino);
 
 		return mino;
-		//return this.shapeQueue[this.idx%=6];
 	},
 	// L O Z T LR ZR I 
 	initHint(matrix) {
@@ -93,7 +91,6 @@ var OpenerGenerator = {
 		shapes.getShape(4),
 		shapes.getShape(3));
 		
-		//console.log("matrix: " + matrix);
 		// L
 		this.hintQueue[0].x = 0;
 		this.hintQueue[0].y = 17;
@@ -101,7 +98,6 @@ var OpenerGenerator = {
 		this.hintQueue[1].x = 3;
 		this.hintQueue[1].y = 19;
 		this.hintQueue[1].state = this.hintQueue[1].nextState(1);
-		//this.hintQueue[1].matrix = 
 		// O
 		this.hintQueue[2].x = 8;
 		this.hintQueue[2].y = 18;
@@ -126,26 +122,25 @@ var OpenerGenerator = {
 		
 		this.isHintInit = 1;
 		
-		return;// this.shapeQueue;
+		return;
 	},
 	getNextHint(matrix) {
 		this.initHint(matrix);
-		console.log("hint " + this.hintIdx);
 		var mino = this.hintQueue[this.hintIdx];
 		this.hintIdx++;
 		if(this.hintIdx == 7) {
 			this.hintIdx = 0;
 			this.isHintInit = 0;
 		}
-	console.log("hintmino: " + mino)
 		return mino;
-		//return this.shapeQueue[this.idx%=6];
 	},
 	reset() {
 		this.shapeQueue = [];
 		this.hintQueue = [];
 		this.idx = 0;
 		this.hintIdx = 0;
+		this.isInit = 0;
+		this.isHintInit = 0;
 	}
 };
 
@@ -155,12 +150,10 @@ function reset() {
 
 function getNextMino() {
 	var mino = OpenerGenerator.getNextMino();
-	//console.log("Mino: " + mino);
 	return mino;
 }
 function getNextHint(matrix) {
 	var mino = OpenerGenerator.getNextHint(matrix);
-	//console.log("Mino: " + mino);
 	return mino;
 }
 module.exports.getNextMino = getNextMino;
