@@ -76,8 +76,8 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDPadDown(finds) {
-		var DAS = 10.0;
-		var ARR = 5.0;
+		var DAS = 30.0;
+		var ARR = 20.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
 		//console.log("but: " + this.gpButtons +  " prev but:" + this.prevGpButtons);
@@ -119,14 +119,16 @@ var UserInputs = {
 	// keyboard keys z,x,space
 	processKeyDown(key)
 	{
-		var deciDAS = 10;
-		var deciARR = 15
+		var deciDAS = 50.0;
+		var deciARR = 50.0;
 		
 
-		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
+		// todo: fix this mess
+		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key] && this.isKeyBoardKeyDown == true) {
 			this.isKeyboardKeyDown = false;
 			if(this.keyboardKeys[key] == true)
 				this.inputqueue.push(key);
+				this.keyboardKeys[key] = false;
 		}
 		
 		var keyboardDASFrames = this.keyboardButtonsDeciframes;
@@ -154,8 +156,8 @@ var UserInputs = {
 	},
 	// Direction arrows
     processKeyboardArrowKeys(key) {		
-		var DAS = 30.0;
-		var ARR = 0.0;
+		var DAS = 50.0;
+		var ARR = 20.0;
 
 	
 		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
@@ -183,10 +185,12 @@ var UserInputs = {
     },
     keyDown(event) {
 		this.keyboardKeys[event.keyCode] = true;
+		this.isKeyBoardKeyDown = true;
     },
     keyUp(event) {
 		this.isKeyDown = false;
 		this.keyboardKeys[event.keyCode] = false;
+		this.isKeyBoardKeyDown = false;
     },
 	gamepadButtonClear() {
 		gpButtons = [];

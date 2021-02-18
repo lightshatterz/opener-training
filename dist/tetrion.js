@@ -496,8 +496,8 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDPadDown(finds) {
-		var DAS = 10.0;
-		var ARR = 5.0;
+		var DAS = 30.0;
+		var ARR = 20.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
 		//console.log("but: " + this.gpButtons +  " prev but:" + this.prevGpButtons);
@@ -539,14 +539,16 @@ var UserInputs = {
 	// keyboard keys z,x,space
 	processKeyDown(key)
 	{
-		var deciDAS = 10;
-		var deciARR = 15
+		var deciDAS = 50.0;
+		var deciARR = 50.0;
 		
 
-		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
+		// todo: fix this mess
+		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key] && this.isKeyBoardKeyDown == true) {
 			this.isKeyboardKeyDown = false;
 			if(this.keyboardKeys[key] == true)
 				this.inputqueue.push(key);
+				this.keyboardKeys[key] = false;
 		}
 		
 		var keyboardDASFrames = this.keyboardButtonsDeciframes;
@@ -574,8 +576,8 @@ var UserInputs = {
 	},
 	// Direction arrows
     processKeyboardArrowKeys(key) {		
-		var DAS = 30.0;
-		var ARR = 0.0;
+		var DAS = 50.0;
+		var ARR = 20.0;
 
 	
 		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
@@ -603,10 +605,12 @@ var UserInputs = {
     },
     keyDown(event) {
 		this.keyboardKeys[event.keyCode] = true;
+		this.isKeyBoardKeyDown = true;
     },
     keyUp(event) {
 		this.isKeyDown = false;
 		this.keyboardKeys[event.keyCode] = false;
+		this.isKeyBoardKeyDown = false;
     },
 	gamepadButtonClear() {
 		gpButtons = [];
@@ -820,6 +824,7 @@ Tetris.prototype = {
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
+		this.prevInputTime = this.startTime;
 		this.shapeQueue = [];
 		this.hintQueue = [];
 		this.holdQueue = [];
@@ -828,14 +833,15 @@ Tetris.prototype = {
         views.setLevel(this.level);
         views.setScore(this.score);
         views.setGameOver(this.isGameOver);
-		//openers.reset();
 
         this._draw();
     },
     //Start game
     start: function() {
         this.running = true;
-        window.requestAnimationFrame(utils.proxy(this._refresh, this));
+		window.requestAnimationFrame(utils.proxy(this._refresh, this));
+	//window.requestAnimationFrame(utils.proxy(this._refresh, this));}
+
     },
     //Pause game
     pause: function() {
@@ -908,6 +914,9 @@ Tetris.prototype = {
         
     },
 
+
+	/*_processCollisions: function {
+	},*/
     // Draw game data
     _draw: function() {
         canvas.drawScene();
@@ -920,56 +929,63 @@ Tetris.prototype = {
 
 		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
 		
+		//todo: put in collision detsction
 		var bottomY = clone.bottomAt(this.matrix);
 		//clone.color = "#ffffff";
 		canvas.drawGhostShape(clone, bottomY);
 		}
         canvas.drawMatrix(this.matrix);
     },
-    // Refresh game canvas
-    _refresh: function() {
-        if (!this.running) {
-            return;
-        }
-        this.currentTime = new Date().getTime();
-		var deltaTime = this.currentTime - this.prevTime;
-
+	// Render Shape
+	_renderShape: function()
+	{
+		this._draw();
+	},
+	_processInput: async function(deltaTime) {
+	
+		var tenthOfFrame = 1.6//1;//1.6; // 1.6ms = 1 fram
+		var halfFrame = 8.0//5;//8.0;
+		var halfFramePlus = 10.0;//10.0;
+		
 		// TODO: put in web worker--limited to 60fps here
-		if(deltaTime >= 1) {	//  needs to be 600hz
+		if(deltaTime >= tenthOfFrame) {	//  needs to be 600hz // 16 / 10
 			inputs.incDeciframes();
 			//console.log(deltaTime / 600.0);
 		}
 		
-		if(deltaTime >= 1) {
+		if(deltaTime >= tenthOfFrame) {
 			inputs.updateGamepad();
 			inputs.processGamepadDPad();
 			inputs.processGamepadInput();
 		}
 		
 		// drain gamepad queue
-		if(deltaTime > 5)
+		if(deltaTime > halfFrame)  // 8 millisecons
 		{
 			while((inputs.gamepadQueue != undefined && inputs.gamepadQueue.length >= 1)){
 				var curkey = inputs.gamepadQueue.shift();
 				if(curkey == "DPad-Left") {
 					this.shape.goLeft(this.matrix);
-					this._draw();
+					this._renderShape();
 				}
 				if(curkey == "DPad-Right") {
 					this.shape.goRight(this.matrix);
-					this._draw();
+					this._renderShape();
 				}
 				if(curkey == "A") {
 					this.shape.rotate(this.matrix);
-					this._draw();
+					this._renderShape();
+					//this._draw();
 				}
 				if(curkey == "B") {
-					this.shape.rotateClockwise(this.matrix);;
-					this._draw();
+					this.shape.rotateClockwise(this.matrix);
+					this._renderShape();
+					//this._draw();
 				}
 				if(curkey == "DPad-Down") {
 					 this.shape.goDown(this.matrix);
-					 this._draw();
+					 this._renderShape();
+					 //this._draw();
 				}
 				if(curkey == "RB") {
 					this.shape.goBottom(this.matrix);
@@ -977,10 +993,12 @@ Tetris.prototype = {
 				}
 				if(curkey == "LB") {
 					this.pushHoldStack();
+					//this._renderShape();
 					this._update();
 				}				
 				if(curkey == "DPad-Up") {
 					this.popHoldStack();
+					//this._renderShape();
 					this._update();
 				}
 				if(curkey == "Back") {
@@ -996,46 +1014,49 @@ Tetris.prototype = {
 		//inputs.gamepadButtonClear();
 		
 		// Do keyboard
-		if(deltaTime > 1)		// 120hz
+		if(deltaTime > tenthOfFrame)		// 120hz
 		{
 			inputs.processKeys();
 		}
 		
-		if (deltaTime > 1) {  // 60hz
+		if (deltaTime > tenthOfFrame) {  // 60hz
 			inputs.processKeyShift();
 			// Keyboard inputs
 			while((inputs.inputqueue != undefined && inputs.inputqueue.length >= 1)){
 				var curkey = inputs.inputqueue.shift();
 				if(curkey == 37) {
 					this.shape.goLeft(this.matrix);
-					this._draw();
+					this._renderShape();
 				}
 				if(curkey == 39){
 					this.shape.goRight(this.matrix);
-					this._draw();
+					this._renderShape();
 				}
 				if(curkey == 40) {
 					 this.shape.goDown(this.matrix);
-					 this._draw();
+					 this._renderShape();
 				}
 				if(curkey == 90) {
 					this.shape.rotate(this.matrix);
-					this._draw();
+					this._renderShape();
 				}
 				if(curkey == 88){
 					this.shape.rotateClockwise(this.matrix);;
-					this._draw();
+					this._renderShape();
 				}
 				if(curkey == 32) {
 					this.shape.goBottom(this.matrix);
+					//this._renderShape();
 					this._update();
 				}
 				if(curkey == 16) {
 					this.pushHoldStack();
+					//this._renderShape();
 					this._update();
 				}
 				if(curkey == 17) {
 					this.popHoldStack();
+					//this._renderShape();
 					this._update();
 				}
 				if(curkey == 81) {
@@ -1055,21 +1076,61 @@ Tetris.prototype = {
 		}
 		
 		
-		if(deltaTime >= 10)
+		if(deltaTime >= halfFramePlus)
 			inputs.saveKeyboardKeys();
 		
-		if(deltaTime >= 1)
+		if(deltaTime >= tenthOfFrame)
 			inputs.saveButtons();
 		
-        if (deltaTime > this.interval) {
-            this._update();
-		
-            this.prevTime = this.currentTime;
-            this._checkLevel();
+	},		
+	sleep: function(ms) {
+	  return new Promise(resolve => setTimeout(resolve, ms));
+	},
+    // Refresh game canvas
+    _refresh: async function() {
+
+		if (!this.running) {
+            return;
         }
+		
+		this.currentTime = new Date().getTime();
+		
+		
+		var curInputTime = new Date().getTime();
+		var prevCounterTime = curInputTime;
+		var deltaInputTime = 0;
+		var deltaCounterTime = 0;
+		
+		// Process input as many times as possible in a frame--60hz hopefully
+		while(deltaCounterTime <= 16) {		// 16.666ms = 1 frame	
+			deltaCounterTime = curInputTime - prevCounterTime;
+			deltaInputTime = curInputTime - this.prevInputTime;
+			this._processInput(deltaInputTime);
+			await this.sleep(1);
+			curInputTime = new Date().getTime();
+		}
+		
+		this.prevInputTime = curInputTime;
+		var deltaLevelTime = this.currentTime - this.prevTime;
+		
+	
+
+		
+		//if(deltaGameTime < 16) this._refresh();
+		
+		// Render Level
+		
+		
+        if (deltaLevelTime > this.interval) {
+            this._update();
+            this._checkLevel(this.prevTime = this.currentTime);
+        }
+		
+		// Draw Frame
         if (!this.isGameOver) {
             window.requestAnimationFrame(utils.proxy(this._refresh, this));
         }
+		
 
     },
     // Update game data
