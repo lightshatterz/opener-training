@@ -237,7 +237,7 @@ Tetris.prototype = {
     },
     // Bind game events
     _initEvents: function() {
-        window.addEventListener('keydown', utils.proxy(this._keydownHandler, this), false);
+        //window.addEventListener('keydown', utils.proxy(this._keydownHandler, this), false);
         views.btnRestart.addEventListener('click', utils.proxy(this._restartHandler, this), false);
     },
 
@@ -293,8 +293,8 @@ Tetris.prototype = {
 	},
 	_processInput: async function(deltaTime) {
 	
-		var tenthOfFrame = 1.6//1;//1.6; // 1.6ms = 1 fram
-		var halfFrame = 8.0//5;//8.0;
+		var tenthOfFrame = 1.0//1;//1.6; // 1.6ms = 1 fram
+		var halfFrame = 5.0//5;//8.0;
 		var halfFramePlus = 10.0;//10.0;
 		
 		// TODO: put in web worker--limited to 60fps here
@@ -451,18 +451,18 @@ Tetris.prototype = {
 		var deltaCounterTime = 0;
 		
 		// Process input as many times as possible in a frame--60hz hopefully
-		while(deltaCounterTime <= 16) {		// 16.666ms = 1 frame	
+		/*while(deltaCounterTime <= 16) {		// 16.666ms = 1 frame	
 			deltaCounterTime = curInputTime - prevCounterTime;
 			deltaInputTime = curInputTime - this.prevInputTime;
 			this._processInput(deltaInputTime);
 			await this.sleep(1);
 			curInputTime = new Date().getTime();
-		}
+		}*/
 		
 		this.prevInputTime = curInputTime;
 		var deltaLevelTime = this.currentTime - this.prevTime;
 		
-	
+	this._processInput(deltaLevelTime);
 
 		
 		//if(deltaGameTime < 16) this._refresh();
@@ -483,9 +483,10 @@ Tetris.prototype = {
 
     },
 	_checkHint: function() {
-		if(this.shape.y != this.hintMino.y || this.shape.x != this.hintMino.x)
-			//1console.log("success!");
-		this._restartHandler();
+		if(this.shape.y != this.hintMino.y || this.shape.x != this.hintMino.x) {
+			new Audio('./dist/Failed.ogg').play();
+			this._restartHandler();
+		}
 	},
     // Update game data
     _update: function() {

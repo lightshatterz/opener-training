@@ -76,8 +76,8 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDPadDown(finds) {
-		var DAS = 30.0;
-		var ARR = 20.0;
+		var DAS = 15.0;
+		var ARR = 8.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
 		
@@ -156,8 +156,8 @@ var UserInputs = {
 	},
 	// Direction arrows
     processKeyboardArrowKeys(key) {		
-		var DAS = 50.0;
-		var ARR = 20.0;
+		var DAS = 20.0;
+		var ARR = 10.0;
 
 	
 		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {

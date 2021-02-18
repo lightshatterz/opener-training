@@ -6,7 +6,7 @@ nav ul{height:200px; width:80%;}
 nav ul{overflow:hidden; overflow-y:scroll;}
 
 body{
-	background: #3f3f3f;
+	background: #000000;
 	margin:0;
 	padding:0;
 	position: relative;
