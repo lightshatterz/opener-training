@@ -281,7 +281,7 @@ Tetris.prototype = {
         canvas.drawShape(this.shape);
 		canvas.drawHoldShape(this.holdQueue);
 		canvas.drawPreviewShape(this.shapeQueue);
-		//canvas.drawHintShape(this.hintMino);
+		canvas.drawHintShape(this.hintMino);
 		
 		if(this.shape != undefined) {
 		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
@@ -304,12 +304,11 @@ Tetris.prototype = {
 		var halfFrame = 5.0//5;//8.0;
 		var halfFramePlus = 10.0;//10.0;
 		
-		// TODO: put in web worker--limited to 60fps here
-		//if(deltaTime >= tenthOfFrame) {	//  needs to be 600hz // 16 / 10
-			inputs.incDeciframes();
-			inputs.incTickCounter();
-		//}
 		
+		inputs.incDeciframes();
+		inputs.incTickCounter();
+		
+	
 		if(inputs.getTickCounter() >= tenthOfFrame) {
 			inputs.updateGamepad();
 			inputs.processGamepadDPad();
@@ -494,6 +493,7 @@ Tetris.prototype = {
 		
 		if(!this.shape.isSameSRS(this.hintMino))
 		{
+			new Audio('./dist/Failed.ogg').play();
 			this._restartHandler();
 		}
 		/*if(this.shape.y != this.hintMino.y || this.shape.x != this.hintMino.x) {
@@ -510,7 +510,7 @@ Tetris.prototype = {
 			this.canPullFromHoldQueue = true;
             this.shape.copyTo(this.matrix);
             this._check();
-			//this._checkHint();
+			this._checkHint();
             this._fireShape();
 			new Audio('./dist/Blop2.ogg').play();
         }
