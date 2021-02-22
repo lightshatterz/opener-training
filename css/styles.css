@@ -11,7 +11,8 @@ body{
 	padding:0;
 	position: relative;
 	font-family: 'American Typewriter','Marker Felt';
-	
+	overflow-x: hidden;
+	overflow-y: hidden;
 }
 
 #tetris{

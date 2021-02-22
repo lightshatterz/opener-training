@@ -17,6 +17,12 @@ var UserInputs = {
 		this.gamepadButtonsDeciFrames++;
 		this.gamepadDirectionPadDeciFrames++;
 	},
+	incTickCounter() {
+		this.ticks++;
+	},
+	getTickCounter() {
+		return this.ticks;
+	},
 	
 	processGamepadInput() {
 		this.gamepadButtonsDown("RB");
@@ -76,8 +82,8 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDPadDown(finds) {
-		var DAS = 15.0;
-		var ARR = 8.0;
+		var DAS = 80.0;
+		var ARR = 20.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
 		
@@ -156,8 +162,8 @@ var UserInputs = {
 	},
 	// Direction arrows
     processKeyboardArrowKeys(key) {		
-		var DAS = 20.0;
-		var ARR = 10.0;
+		var DAS = 80.0;
+		var ARR = 20.0;
 
 	
 		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
@@ -224,7 +230,9 @@ var UserInputs = {
     
 	// button pressed containers
 	inputqueue: [],
-	gamepadQueue: []
+	gamepadQueue: [],
+	
+	ticks: 0
 };
 
 module.exports = UserInputs;

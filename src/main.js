@@ -97,7 +97,9 @@ var checkGameOver = function(matrix) {
 /**
 	Calculate  the extra rewards add to the score
 */
-var calcRewards = function(rows) {
+var calcRewards = function(rows, tspinType) {
+	if(tspinType == 2)
+		rows*=2+1;
     if (rows && rows.length > 1) {
         return Math.pow(2, rows.length - 1) * 100;
     }
@@ -151,7 +153,7 @@ Tetris.prototype = {
 		
         this.matrix = initMatrix(consts.ROW_COUNT, consts.COLUMN_COUNT);
         this.reset();
-		
+		setInterval(() => {this._processInput();}, 1);
 
         this._initEvents();
         this._fireShape();
@@ -260,6 +262,12 @@ Tetris.prototype = {
 		this.hintMino = this.hintQueue.shift();
 		this.shape = this.shapeQueue.shift();// shapes.randomShape();
        
+		// Reset matrix at successful end of opener
+		//if(this.shapeQueue.length == openers.length) {
+		//	this.matrix = [];
+		//	new Audio("Tetris.ogg");
+		//}
+		
 		this._draw();
         
     },
@@ -273,15 +281,13 @@ Tetris.prototype = {
         canvas.drawShape(this.shape);
 		canvas.drawHoldShape(this.holdQueue);
 		canvas.drawPreviewShape(this.shapeQueue);
-		canvas.drawHintShape(this.hintMino);
+		//canvas.drawHintShape(this.hintMino);
+		
 		if(this.shape != undefined) {
-
-
 		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
 		
 		//todo: put in collision detsction
 		var bottomY = clone.bottomAt(this.matrix);
-		//clone.color = "#ffffff";
 		canvas.drawGhostShape(clone, bottomY);
 		}
         canvas.drawMatrix(this.matrix);
@@ -291,25 +297,27 @@ Tetris.prototype = {
 	{
 		this._draw();
 	},
-	_processInput: async function(deltaTime) {
+	_processInput: async function() {
 	
+		var deltaTime = 1.0; // 1 millisecond
 		var tenthOfFrame = 1.0//1;//1.6; // 1.6ms = 1 fram
 		var halfFrame = 5.0//5;//8.0;
 		var halfFramePlus = 10.0;//10.0;
 		
 		// TODO: put in web worker--limited to 60fps here
-		if(deltaTime >= tenthOfFrame) {	//  needs to be 600hz // 16 / 10
+		//if(deltaTime >= tenthOfFrame) {	//  needs to be 600hz // 16 / 10
 			inputs.incDeciframes();
-		}
+			inputs.incTickCounter();
+		//}
 		
-		if(deltaTime >= tenthOfFrame) {
+		if(inputs.getTickCounter() >= tenthOfFrame) {
 			inputs.updateGamepad();
 			inputs.processGamepadDPad();
 			inputs.processGamepadInput();
 		}
 		
 		// drain gamepad queue
-		if(deltaTime > halfFrame)  // 8 millisecons
+		if(inputs.getTickCounter() > halfFrame)  // 8 millisecons
 		{
 			while((inputs.gamepadQueue != undefined && inputs.gamepadQueue.length >= 1)){
 				var curkey = inputs.gamepadQueue.shift();
@@ -363,12 +371,12 @@ Tetris.prototype = {
 		//inputs.gamepadButtonClear();
 		
 		// Do keyboard
-		if(deltaTime > tenthOfFrame)		// 120hz
+		if(inputs.getTickCounter() > tenthOfFrame)		// 120hz
 		{
 			inputs.processKeys();
 		}
 		
-		if (deltaTime > tenthOfFrame) {  // 60hz
+		if (inputs.getTickCounter() > tenthOfFrame) {  // 60hz
 			inputs.processKeyShift();
 			// Keyboard inputs
 			while((inputs.inputqueue != undefined && inputs.inputqueue.length >= 1)){
@@ -425,10 +433,10 @@ Tetris.prototype = {
 		}
 		
 		
-		if(deltaTime >= halfFramePlus)
+		if(inputs.getTickCounter() >= halfFramePlus)
 			inputs.saveKeyboardKeys();
 		
-		if(deltaTime >= tenthOfFrame)
+		if(inputs.getTickCounter() >= tenthOfFrame)
 			inputs.saveButtons();
 		
 	},		
@@ -462,7 +470,7 @@ Tetris.prototype = {
 		this.prevInputTime = curInputTime;
 		var deltaLevelTime = this.currentTime - this.prevTime;
 		
-	this._processInput(deltaLevelTime);
+		//this._processInput(deltaLevelTime);
 
 		
 		//if(deltaGameTime < 16) this._refresh();
@@ -483,10 +491,15 @@ Tetris.prototype = {
 
     },
 	_checkHint: function() {
-		if(this.shape.y != this.hintMino.y || this.shape.x != this.hintMino.x) {
-			new Audio('./dist/Failed.ogg').play();
+		
+		if(!this.shape.isSameSRS(this.hintMino))
+		{
 			this._restartHandler();
 		}
+		/*if(this.shape.y != this.hintMino.y || this.shape.x != this.hintMino.x) {
+			//new Audio('./dist/Failed.ogg').play();
+			this._restartHandler();
+		}*/
 	},
     // Update game data
     _update: function() {
@@ -497,7 +510,7 @@ Tetris.prototype = {
 			this.canPullFromHoldQueue = true;
             this.shape.copyTo(this.matrix);
             this._check();
-			this._checkHint();
+			//this._checkHint();
             this._fireShape();
 			new Audio('./dist/Blop2.ogg').play();
         }
@@ -511,15 +524,61 @@ Tetris.prototype = {
         }
 
     },
+	// 0 - none, 1 - mini, 2 - tspin
+	
+	_tSpinType: function(tPiece, matrix) {
+		
+		var side1 = 0;
+		var side2 = 0;
+		var side3 = 0;
+		var side4 = 0;
+		
+		side1X = tPiece.x;
+		side1Y = tPiece.y;
+		side2X = tPiece.x + 2;
+		side2Y = tPiece.y;
+		side3X = tPiece.x;
+		side3Y = tPiece.y + 2;
+		side4X = tPiece.x + 2;
+		side4Y = tPiece.y + 2;
+		
+		if(matrix[side1Y][side1X] != 0)
+			side1 = 1;
+		if(matrix[side2Y][side2X] != 0)
+			side2 = 1;
+		if(matrix[side3Y][side3X] != 0)
+			side3 = 1;
+		if(matrix[side4Y][side4X] != 0)
+			side4 = 1;
+		
+		console.log("sides: " + side1+side2+side3+side4);
+		// if Sides A and B + (C or D) are touching a Surface
+		//considered a T-Spin
+		if((side1+side2+side3+side4) >= 3)
+			return 2;
+		
+		//if Sides C and D + (A or B) are touching a Surface
+		//considered a Mini T-Spin
+		if((side1 || side2) && (side3 && side4))
+			return 1;
+		
+		return 0;
+	},
     // Check and update game data
     _check: function() {
         var rows = checkFullRows(this.matrix);
         if (rows.length) {
+			var tspinType;
 			if(rows.length >= 4)
 				new Audio('./dist/Tetris.ogg').play();
+			if(this.shape.flag === 'T')
+				tspinType = this._tSpinType(this.shape, this.matrix);
+			
             removeRows(this.matrix, rows);
+
+			console.log("type: " + tspinType);
             var score = calcScore(rows);
-            var reward = calcRewards(rows);
+            var reward = calcRewards(rows, tspinType);
             this.score += score + reward;
 			this.lines += rows.length;
 			

@@ -7,29 +7,35 @@ var COLUMN_COUNT = consts.COLUMN_COUNT;
 	You can add more shapes if you wish.
 */
 
+
 function ShapeL() {
     var state1 = [
-        [1, 0],
-        [1, 0],
-        [1, 1]
+        [0, 0, 1, 0],
+        [1, 1, 1, 0],
+		[0, 0, 0, 0],
+        [0, 0, 0, 0]
     ];
 
     var state2 = [
-        [0, 0, 1],
-        [1, 1, 1]
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+		[0, 1, 1, 0],
+        [0, 0, 0, 0]
     ];
 
     var state3 = [
-        [1, 1],
-        [0, 1],
-        [0, 1]
+        [0, 0, 0, 0],
+        [1, 1, 1, 0],
+		[1, 0, 0, 0],
+        [0, 0, 0, 0]
     ];
 
     var state4 = [
-        [1, 1, 1],
-        [1, 0, 0]
+        [1, 1, 0, 0],
+        [0, 1, 0, 0],
+		[0, 1, 0, 0],
+        [0, 0, 0, 0]
     ];
-
 
     this.states = [state1, state2, state3, state4];
     this.x = 4;
@@ -40,27 +46,32 @@ function ShapeL() {
 
 function ShapeLR() {
     var state1 = [
-        [0, 1],
-        [0, 1],
-        [1, 1]
+        [1, 0, 0, 0],
+        [1, 1, 1, 0],
+		[0, 0, 0, 0],
+        [0, 0, 0, 0]
     ];
 
     var state2 = [
-        [1, 1, 1],
-        [0, 0, 1]
+        [0, 1, 1, 0],
+        [0, 1, 0, 0],
+		[0, 1, 0, 0],
+        [0, 0, 0, 0]
     ];
 
     var state3 = [
-        [1, 1],
-        [1, 0],
-        [1, 0]
+        [0, 0, 0, 0],
+        [1, 1, 1, 0],
+		[0, 0, 1, 0],
+        [0, 0, 0, 0]
     ];
 
     var state4 = [
-        [1, 0, 0],
-        [1, 1, 1]
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+		[1, 1, 0, 0],
+        [0, 0, 0, 0]
     ];
-
 
     this.states = [state1, state2, state3, state4];
     this.x = 4;
@@ -72,10 +83,29 @@ function ShapeLR() {
 function ShapeO() {
 
     var state1 = [
-        [1, 1],
-        [1, 1]
+        [0, 0, 1, 1],
+        [0, 0, 1, 1],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
     ];
-
+    var state2 = [
+        [0, 0, 1, 1],
+        [0, 0, 1, 1],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
+    ];
+    var state3 = [
+        [0, 0, 1, 1],
+        [0, 0, 1, 1],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
+    ];
+    var state4 = [
+        [0, 0, 1, 1],
+        [0, 0, 1, 1],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
+    ];
 
     this.states = [state1];
     this.x = 4;
@@ -85,18 +115,39 @@ function ShapeO() {
 }
 
 function ShapeI() {
+	// North
     var state1 = [
-        [1],
-        [1],
-        [1],
-        [1]
+        [1, 0, 0, 0],
+        [1, 0, 0, 0],
+        [1, 0, 0, 0],
+        [1, 0, 0, 0]
     ];
 
+	// East
     var state2 = [
-        [1, 1, 1, 1]
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+		[1, 1, 1, 1],
+        [0, 0, 0, 0]
     ];
-
-    this.states = [state1, state2];
+	
+	// South
+    var state3 = [
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+		[0, 0, 1, 0],
+        [0, 0, 1, 0]
+    ];
+	
+	// West
+    var state4 = [
+        [0, 0, 0, 0],
+        [1, 1, 1, 1],
+		[0, 0, 0, 0],
+        [0, 0, 0, 0]
+    ];1
+	
+    this.states = [state1, state2, state3, state4];
 
     this.x = 5;
     this.y = -4;
@@ -106,28 +157,89 @@ function ShapeI() {
 
 function ShapeT() {
     var state1 = [
-        [1, 1, 1],
-        [0, 1, 0]
+        [0, 1, 0, 0],
+        [1, 1, 1, 0],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
     ];
-
     var state2 = [
-        [1, 0],
-        [1, 1],
-        [1, 0]
+        [0, 1, 0, 0],
+        [0, 1, 1, 0],
+		[0, 1, 0, 0],
+		[0, 0, 0, 0]
     ];
-
     var state3 = [
-        [0, 1, 0],
-        [1, 1, 1]
+        [0, 0, 0, 0],
+        [1, 1, 1, 0],
+		[0, 1, 0, 0],
+		[0, 0, 0, 0]
     ];
-
     var state4 = [
-        [0, 1],
-        [1, 1],
-        [0, 1]
+        [0, 1, 0, 0],
+        [1, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 0, 0, 0]
     ];
-
-    this.states = [state1, state2, state3, state4];
+	
+	// rotation points clockwise<point1, point2>, counterclockwise<point1, point2>
+	var state1RotationPointsOffset = [ 
+		0,  0,  0,  0,   
+		1,  0, -1,  0,   
+		1,  1, -1,  1,   
+		NaN, NaN,  NaN,  NaN,   
+		1, -2, -1, -2
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,   
+		1,  0,  1,  0,   
+		1, -1,  1, -1,   
+		0,  2,  0,  2,   
+		1,  2,  1,  2
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,  
+		-1,  0,  1,  0,   
+		NaN,  NaN,  NaN,  NaN,   
+		0, -2,  0, -2,  
+		-1, -2,  1, -2
+	];
+	var state4RotationPointsOffset = [
+		0,  0,  0,  0,  
+		-1,  0, -1,  0,  
+		-1, -1, -1, -1,   
+		0,  2,  0,  2,  
+		-1,  2, -1,  2
+	];
+	
+	var side1 = [
+		[1, 0, 1, 0],
+        [0, 0, 0, 0],
+		[1, 0, 1, 0],
+		[0, 0, 0, 0]
+	];
+	var side2 = [
+		[1, 0, 1, 0],
+        [0, 0, 0, 0],
+		[1, 0, 1, 0],
+		[0, 0, 0, 0]
+	];
+	var side3 = [
+		[1, 0, 1, 0],
+        [0, 0, 0, 0],
+		[1, 0, 1, 0],
+		[0, 0, 0, 0]
+	];
+	var side4 = [
+		[1, 0, 1, 0],
+        [0, 0, 0, 0],
+		[1, 0, 1, 0],
+		[0, 0, 0, 0]
+	];
+	
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
+	this.states = [state1, state2, state3, state4];
+	this.sides = [side1, side2, side4, side4];
+	
     this.x = 4;
     this.y = -2;
 	this.originY = -2;
@@ -136,17 +248,31 @@ function ShapeT() {
 
 function ShapeZ() {
     var state1 = [
-        [1, 1, 0],
-        [0, 1, 1]
+        [1, 1, 0, 0],
+        [0, 1, 1, 0],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
     ];
-
     var state2 = [
-        [0, 1],
-        [1, 1],
-        [1, 0]
+        [0, 0, 1, 0],
+        [0, 1, 1, 0],
+		[0, 1, 0, 0],
+		[0, 0, 0, 0]
+    ];
+	var state3 = [
+        [0, 1, 0, 0],
+        [1, 1, 0, 0],
+		[1, 0, 0, 0],
+		[0, 0, 0, 0]
+    ];
+	var state4 = [
+        [0, 1, 0, 0],
+        [1, 1, 0, 0],
+		[1, 0, 0, 0],
+		[0, 0, 0, 0]
     ];
 
-    this.states = [state1, state2];
+    this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -2;
 	this.originY = -2;
@@ -155,22 +281,110 @@ function ShapeZ() {
 
 function ShapeZR() {
     var state1 = [
-        [0, 1, 1],
-        [1, 1, 0]
+        [0, 1, 1, 0],
+        [1, 1, 0, 0],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
     ];
-
     var state2 = [
-        [1, 0],
-        [1, 1],
-        [0, 1]
+        [0, 1, 0, 0],
+        [0, 1, 1, 0],
+		[0, 0, 1, 0],
+		[0, 0, 0, 0]
+    ];
+	var state3 = [
+        [0, 0, 0, 0],
+        [0, 1, 1, 0],
+		[1, 1, 0, 0],
+		[0, 0, 0, 0]
+    ];
+	var state4 = [
+        [1, 0, 0, 0],
+        [1, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 0, 0, 0]
     ];
 
-    this.states = [state1, state2];
+    this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -2
 	this.originY = -2;
     this.flag = 'ZR';
 }
+
+
+/**
+doesShapeOverlap
+@param shape: tetris shape
+@param matrix: game matrix
+*/
+var doesShapeOverlap = function(shape, matrix) {	
+    var rows = matrix.length;
+    var cols = matrix[0].length;
+	var rotationDirection = 0;
+	
+    var isBoxInMatrix = function(box) {
+
+		
+        var x = shape.x + box.x;
+        var y = shape.y + box.y;
+		if(isNaN(x))return true;
+		if(isNaN(y))return true;
+		if(x < 0) return true;
+		if(x > matrix.cols)return true;
+		if(y > rows) return true;
+        //console.log("matrix X Y: " + " " + x + " "+ y);
+		return (matrix[y][x] != 0)
+    };
+
+	boxes = shape.getBoxes(shape.state);
+	
+	
+	for (var i in boxes)
+        if (isBoxInMatrix(boxes[i]))
+            return true;
+    
+    return false;
+};
+
+/**
+Is same on matrix
+@param shape: tetris shape
+@param hintPiece: hintPiece shape
+@param matrix: game matrix
+@param action:  'left','right','down','rotate'
+*/
+var isBoxesSame = function(shape, hintPiece) {	
+    var isBoxSame = function(shapeBox, hintPieceBox) {
+
+        var shapeX = shape.x + shapeBox.x;
+        var shapeY = shape.y + shapeBox.y;
+		var hintPieceX = hintPiece.x + hintPieceBox.x;
+		var hintPieceY = hintPiece.y + hintPieceBox.y;
+
+		if(shapeX == hintPieceX && shapeY == hintPieceY)
+			return true;
+		
+		return false;
+	};
+	
+    //var boxes =  action === 'rotate'?shape.getBoxes(shape.nextState()) : shape.getBoxes(shape.state);
+    
+	var boxes;
+	var hintPieceBoxes;
+	
+
+	boxes = shape.getBoxes(shape.state);
+	
+	hintPieceBoxes = hintPiece.getBoxes(hintPiece.state);
+	
+	for (var i in boxes) {
+        if (!isBoxSame(boxes[i], hintPieceBoxes[i])) {
+            return false;
+        }
+    }
+    return true;
+};
 
 /**
 Is shape can move
@@ -270,11 +484,53 @@ ShapeZR.prototype = {
 	matrix: function(state) {
 		var st = state !== undefined ? state : this.state;
 		return this.states[st];
+	}, 
+
+	canMoveTo: function(shape, matrix) {
+		if(!doesShapeOverlap(shape, matrix))
+			return true;
+		return false;
+	},
+	// 0 - no, 1 - up,left, 2 - up,right, 3 - down,left, 4 - down, right
+	kickShape: function(matrix, rotationDirection) {
+
+	let clone = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+	
+	for(var j = 0; j < 4; j++) {
+		if(this.state == j) {
+			clone.state = this.nextState(rotationDirection);
+			var i = 0;
+			if(rotationDirection == -1)
+				i = 2;
+			for(; i < this.rotationPoints[j].length; i+=2)
+			{
+				var shiftX = this.rotationPoints[j][i];
+				var shiftY = this.rotationPoints[j][i+1];
+				if(!isNaN(shiftY) && !isNaN(shiftX)) {
+					//console.log("shiftxy: " + shiftX + " " + shiftY);
+					clone.x = this.x + shiftX;
+					clone.y = this.y - shiftY;
+					if(this.canMoveTo(clone, matrix) == true) {
+						this.state = clone.state;// = Object.assign(Object.create(Object.getPrototypeOf(clone)), clone);
+						this.x = clone.x;
+						this.y = clone.y;
+						return;
+					}
+				}
+			}	
+		}
+	
+	}
+
+		
 	},
 	//Rotate shape
 	rotate: function(matrix) {
-		if (isShapeCanMove(this,matrix,'rotate')){
-			this.state = this.nextState(1);
+		//  TODO: rest of pieces
+		if(this.flag == 'T')
+			this.kickShape(matrix, -1);
+		else if (isShapeCanMove(this, matrix, 'rotate')){
+			this.state = this.nextState(-1);
 			//fix position if shape is out of right border
 			var right = this.getRight();
 			if ( right >= COLUMN_COUNT){
@@ -287,8 +543,10 @@ ShapeZR.prototype = {
 	},
 	//Rotate shape clockwise
 	rotateClockwise: function(matrix) {
-		if (isShapeCanMove(this, matrix, 'rotateclockwise')) {
-			this.state = this.nextState(-1);
+		if(this.flag == 'T')
+			this.kickShape(matrix, 1);
+		else if (isShapeCanMove(this, matrix, 'rotateclockwise')) {
+			this.state = this.nextState(1);
 			//fix position if shape is out of right border
 			var right = this.getRight();
 			if (right >= COLUMN_COUNT) {
@@ -387,6 +645,10 @@ ShapeZR.prototype = {
 			}
 		}
 	},
+	// check if piece is same on matrix
+	isSameSRS: function(shape) {
+		return isBoxesSame(this, shape)
+	},
 	resetOrigin: function() {
 		this.y = this.originY + 1;
 	}
@@ -424,7 +686,8 @@ var RandomGenerator = {
 function randomShape() {
     var result = parseInt(RandomGenerator.getTetrimino(),10);//Math.floor(Math.random() * 7);
     var shape;
-
+	shape = new ShapeT();
+	
     switch (result) {
         case 0:
             shape = new ShapeL();

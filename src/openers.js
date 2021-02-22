@@ -92,17 +92,18 @@ var OpenerGenerator = {
 		shapes.getShape(3));
 		
 		// L
-		this.hintQueue[0].x = 0;
+		this.hintQueue[0].x = -1;
 		this.hintQueue[0].y = 17;
+		this.hintQueue[0].state = this.hintQueue[0].nextState(1);
 		// I
 		this.hintQueue[1].x = 3;
-		this.hintQueue[1].y = 19;
+		this.hintQueue[1].y = 17;
 		this.hintQueue[1].state = this.hintQueue[1].nextState(1);
 		// O
-		this.hintQueue[2].x = 8;
+		this.hintQueue[2].x = 6;
 		this.hintQueue[2].y = 18;
 		// S
-		this.hintQueue[3].x = 6;
+		this.hintQueue[3].x = 5;
 		this.hintQueue[3].y = 17;
 		this.hintQueue[3].state = this.hintQueue[3].nextState(1);
 		// Z
@@ -111,12 +112,12 @@ var OpenerGenerator = {
 		// J
 		this.hintQueue[5].x = 7;
 		this.hintQueue[5].y = 16;
-		this.hintQueue[5].state = this.hintQueue[5].nextState(3);
 		
 		// T
 		this.hintQueue[6].x = 1;
-		this.hintQueue[6].y = 18;
-	
+		this.hintQueue[6].y = 17;
+		this.hintQueue[6].state = this.hintQueue[6].nextState(1)
+		this.hintQueue[6].state = this.hintQueue[6].nextState(1)
 		
 		}
 		

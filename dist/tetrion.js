@@ -437,6 +437,12 @@ var UserInputs = {
 		this.gamepadButtonsDeciFrames++;
 		this.gamepadDirectionPadDeciFrames++;
 	},
+	incTickCounter() {
+		this.ticks++;
+	},
+	getTickCounter() {
+		return this.ticks;
+	},
 	
 	processGamepadInput() {
 		this.gamepadButtonsDown("RB");
@@ -496,8 +502,8 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDPadDown(finds) {
-		var DAS = 15.0;
-		var ARR = 8.0;
+		var DAS = 80.0;
+		var ARR = 20.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
 		
@@ -576,8 +582,8 @@ var UserInputs = {
 	},
 	// Direction arrows
     processKeyboardArrowKeys(key) {		
-		var DAS = 20.0;
-		var ARR = 10.0;
+		var DAS = 80.0;
+		var ARR = 20.0;
 
 	
 		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
@@ -644,7 +650,9 @@ var UserInputs = {
     
 	// button pressed containers
 	inputqueue: [],
-	gamepadQueue: []
+	gamepadQueue: [],
+	
+	ticks: 0
 };
 
 module.exports = UserInputs;
@@ -748,7 +756,9 @@ var checkGameOver = function(matrix) {
 /**
 	Calculate  the extra rewards add to the score
 */
-var calcRewards = function(rows) {
+var calcRewards = function(rows, tspinType) {
+	if(tspinType == 2)
+		rows*=2+1;
     if (rows && rows.length > 1) {
         return Math.pow(2, rows.length - 1) * 100;
     }
@@ -802,7 +812,7 @@ Tetris.prototype = {
 		
         this.matrix = initMatrix(consts.ROW_COUNT, consts.COLUMN_COUNT);
         this.reset();
-		
+		setInterval(() => {this._processInput();}, 1);
 
         this._initEvents();
         this._fireShape();
@@ -911,6 +921,12 @@ Tetris.prototype = {
 		this.hintMino = this.hintQueue.shift();
 		this.shape = this.shapeQueue.shift();// shapes.randomShape();
        
+		// Reset matrix at successful end of opener
+		//if(this.shapeQueue.length == openers.length) {
+		//	this.matrix = [];
+		//	new Audio("Tetris.ogg");
+		//}
+		
 		this._draw();
         
     },
@@ -924,15 +940,13 @@ Tetris.prototype = {
         canvas.drawShape(this.shape);
 		canvas.drawHoldShape(this.holdQueue);
 		canvas.drawPreviewShape(this.shapeQueue);
-		canvas.drawHintShape(this.hintMino);
+		//canvas.drawHintShape(this.hintMino);
+		
 		if(this.shape != undefined) {
-
-
 		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
 		
 		//todo: put in collision detsction
 		var bottomY = clone.bottomAt(this.matrix);
-		//clone.color = "#ffffff";
 		canvas.drawGhostShape(clone, bottomY);
 		}
         canvas.drawMatrix(this.matrix);
@@ -942,25 +956,27 @@ Tetris.prototype = {
 	{
 		this._draw();
 	},
-	_processInput: async function(deltaTime) {
+	_processInput: async function() {
 	
+		var deltaTime = 1.0; // 1 millisecond
 		var tenthOfFrame = 1.0//1;//1.6; // 1.6ms = 1 fram
 		var halfFrame = 5.0//5;//8.0;
 		var halfFramePlus = 10.0;//10.0;
 		
 		// TODO: put in web worker--limited to 60fps here
-		if(deltaTime >= tenthOfFrame) {	//  needs to be 600hz // 16 / 10
+		//if(deltaTime >= tenthOfFrame) {	//  needs to be 600hz // 16 / 10
 			inputs.incDeciframes();
-		}
+			inputs.incTickCounter();
+		//}
 		
-		if(deltaTime >= tenthOfFrame) {
+		if(inputs.getTickCounter() >= tenthOfFrame) {
 			inputs.updateGamepad();
 			inputs.processGamepadDPad();
 			inputs.processGamepadInput();
 		}
 		
 		// drain gamepad queue
-		if(deltaTime > halfFrame)  // 8 millisecons
+		if(inputs.getTickCounter() > halfFrame)  // 8 millisecons
 		{
 			while((inputs.gamepadQueue != undefined && inputs.gamepadQueue.length >= 1)){
 				var curkey = inputs.gamepadQueue.shift();
@@ -1014,12 +1030,12 @@ Tetris.prototype = {
 		//inputs.gamepadButtonClear();
 		
 		// Do keyboard
-		if(deltaTime > tenthOfFrame)		// 120hz
+		if(inputs.getTickCounter() > tenthOfFrame)		// 120hz
 		{
 			inputs.processKeys();
 		}
 		
-		if (deltaTime > tenthOfFrame) {  // 60hz
+		if (inputs.getTickCounter() > tenthOfFrame) {  // 60hz
 			inputs.processKeyShift();
 			// Keyboard inputs
 			while((inputs.inputqueue != undefined && inputs.inputqueue.length >= 1)){
@@ -1076,10 +1092,10 @@ Tetris.prototype = {
 		}
 		
 		
-		if(deltaTime >= halfFramePlus)
+		if(inputs.getTickCounter() >= halfFramePlus)
 			inputs.saveKeyboardKeys();
 		
-		if(deltaTime >= tenthOfFrame)
+		if(inputs.getTickCounter() >= tenthOfFrame)
 			inputs.saveButtons();
 		
 	},		
@@ -1113,7 +1129,7 @@ Tetris.prototype = {
 		this.prevInputTime = curInputTime;
 		var deltaLevelTime = this.currentTime - this.prevTime;
 		
-	this._processInput(deltaLevelTime);
+		//this._processInput(deltaLevelTime);
 
 		
 		//if(deltaGameTime < 16) this._refresh();
@@ -1134,10 +1150,15 @@ Tetris.prototype = {
 
     },
 	_checkHint: function() {
-		if(this.shape.y != this.hintMino.y || this.shape.x != this.hintMino.x) {
-			new Audio('./dist/Failed.ogg').play();
+		
+		if(!this.shape.isSameSRS(this.hintMino))
+		{
 			this._restartHandler();
 		}
+		/*if(this.shape.y != this.hintMino.y || this.shape.x != this.hintMino.x) {
+			//new Audio('./dist/Failed.ogg').play();
+			this._restartHandler();
+		}*/
 	},
     // Update game data
     _update: function() {
@@ -1148,7 +1169,7 @@ Tetris.prototype = {
 			this.canPullFromHoldQueue = true;
             this.shape.copyTo(this.matrix);
             this._check();
-			this._checkHint();
+			//this._checkHint();
             this._fireShape();
 			new Audio('./dist/Blop2.ogg').play();
         }
@@ -1162,15 +1183,61 @@ Tetris.prototype = {
         }
 
     },
+	// 0 - none, 1 - mini, 2 - tspin
+	
+	_tSpinType: function(tPiece, matrix) {
+		
+		var side1 = 0;
+		var side2 = 0;
+		var side3 = 0;
+		var side4 = 0;
+		
+		side1X = tPiece.x;
+		side1Y = tPiece.y;
+		side2X = tPiece.x + 2;
+		side2Y = tPiece.y;
+		side3X = tPiece.x;
+		side3Y = tPiece.y + 2;
+		side4X = tPiece.x + 2;
+		side4Y = tPiece.y + 2;
+		
+		if(matrix[side1Y][side1X] != 0)
+			side1 = 1;
+		if(matrix[side2Y][side2X] != 0)
+			side2 = 1;
+		if(matrix[side3Y][side3X] != 0)
+			side3 = 1;
+		if(matrix[side4Y][side4X] != 0)
+			side4 = 1;
+		
+		console.log("sides: " + side1+side2+side3+side4);
+		// if Sides A and B + (C or D) are touching a Surface
+		//considered a T-Spin
+		if((side1+side2+side3+side4) >= 3)
+			return 2;
+		
+		//if Sides C and D + (A or B) are touching a Surface
+		//considered a Mini T-Spin
+		if((side1 || side2) && (side3 && side4))
+			return 1;
+		
+		return 0;
+	},
     // Check and update game data
     _check: function() {
         var rows = checkFullRows(this.matrix);
         if (rows.length) {
+			var tspinType;
 			if(rows.length >= 4)
 				new Audio('./dist/Tetris.ogg').play();
+			if(this.shape.flag === 'T')
+				tspinType = this._tSpinType(this.shape, this.matrix);
+			
             removeRows(this.matrix, rows);
+
+			console.log("type: " + tspinType);
             var score = calcScore(rows);
-            var reward = calcRewards(rows);
+            var reward = calcRewards(rows, tspinType);
             this.score += score + reward;
 			this.lines += rows.length;
 			
@@ -1289,17 +1356,18 @@ var OpenerGenerator = {
 		shapes.getShape(3));
 		
 		// L
-		this.hintQueue[0].x = 0;
+		this.hintQueue[0].x = -1;
 		this.hintQueue[0].y = 17;
+		this.hintQueue[0].state = this.hintQueue[0].nextState(1);
 		// I
 		this.hintQueue[1].x = 3;
-		this.hintQueue[1].y = 19;
+		this.hintQueue[1].y = 17;
 		this.hintQueue[1].state = this.hintQueue[1].nextState(1);
 		// O
-		this.hintQueue[2].x = 8;
+		this.hintQueue[2].x = 6;
 		this.hintQueue[2].y = 18;
 		// S
-		this.hintQueue[3].x = 6;
+		this.hintQueue[3].x = 5;
 		this.hintQueue[3].y = 17;
 		this.hintQueue[3].state = this.hintQueue[3].nextState(1);
 		// Z
@@ -1308,12 +1376,12 @@ var OpenerGenerator = {
 		// J
 		this.hintQueue[5].x = 7;
 		this.hintQueue[5].y = 16;
-		this.hintQueue[5].state = this.hintQueue[5].nextState(3);
 		
 		// T
 		this.hintQueue[6].x = 1;
-		this.hintQueue[6].y = 18;
-	
+		this.hintQueue[6].y = 17;
+		this.hintQueue[6].state = this.hintQueue[6].nextState(1)
+		this.hintQueue[6].state = this.hintQueue[6].nextState(1)
 		
 		}
 		
@@ -1368,29 +1436,35 @@ var COLUMN_COUNT = consts.COLUMN_COUNT;
 	You can add more shapes if you wish.
 */
 
+
 function ShapeL() {
     var state1 = [
-        [1, 0],
-        [1, 0],
-        [1, 1]
+        [0, 0, 1, 0],
+        [1, 1, 1, 0],
+		[0, 0, 0, 0],
+        [0, 0, 0, 0]
     ];
 
     var state2 = [
-        [0, 0, 1],
-        [1, 1, 1]
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+		[0, 1, 1, 0],
+        [0, 0, 0, 0]
     ];
 
     var state3 = [
-        [1, 1],
-        [0, 1],
-        [0, 1]
+        [0, 0, 0, 0],
+        [1, 1, 1, 0],
+		[1, 0, 0, 0],
+        [0, 0, 0, 0]
     ];
 
     var state4 = [
-        [1, 1, 1],
-        [1, 0, 0]
+        [1, 1, 0, 0],
+        [0, 1, 0, 0],
+		[0, 1, 0, 0],
+        [0, 0, 0, 0]
     ];
-
 
     this.states = [state1, state2, state3, state4];
     this.x = 4;
@@ -1401,27 +1475,32 @@ function ShapeL() {
 
 function ShapeLR() {
     var state1 = [
-        [0, 1],
-        [0, 1],
-        [1, 1]
+        [1, 0, 0, 0],
+        [1, 1, 1, 0],
+		[0, 0, 0, 0],
+        [0, 0, 0, 0]
     ];
 
     var state2 = [
-        [1, 1, 1],
-        [0, 0, 1]
+        [0, 1, 1, 0],
+        [0, 1, 0, 0],
+		[0, 1, 0, 0],
+        [0, 0, 0, 0]
     ];
 
     var state3 = [
-        [1, 1],
-        [1, 0],
-        [1, 0]
+        [0, 0, 0, 0],
+        [1, 1, 1, 0],
+		[0, 0, 1, 0],
+        [0, 0, 0, 0]
     ];
 
     var state4 = [
-        [1, 0, 0],
-        [1, 1, 1]
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+		[1, 1, 0, 0],
+        [0, 0, 0, 0]
     ];
-
 
     this.states = [state1, state2, state3, state4];
     this.x = 4;
@@ -1433,10 +1512,29 @@ function ShapeLR() {
 function ShapeO() {
 
     var state1 = [
-        [1, 1],
-        [1, 1]
+        [0, 0, 1, 1],
+        [0, 0, 1, 1],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
     ];
-
+    var state2 = [
+        [0, 0, 1, 1],
+        [0, 0, 1, 1],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
+    ];
+    var state3 = [
+        [0, 0, 1, 1],
+        [0, 0, 1, 1],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
+    ];
+    var state4 = [
+        [0, 0, 1, 1],
+        [0, 0, 1, 1],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
+    ];
 
     this.states = [state1];
     this.x = 4;
@@ -1446,18 +1544,39 @@ function ShapeO() {
 }
 
 function ShapeI() {
+	// North
     var state1 = [
-        [1],
-        [1],
-        [1],
-        [1]
+        [1, 0, 0, 0],
+        [1, 0, 0, 0],
+        [1, 0, 0, 0],
+        [1, 0, 0, 0]
     ];
 
+	// East
     var state2 = [
-        [1, 1, 1, 1]
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+		[1, 1, 1, 1],
+        [0, 0, 0, 0]
     ];
-
-    this.states = [state1, state2];
+	
+	// South
+    var state3 = [
+        [0, 0, 1, 0],
+        [0, 0, 1, 0],
+		[0, 0, 1, 0],
+        [0, 0, 1, 0]
+    ];
+	
+	// West
+    var state4 = [
+        [0, 0, 0, 0],
+        [1, 1, 1, 1],
+		[0, 0, 0, 0],
+        [0, 0, 0, 0]
+    ];1
+	
+    this.states = [state1, state2, state3, state4];
 
     this.x = 5;
     this.y = -4;
@@ -1467,28 +1586,89 @@ function ShapeI() {
 
 function ShapeT() {
     var state1 = [
-        [1, 1, 1],
-        [0, 1, 0]
+        [0, 1, 0, 0],
+        [1, 1, 1, 0],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
     ];
-
     var state2 = [
-        [1, 0],
-        [1, 1],
-        [1, 0]
+        [0, 1, 0, 0],
+        [0, 1, 1, 0],
+		[0, 1, 0, 0],
+		[0, 0, 0, 0]
     ];
-
     var state3 = [
-        [0, 1, 0],
-        [1, 1, 1]
+        [0, 0, 0, 0],
+        [1, 1, 1, 0],
+		[0, 1, 0, 0],
+		[0, 0, 0, 0]
     ];
-
     var state4 = [
-        [0, 1],
-        [1, 1],
-        [0, 1]
+        [0, 1, 0, 0],
+        [1, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 0, 0, 0]
     ];
-
-    this.states = [state1, state2, state3, state4];
+	
+	// rotation points clockwise<point1, point2>, counterclockwise<point1, point2>
+	var state1RotationPointsOffset = [ 
+		0,  0,  0,  0,   
+		1,  0, -1,  0,   
+		1,  1, -1,  1,   
+		NaN, NaN,  NaN,  NaN,   
+		1, -2, -1, -2
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,   
+		1,  0,  1,  0,   
+		1, -1,  1, -1,   
+		0,  2,  0,  2,   
+		1,  2,  1,  2
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,  
+		-1,  0,  1,  0,   
+		NaN,  NaN,  NaN,  NaN,   
+		0, -2,  0, -2,  
+		-1, -2,  1, -2
+	];
+	var state4RotationPointsOffset = [
+		0,  0,  0,  0,  
+		-1,  0, -1,  0,  
+		-1, -1, -1, -1,   
+		0,  2,  0,  2,  
+		-1,  2, -1,  2
+	];
+	
+	var side1 = [
+		[1, 0, 1, 0],
+        [0, 0, 0, 0],
+		[1, 0, 1, 0],
+		[0, 0, 0, 0]
+	];
+	var side2 = [
+		[1, 0, 1, 0],
+        [0, 0, 0, 0],
+		[1, 0, 1, 0],
+		[0, 0, 0, 0]
+	];
+	var side3 = [
+		[1, 0, 1, 0],
+        [0, 0, 0, 0],
+		[1, 0, 1, 0],
+		[0, 0, 0, 0]
+	];
+	var side4 = [
+		[1, 0, 1, 0],
+        [0, 0, 0, 0],
+		[1, 0, 1, 0],
+		[0, 0, 0, 0]
+	];
+	
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
+	this.states = [state1, state2, state3, state4];
+	this.sides = [side1, side2, side4, side4];
+	
     this.x = 4;
     this.y = -2;
 	this.originY = -2;
@@ -1497,17 +1677,31 @@ function ShapeT() {
 
 function ShapeZ() {
     var state1 = [
-        [1, 1, 0],
-        [0, 1, 1]
+        [1, 1, 0, 0],
+        [0, 1, 1, 0],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
     ];
-
     var state2 = [
-        [0, 1],
-        [1, 1],
-        [1, 0]
+        [0, 0, 1, 0],
+        [0, 1, 1, 0],
+		[0, 1, 0, 0],
+		[0, 0, 0, 0]
+    ];
+	var state3 = [
+        [0, 1, 0, 0],
+        [1, 1, 0, 0],
+		[1, 0, 0, 0],
+		[0, 0, 0, 0]
+    ];
+	var state4 = [
+        [0, 1, 0, 0],
+        [1, 1, 0, 0],
+		[1, 0, 0, 0],
+		[0, 0, 0, 0]
     ];
 
-    this.states = [state1, state2];
+    this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -2;
 	this.originY = -2;
@@ -1516,22 +1710,110 @@ function ShapeZ() {
 
 function ShapeZR() {
     var state1 = [
-        [0, 1, 1],
-        [1, 1, 0]
+        [0, 1, 1, 0],
+        [1, 1, 0, 0],
+		[0, 0, 0, 0],
+		[0, 0, 0, 0]
     ];
-
     var state2 = [
-        [1, 0],
-        [1, 1],
-        [0, 1]
+        [0, 1, 0, 0],
+        [0, 1, 1, 0],
+		[0, 0, 1, 0],
+		[0, 0, 0, 0]
+    ];
+	var state3 = [
+        [0, 0, 0, 0],
+        [0, 1, 1, 0],
+		[1, 1, 0, 0],
+		[0, 0, 0, 0]
+    ];
+	var state4 = [
+        [1, 0, 0, 0],
+        [1, 1, 0, 0],
+		[0, 1, 0, 0],
+		[0, 0, 0, 0]
     ];
 
-    this.states = [state1, state2];
+    this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -2
 	this.originY = -2;
     this.flag = 'ZR';
 }
+
+
+/**
+doesShapeOverlap
+@param shape: tetris shape
+@param matrix: game matrix
+*/
+var doesShapeOverlap = function(shape, matrix) {	
+    var rows = matrix.length;
+    var cols = matrix[0].length;
+	var rotationDirection = 0;
+	
+    var isBoxInMatrix = function(box) {
+
+		
+        var x = shape.x + box.x;
+        var y = shape.y + box.y;
+		if(isNaN(x))return true;
+		if(isNaN(y))return true;
+		if(x < 0) return true;
+		if(x > matrix.cols)return true;
+		if(y > rows) return true;
+        //console.log("matrix X Y: " + " " + x + " "+ y);
+		return (matrix[y][x] != 0)
+    };
+
+	boxes = shape.getBoxes(shape.state);
+	
+	
+	for (var i in boxes)
+        if (isBoxInMatrix(boxes[i]))
+            return true;
+    
+    return false;
+};
+
+/**
+Is same on matrix
+@param shape: tetris shape
+@param hintPiece: hintPiece shape
+@param matrix: game matrix
+@param action:  'left','right','down','rotate'
+*/
+var isBoxesSame = function(shape, hintPiece) {	
+    var isBoxSame = function(shapeBox, hintPieceBox) {
+
+        var shapeX = shape.x + shapeBox.x;
+        var shapeY = shape.y + shapeBox.y;
+		var hintPieceX = hintPiece.x + hintPieceBox.x;
+		var hintPieceY = hintPiece.y + hintPieceBox.y;
+
+		if(shapeX == hintPieceX && shapeY == hintPieceY)
+			return true;
+		
+		return false;
+	};
+	
+    //var boxes =  action === 'rotate'?shape.getBoxes(shape.nextState()) : shape.getBoxes(shape.state);
+    
+	var boxes;
+	var hintPieceBoxes;
+	
+
+	boxes = shape.getBoxes(shape.state);
+	
+	hintPieceBoxes = hintPiece.getBoxes(hintPiece.state);
+	
+	for (var i in boxes) {
+        if (!isBoxSame(boxes[i], hintPieceBoxes[i])) {
+            return false;
+        }
+    }
+    return true;
+};
 
 /**
 Is shape can move
@@ -1631,11 +1913,53 @@ ShapeZR.prototype = {
 	matrix: function(state) {
 		var st = state !== undefined ? state : this.state;
 		return this.states[st];
+	}, 
+
+	canMoveTo: function(shape, matrix) {
+		if(!doesShapeOverlap(shape, matrix))
+			return true;
+		return false;
+	},
+	// 0 - no, 1 - up,left, 2 - up,right, 3 - down,left, 4 - down, right
+	kickShape: function(matrix, rotationDirection) {
+
+	let clone = Object.assign(Object.create(Object.getPrototypeOf(this)), this);
+	
+	for(var j = 0; j < 4; j++) {
+		if(this.state == j) {
+			clone.state = this.nextState(rotationDirection);
+			var i = 0;
+			if(rotationDirection == -1)
+				i = 2;
+			for(; i < this.rotationPoints[j].length; i+=2)
+			{
+				var shiftX = this.rotationPoints[j][i];
+				var shiftY = this.rotationPoints[j][i+1];
+				if(!isNaN(shiftY) && !isNaN(shiftX)) {
+					//console.log("shiftxy: " + shiftX + " " + shiftY);
+					clone.x = this.x + shiftX;
+					clone.y = this.y - shiftY;
+					if(this.canMoveTo(clone, matrix) == true) {
+						this.state = clone.state;// = Object.assign(Object.create(Object.getPrototypeOf(clone)), clone);
+						this.x = clone.x;
+						this.y = clone.y;
+						return;
+					}
+				}
+			}	
+		}
+	
+	}
+
+		
 	},
 	//Rotate shape
 	rotate: function(matrix) {
-		if (isShapeCanMove(this,matrix,'rotate')){
-			this.state = this.nextState(1);
+		//  TODO: rest of pieces
+		if(this.flag == 'T')
+			this.kickShape(matrix, -1);
+		else if (isShapeCanMove(this, matrix, 'rotate')){
+			this.state = this.nextState(-1);
 			//fix position if shape is out of right border
 			var right = this.getRight();
 			if ( right >= COLUMN_COUNT){
@@ -1648,8 +1972,10 @@ ShapeZR.prototype = {
 	},
 	//Rotate shape clockwise
 	rotateClockwise: function(matrix) {
-		if (isShapeCanMove(this, matrix, 'rotateclockwise')) {
-			this.state = this.nextState(-1);
+		if(this.flag == 'T')
+			this.kickShape(matrix, 1);
+		else if (isShapeCanMove(this, matrix, 'rotateclockwise')) {
+			this.state = this.nextState(1);
 			//fix position if shape is out of right border
 			var right = this.getRight();
 			if (right >= COLUMN_COUNT) {
@@ -1748,6 +2074,10 @@ ShapeZR.prototype = {
 			}
 		}
 	},
+	// check if piece is same on matrix
+	isSameSRS: function(shape) {
+		return isBoxesSame(this, shape)
+	},
 	resetOrigin: function() {
 		this.y = this.originY + 1;
 	}
@@ -1785,7 +2115,8 @@ var RandomGenerator = {
 function randomShape() {
     var result = parseInt(RandomGenerator.getTetrimino(),10);//Math.floor(Math.random() * 7);
     var shape;
-
+	shape = new ShapeT();
+	
     switch (result) {
         case 0:
             shape = new ShapeL();
