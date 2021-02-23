@@ -1,4 +1,3 @@
-
 var gamepad = require('./gamepad.js');
 
 var UserInputs = {
@@ -190,6 +189,12 @@ var UserInputs = {
         //}
     },
     keyDown(event) {
+		
+		// Disable space scrolling etc
+		//if (event.keyCode === 32) {
+			event.preventDefault();
+		//}
+		
 		this.keyboardKeys[event.keyCode] = true;
 		this.isKeyBoardKeyDown = true;
     },

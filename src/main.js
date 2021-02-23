@@ -142,6 +142,9 @@ Tetris.prototype = {
 
     init: function(options) {
 
+		// Initialize function calls
+		//document.getElementById("TKIFonzieVar").onclick = function() { this._restartHandler() };
+		
         var cfg = this.config = utils.extend(options, defaults);
         this.interval = consts.DEFAULT_INTERVAL;
 
@@ -149,8 +152,8 @@ Tetris.prototype = {
         views.init(this.id, cfg.maxWidth, cfg.maxHeight);
         canvas.init(views.scene, views.preview, views.hold);
 		inputs.init();
-		//openers.init();
 		
+		this.currentOpener = 0;
         this.matrix = initMatrix(consts.ROW_COUNT, consts.COLUMN_COUNT);
         this.reset();
 		setInterval(() => {this._processInput();}, 1);
@@ -161,7 +164,19 @@ Tetris.prototype = {
     },
 	setTKIFonzieVar: function()
 	{
-		this.reset();
+		this._restartHandler();
+		this.currentOpener = 1;
+		this._fireShape();
+		
+		//this._update();
+	},	
+	setDTCannonVar: function()
+	{
+		this._restartHandler();
+		this.currentOpener = 2;
+		this._fireShape();
+		
+		//this._update();
 	},
     //Reset game
     reset: function() {
@@ -170,12 +185,12 @@ Tetris.prototype = {
         this.level = 1;
         this.score = 0;
 		this.lines = 0;
-		this.currentMinoInx = 0;
         this.startTime = new Date().getTime();
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
 		this.prevInputTime = this.startTime;
+		this.currentMinoInx = 0;
 		this.shapeQueue = [];
 		this.hintQueue = [];
 		this.holdQueue = [];
@@ -192,7 +207,6 @@ Tetris.prototype = {
     start: function() {
         this.running = true;
 		window.requestAnimationFrame(utils.proxy(this._refresh, this));
-	//window.requestAnimationFrame(utils.proxy(this._refresh, this));}
 
     },
     //Pause game
@@ -247,21 +261,32 @@ Tetris.prototype = {
     _fireShape: function() {
 		//this.shape = this.shapeQueue.shift() || shapes.randomShape();
 
+	
 
+			
 		while(this.shapeQueue.length <= 4)
 		{
-			this.preparedShape = openers.getNextMino();
+			this.preparedShape = openers.getNextMino(this.currentOpener);
 			this.shapeQueue.push(this.preparedShape);
 		}
 		while(this.hintQueue.length <= 4)
 		{
-			this.preparedShape = openers.getNextHint(this.matrix);
+			this.preparedShape = openers.getNextHint(this.currentOpener);
 			this.hintQueue.push(this.preparedShape);
 		}
 		
 		this.hintMino = this.hintQueue.shift();
 		this.shape = this.shapeQueue.shift();// shapes.randomShape();
        
+	   this.currentMinoInx++;
+	   
+		if(this.currentMinoInx > openers.getLength()) {
+			this.hintQueue = [];
+			this.shapeQueue = [];
+			this._restartHandler();
+			this._fireShape();
+		}
+		
 		// Reset matrix at successful end of opener
 		//if(this.shapeQueue.length == openers.length) {
 		//	this.matrix = [];
@@ -271,10 +296,6 @@ Tetris.prototype = {
 		this._draw();
         
     },
-
-
-	/*_processCollisions: function {
-	},*/
     // Draw game data
     _draw: function() {
         canvas.drawScene();
@@ -451,31 +472,11 @@ Tetris.prototype = {
 		
 		this.currentTime = new Date().getTime();
 		
-		
 		var curInputTime = new Date().getTime();
-		var prevCounterTime = curInputTime;
-		var deltaInputTime = 0;
-		var deltaCounterTime = 0;
-		
-		// Process input as many times as possible in a frame--60hz hopefully
-		/*while(deltaCounterTime <= 16) {		// 16.666ms = 1 frame	
-			deltaCounterTime = curInputTime - prevCounterTime;
-			deltaInputTime = curInputTime - this.prevInputTime;
-			this._processInput(deltaInputTime);
-			await this.sleep(1);
-			curInputTime = new Date().getTime();
-		}*/
-		
+	
 		this.prevInputTime = curInputTime;
 		var deltaLevelTime = this.currentTime - this.prevTime;
-		
-		//this._processInput(deltaLevelTime);
 
-		
-		//if(deltaGameTime < 16) this._refresh();
-		
-		// Render Level
-		
 		
         if (deltaLevelTime > this.interval) {
             this._update();
@@ -496,10 +497,6 @@ Tetris.prototype = {
 			new Audio('./dist/Failed.ogg').play();
 			this._restartHandler();
 		}
-		/*if(this.shape.y != this.hintMino.y || this.shape.x != this.hintMino.x) {
-			//new Audio('./dist/Failed.ogg').play();
-			this._restartHandler();
-		}*/
 	},
     // Update game data
     _update: function() {

@@ -26,59 +26,89 @@
 	<title>Tetrion Opening Trainer</title>
 
 	<link rel="stylesheet" href="css/styles.css">
-	<script>
-	function setOpener() {
-	document.getElementById("demo").innerHTML = "Paragraph changed.";
-	}
-	</script>
+
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 </head>
 <body>
 
 
+<!--insert shadertoy background-->
 <!--https://www.shadertoy.com/embed/wttfW2?gui=&t=10&paused=false&muted=false-->
 
 
-<iframe id="bg" width="640" height="360" frameborder="0" src="https://www.shadertoy.com/embed/WldfWX?gui=&t=10&paused=false&muted=false" allowfullscreen></iframe>
-
+<div id="divbg">
+<iframe id="bg" width="640" height="360" frameborder="0" src="https://www.shadertoy.com/embed/WldfWX?gui=&paused=false&muted=false" ></iframe>
 <script>
-
 document.getElementById("bg").width = window.innerWidth;
 document.getElementById("bg").height = window.innerHeight;
+//document.getElementById("bg").setAttribute("tabIndex", "-1");
+//document.getElementById("divbg").setAttribute("tabIndex", "-1");
+document.getElementById("bg").removeAttribute("tabIndex");
+document.getElementById("divbg").removeAttribute("tabIndex");
 </script>
+</div>
+
 
 <div id="tetris">
-
 	<canvas id="scene"></canvas>
+	
 	<div id="leftSide">
-
-        <!--<header>header area</header>-->
-        <nav>
-            <ul>
-                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">TKI 3 (Fonzie variation) </a></li>
-                <!--<li style="font-size:12px";><a href="#" id="setTKIFonzieVar">TKI 3 (Flat Top variation) </a></li>
-                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">TKI 3 (Castle Top variation) </a></li>
-                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Ajanba TSD </a></li> -->
-                <li style="font-size:12px";><a href="#" id="setTKIDTCannonVar">DT Cannon (LS / JZ base)</a></li> 
-                <!--<li style="font-size:12px";><a href="#" id="setTKIFonzieVar">MKO Stacking</a></li> 
-                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Pokemino's STD </a></li> 
-                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Mr. T-Spin's STD (reversed) </a></li>
-                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Hachispin</a></li>
-                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Albatross</a></li>
-                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Number One </a></li>
-                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Pelican</a></li>
-                <li style="font-size:12px";><a href="#" id="setTKIFonzieVar">DT Cannon (TSZ base) </a></li>
-				<li style="font-size:12px";><a href="#" id="setTKIFonzieVar">BT Cannon </a></li>
-				<li style="font-size:12px";><a href="#" id="setTKIFonzieVar">C-Spin </a></li>
-				<li style="font-size:12px";><a href="#" id="setTKIFonzieVar">Hummingbird</a></li>-->
-
-            </ul>
-        </nav>
-        
-       <!-- <footer>footer area</footer>-->
+		<div id="leftInfo">
+			
+			<ul style="font-size:16px;color:dodgerblue;text-align:left;" id="Openers">Openers:
+			
+				<ul style="font-size:14px;color:powderblue;text-align:left;" id="TSpinOpeners">T-Spin Openers:	
+					<ul style="font-size:13px;color:powderblue;text-align:left;padding-left:1em;" id="EarlyIPiece">Early I Piece:
+						<li style="font-size:12px;padding-left:1em;"><a href="#" id="setTKIFonzieVar">TKI 3 (Fonzie variation) </a></li>
+						<li style="font-size:12px;padding-left:1em;";><a href="#" id="setTKIFTVar">TKI 3 (Flat Top variation) </a></li>
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setTKICTVar">TKI 3 (Castle Top variation) </a></li>
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setAjanbaTSDVar">Ajanba TSD </a></li>
+					</ul>
+					<ul style="font-size:13px;color:powderblue;text-align:left;padding-left:1em;" id="EarlyLOrJPiece">Early L or J Piece:
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setDTCannonVar">DT Cannon (LS / JZ base)</a></li> 
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setMKOStackingVar">MKO Stacking</a></li> 
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setPokeminosSTD Var">Pokemino's STD </a></li> 
+					</ul>
+					<ul style="font-size:13px;color:powderblue;text-align:left;padding-left:1em;" id="EarlyLOrJPiece">Early O Piece:
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setMrTSpinsSTDreversedVar">Mr. T-Spin's STD (reversed) </a></li>
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setHachispinVar">Hachispin</a></li>
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setAlbatrossVar">Albatross</a></li>
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setNumberOneVar">Number One </a></li>
+					</ul>
+					<ul style="font-size:13px;color:powderblue;text-align:left;padding-left:1em;" id="EarlySZOrJPiece">Early S, Z, or T Piece:
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setPelicanVar">Pelican</a></li>
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setDTCannonTSZbaseVar">DT Cannon (TSZ base) </a></li>
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setBTCannonVar">BT Cannon </a></li>
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setCSpinVar">C-Spin </a></li>
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setHummingbirdVar">Hummingbird</a></li>
+					</ul>
+				</ul>
+				
+				<!--
+				<ul style="font-size:14px;color:powderblue;text-align:left;" id="ComboOpeners">Combo Openers
+					<li style="font-size:12px;padding-left:1em;"><a href="#" id="setTKIFonzieVar">Side 4 Wide </a></li>
+					<li style="font-size:12px;padding-left:1em;"><a href="#" id="setTKIFonzieVar">Center 4 Wide </a></li>
+					<li style="font-size:12px;padding-left:1em;"><a href="#" id="setTKIFonzieVar">6 Residuals </a></li>
+				</ul>
+				-->
+				<ul style="font-size:16px;color:dodgerblue;text-align:left;" > 
+					<ul style="font-size:13px;color:powderblue;text-align:left;padding-left:1em;" id="setPCOpenersVar">Perfect Clear Openers:
+						<li style="font-size:12px;padding-left:1em;"><a href="#" id="setStdPCOpenerVar">The Standard PC Opener </a></li>
+						<li style="font-size:12px;padding-left:1em;"><a href="#" id="setSecondPCVar">Second Perfect Clear </a></li>
+						<li style="font-size:12px;padding-left:1em;"><a href="#" id="setLoJVar">Either L or J </a></li>
+						<li style="font-size:12px;padding-left:1em;"><a href="#" id="setLnJVar">Neither L nor J </a></li>
+						<li style="font-size:12px;padding-left:1em;"><a href="#" id="setLaJVar">Both L and J </a></li>
+						<li style="font-size:12px;padding-left:1em;"><a href="#" id="setPCTPieceVar">T piece </a></li>
+						<li style="font-size:12px;padding-left:1em;"><a href="#" id="setSAVar">see also </a></li>
+					</ul>
+				</ul>
+			</ul>
+		</div>
+		
 		<canvas id="hold"></canvas>
 	</div>
+	
 	<div id="gameOver">
 		<h1>Game Over !</h1>
 		<h3>Score: <span id="finalScore">0</span></h3>
@@ -101,8 +131,12 @@ document.getElementById("bg").height = window.innerHeight;
 <script src="dist/tetrion.js"></script>
 <script>
 	(function(){
-		var tetris = new Tetris('tetris');
-		tetris.start();
+		var tetrion = new Tetris('tetris');
+		
+		document.getElementById("setTKIFonzieVar").addEventListener("click", function() { tetrion.setTKIFonzieVar(); } );
+		document.getElementById("setDTCannonVar").addEventListener("click", function() { tetrion.setDTCannonVar(); } );
+		
+		tetrion.start();
 	})();
 </script>
 </html>

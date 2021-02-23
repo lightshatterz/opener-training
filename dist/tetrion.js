@@ -418,7 +418,6 @@ window.addEventListener("gamepaddisconnected", gamepadAPI.disconnect);
 
 module.exports = gamepadAPI;
 },{}],4:[function(require,module,exports){
-
 var gamepad = require('./gamepad.js');
 
 var UserInputs = {
@@ -610,6 +609,12 @@ var UserInputs = {
         //}
     },
     keyDown(event) {
+		
+		// Disable space scrolling etc
+		//if (event.keyCode === 32) {
+			event.preventDefault();
+		//}
+		
 		this.keyboardKeys[event.keyCode] = true;
 		this.isKeyBoardKeyDown = true;
     },
@@ -801,6 +806,9 @@ Tetris.prototype = {
 
     init: function(options) {
 
+		// Initialize function calls
+		//document.getElementById("TKIFonzieVar").onclick = function() { this._restartHandler() };
+		
         var cfg = this.config = utils.extend(options, defaults);
         this.interval = consts.DEFAULT_INTERVAL;
 
@@ -808,8 +816,8 @@ Tetris.prototype = {
         views.init(this.id, cfg.maxWidth, cfg.maxHeight);
         canvas.init(views.scene, views.preview, views.hold);
 		inputs.init();
-		//openers.init();
 		
+		this.currentOpener = 0;
         this.matrix = initMatrix(consts.ROW_COUNT, consts.COLUMN_COUNT);
         this.reset();
 		setInterval(() => {this._processInput();}, 1);
@@ -820,7 +828,19 @@ Tetris.prototype = {
     },
 	setTKIFonzieVar: function()
 	{
-		this.reset();
+		this._restartHandler();
+		this.currentOpener = 1;
+		this._fireShape();
+		
+		//this._update();
+	},	
+	setDTCannonVar: function()
+	{
+		this._restartHandler();
+		this.currentOpener = 2;
+		this._fireShape();
+		
+		//this._update();
 	},
     //Reset game
     reset: function() {
@@ -829,12 +849,12 @@ Tetris.prototype = {
         this.level = 1;
         this.score = 0;
 		this.lines = 0;
-		this.currentMinoInx = 0;
         this.startTime = new Date().getTime();
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
         this.levelTime = this.startTime;
 		this.prevInputTime = this.startTime;
+		this.currentMinoInx = 0;
 		this.shapeQueue = [];
 		this.hintQueue = [];
 		this.holdQueue = [];
@@ -851,7 +871,6 @@ Tetris.prototype = {
     start: function() {
         this.running = true;
 		window.requestAnimationFrame(utils.proxy(this._refresh, this));
-	//window.requestAnimationFrame(utils.proxy(this._refresh, this));}
 
     },
     //Pause game
@@ -906,21 +925,32 @@ Tetris.prototype = {
     _fireShape: function() {
 		//this.shape = this.shapeQueue.shift() || shapes.randomShape();
 
+	
 
+			
 		while(this.shapeQueue.length <= 4)
 		{
-			this.preparedShape = openers.getNextMino();
+			this.preparedShape = openers.getNextMino(this.currentOpener);
 			this.shapeQueue.push(this.preparedShape);
 		}
 		while(this.hintQueue.length <= 4)
 		{
-			this.preparedShape = openers.getNextHint(this.matrix);
+			this.preparedShape = openers.getNextHint(this.currentOpener);
 			this.hintQueue.push(this.preparedShape);
 		}
 		
 		this.hintMino = this.hintQueue.shift();
 		this.shape = this.shapeQueue.shift();// shapes.randomShape();
        
+	   this.currentMinoInx++;
+	   
+		if(this.currentMinoInx > openers.getLength()) {
+			this.hintQueue = [];
+			this.shapeQueue = [];
+			this._restartHandler();
+			this._fireShape();
+		}
+		
 		// Reset matrix at successful end of opener
 		//if(this.shapeQueue.length == openers.length) {
 		//	this.matrix = [];
@@ -930,10 +960,6 @@ Tetris.prototype = {
 		this._draw();
         
     },
-
-
-	/*_processCollisions: function {
-	},*/
     // Draw game data
     _draw: function() {
         canvas.drawScene();
@@ -1110,31 +1136,11 @@ Tetris.prototype = {
 		
 		this.currentTime = new Date().getTime();
 		
-		
 		var curInputTime = new Date().getTime();
-		var prevCounterTime = curInputTime;
-		var deltaInputTime = 0;
-		var deltaCounterTime = 0;
-		
-		// Process input as many times as possible in a frame--60hz hopefully
-		/*while(deltaCounterTime <= 16) {		// 16.666ms = 1 frame	
-			deltaCounterTime = curInputTime - prevCounterTime;
-			deltaInputTime = curInputTime - this.prevInputTime;
-			this._processInput(deltaInputTime);
-			await this.sleep(1);
-			curInputTime = new Date().getTime();
-		}*/
-		
+	
 		this.prevInputTime = curInputTime;
 		var deltaLevelTime = this.currentTime - this.prevTime;
-		
-		//this._processInput(deltaLevelTime);
 
-		
-		//if(deltaGameTime < 16) this._refresh();
-		
-		// Render Level
-		
 		
         if (deltaLevelTime > this.interval) {
             this._update();
@@ -1155,10 +1161,6 @@ Tetris.prototype = {
 			new Audio('./dist/Failed.ogg').play();
 			this._restartHandler();
 		}
-		/*if(this.shape.y != this.hintMino.y || this.shape.x != this.hintMino.x) {
-			//new Audio('./dist/Failed.ogg').play();
-			this._restartHandler();
-		}*/
 	},
     // Update game data
     _update: function() {
@@ -1264,52 +1266,6 @@ window.Tetris = Tetris;
 },{"./canvas.js":1,"./consts.js":2,"./input.js":4,"./openers.js":6,"./shapes.js":7,"./utils.js":8,"./views.js":9}],6:[function(require,module,exports){
 var shapes = require("./shapes.js");
 
-/*
-function TKI3FonzieVariation() {
-		
-		this.shapeQueue = new Array(7);
-		this.shapeQueue.push(new shapes.ShapeL());
-		this.shapeQueue.push(new shapes.ShapeI());
-		this.shapeQueue.push(new shapes.ShapeO());
-		this.shapeQueue.push(new shapes.ShapeZR());
-		this.shapeQueue.push(new shapes.ShapeZ());
-		this.shapeQueue.push(new shapes.ShapeLR());
-		this.shapeQueue.push(new shapes.ShapeT());
-	//this.hintShapeQueue = [];
-
-}
-
-TKI3FonzieVariation.prototype = {
-	getShapeQueue: function () {
-
-		return this.shapeQueue;
-	}
-
-		getHintQueue: function() {
-		this.hintShapeQueue.push(new shapes.ShapeL());
-		this.hintShapeQueue.push(new shapes.ShapeI());
-		this.hintShapeQueue.push(new shapes.ShapeO());
-		this.hintShapeQueue.push(new shapes.ShapeZR());
-		this.hintShapeQueue.push(new shapes.ShapeZ());
-		this.hintShapeQueue.push(new shapes.ShapeLR());
-		this.hintShapeQueue.push(new shapes.ShapeT());
-		return this.hintShapeQueue;
-		
-	},
-	init: function () {
-		//todo: switch to queue builder
-		//this.getShapeQueue();
-		//this.getHintQueue();
-	}
-
-
-
-	//hintShape
-}
-
-*/
-
-// L O Z T LR/J ZR/S I 
 var OpenerGenerator = {
 	shapeQueue: [],
 	hintQueue: [],
@@ -1317,40 +1273,53 @@ var OpenerGenerator = {
 	hintIdx: 0,
 	isInit: 0,
 	isHintInit: 0,
-	init() {
+	
+	// Current Tetriminos
+	init(opener) {
 		if(!this.isInit || this.shapeQueue == undefined) {
-		this.shapeQueue = new Array(
-		/*
-		shapes.getShape(0),
-		shapes.getShape(6),
-		shapes.getShape(1),
-		shapes.getShape(5),
-		shapes.getShape(2),
-		shapes.getShape(4),
-		shapes.getShape(3));*/
-		// O I L S J Z T O I L J T O T
-		shapes.getShape(1),
-		shapes.getShape(6),
-		shapes.getShape(0),
-		shapes.getShape(5),
-		shapes.getShape(4),
-		shapes.getShape(2),
-		shapes.getShape(3),
-		shapes.getShape(1),
-		shapes.getShape(6),
-		shapes.getShape(0),
-		shapes.getShape(4),
-		shapes.getShape(3),
-		shapes.getShape(1),
-		shapes.getShape(3));
+			switch(opener) {
+				case 0:
+				case 1:
+					// Fonzie Variation
+					this.shapeQueue = new Array(
+					shapes.getShape(0),
+					shapes.getShape(6),
+					shapes.getShape(1),
+					shapes.getShape(5),
+					shapes.getShape(2),
+					shapes.getShape(4),
+					shapes.getShape(3));
+				break;
+				case 2:
+					// DTCannon -- O I L S J Z T O I L J T O T
+					this.shapeQueue = new Array(
+					shapes.getShape(1),
+					shapes.getShape(6),
+					shapes.getShape(0),
+					shapes.getShape(5),
+					shapes.getShape(4),
+					shapes.getShape(2),
+					shapes.getShape(3),
+					shapes.getShape(1),
+					shapes.getShape(6),
+					shapes.getShape(0),
+					shapes.getShape(4),
+					shapes.getShape(3),
+					shapes.getShape(1),
+					shapes.getShape(3));
+				break;
+					
+			default:
+				return;
+			}
 		}
 		this.isInit = 1;
 		
 		return;
 	},
 		
-	getNextMino() {
-		this.init();
+	getNextMino(opener) {
+		this.init(opener);
 		var mino = this.shapeQueue[this.idx];
 		this.idx++;
 		if(this.idx == this.shapeQueue.length) {
@@ -1360,152 +1329,138 @@ var OpenerGenerator = {
 
 		return mino;
 	},
-	// L O Z T LR ZR I 
-/*	initHint(matrix) {
+	
+	// Hint Tetrimions
+	initHint(opener) {
 		if(!this.isHintInit || this.hintQueue == undefined) {
-		this.hintQueue = new Array(
-		shapes.getShape(0),
-		shapes.getShape(6),
-		shapes.getShape(1),
-		shapes.getShape(5),
-		shapes.getShape(2),
-		shapes.getShape(4),
-		shapes.getShape(3));
-		
-		// L
-		this.hintQueue[0].x = -1;
-		this.hintQueue[0].y = 17;
-		this.hintQueue[0].state = this.hintQueue[0].nextState(1);
-		// I
-		this.hintQueue[1].x = 3;
-		this.hintQueue[1].y = 17;
-		this.hintQueue[1].state = this.hintQueue[1].nextState(1);
-		// O
-		this.hintQueue[2].x = 6;
-		this.hintQueue[2].y = 18;
-		// S
-		this.hintQueue[3].x = 5;
-		this.hintQueue[3].y = 17;
-		this.hintQueue[3].state = this.hintQueue[3].nextState(1);
-		// Z
-		this.hintQueue[4].x = 3;
-		this.hintQueue[4].y = 17;
-		// J
-		this.hintQueue[5].x = 7;
-		this.hintQueue[5].y = 16;
-		
-		// T
-		this.hintQueue[6].x = 1;
-		this.hintQueue[6].y = 17;
-		this.hintQueue[6].state = this.hintQueue[6].nextState(1)
-		this.hintQueue[6].state = this.hintQueue[6].nextState(1)
-		
-		}
-		
-		this.isHintInit = 1;
-		
-		return;
-	},*/
-	// L O Z T LR ZR I 
-	initHint(matrix) {
-		if(!this.isHintInit || this.hintQueue == undefined) {
-		this.hintQueue = new Array(
-		/*shapes.getShape(0),
-		shapes.getShape(6),
-		shapes.getShape(1),
-		shapes.getShape(5),
-		shapes.getShape(2),
-		shapes.getShape(4),
-		shapes.getShape(3)
-		*/
-		shapes.getShape(1),
-		shapes.getShape(6),
-		shapes.getShape(0),
-		shapes.getShape(5),
-		shapes.getShape(4),
-		shapes.getShape(2),
-		shapes.getShape(3),
-		shapes.getShape(1),
-		shapes.getShape(6),
-		shapes.getShape(0),
-		shapes.getShape(4),
-		shapes.getShape(3),
-		shapes.getShape(1),
-		shapes.getShape(3));
-		
-		// O I L S J Z T O I L J T O T
-		
-		// O
-		this.hintQueue[0].x = -2;
-		this.hintQueue[0].y = 18;
-		
-		// I
-		this.hintQueue[1].x = 6;
-		this.hintQueue[1].y = 16;
-		//this.hintQueue[1].state = this.hintQueue[1].nextState(1);
-		// L
-		this.hintQueue[2].x = 6;
-		this.hintQueue[2].y = 17;
-		this.hintQueue[2].state = this.hintQueue[2].nextState(1);
-		// S
-		this.hintQueue[3].x = 7;
-		this.hintQueue[3].y = 17;
-		this.hintQueue[3].state = this.hintQueue[3].nextState(1);
-		// J
-		this.hintQueue[4].x = 4;
-		this.hintQueue[4].y = 17;
-		this.hintQueue[4].state = this.hintQueue[4].nextState(-1);
-		
-		// Z
-		this.hintQueue[5].x = 3;
-		this.hintQueue[5].y = 17;
-		this.hintQueue[5].state = this.hintQueue[5].nextState(2);
-		
-		// T
-		this.hintQueue[6].x = 3;
-		this.hintQueue[6].y = 15;
-		
-		// O
-		this.hintQueue[7].x = 5;
-		this.hintQueue[7].y = 15;
-		
-		// I
-		this.hintQueue[8].x = 9;
-		this.hintQueue[8].y = 14;
-		//this.hintQueue[8].state = this.hintQueue[8].nextState(1);
-		
-		// L
-		this.hintQueue[9].x = 2;
-		this.hintQueue[9].y = 13;
-		this.hintQueue[9].state = this.hintQueue[9].nextState(-1);
-		
-		// J
-		this.hintQueue[10].x = -1;
-		this.hintQueue[10].y = 15;
-		this.hintQueue[10].state = this.hintQueue[10].nextState(1);
-		
-		// T
-		this.hintQueue[11].x = 1;
-		this.hintQueue[11].y = 16;
-		this.hintQueue[11].state = this.hintQueue[11].nextState(2);
+			
+			switch(opener) {
+			case 0:
+			case 1:
+			// Fonzie Variation
+			this.hintQueue = new Array(
+				shapes.getShape(0),
+				shapes.getShape(6),
+				shapes.getShape(1),
+				shapes.getShape(5),
+				shapes.getShape(2),
+				shapes.getShape(4),
+				shapes.getShape(3));
 				
-		// O
-		this.hintQueue[12].x = 3;
-		this.hintQueue[12].y = 16;
-		this.hintQueue[12].state = this.hintQueue[12].nextState(1);
+				// L
+				this.hintQueue[0].x = -1;
+				this.hintQueue[0].y = 17;
+				this.hintQueue[0].state = this.hintQueue[0].nextState(1);
+				// I
+				this.hintQueue[1].x = 3;
+				this.hintQueue[1].y = 17;
+				this.hintQueue[1].state = this.hintQueue[1].nextState(1);
+				// O
+				this.hintQueue[2].x = 6;
+				this.hintQueue[2].y = 18;
+				// S
+				this.hintQueue[3].x = 5;
+				this.hintQueue[3].y = 17;
+				this.hintQueue[3].state = this.hintQueue[3].nextState(1);
+				// Z
+				this.hintQueue[4].x = 3;
+				this.hintQueue[4].y = 17;
+				// J
+				this.hintQueue[5].x = 7;
+				this.hintQueue[5].y = 16;
+				
+				// T
+				this.hintQueue[6].x = 1;
+				this.hintQueue[6].y = 17;
+				this.hintQueue[6].state = this.hintQueue[6].nextState(2);
+				
+			break;
+			case 2:
+				this.hintQueue = new Array(
+
+				shapes.getShape(1),
+				shapes.getShape(6),
+				shapes.getShape(0),
+				shapes.getShape(5),
+				shapes.getShape(4),
+				shapes.getShape(2),
+				shapes.getShape(3),
+				shapes.getShape(1),
+				shapes.getShape(6),
+				shapes.getShape(0),
+				shapes.getShape(4),
+				shapes.getShape(3),
+				shapes.getShape(1),
+				shapes.getShape(3));
+				
+				// DT Cannon -- O I L S J Z T O I L J T O T
+				// O
+				this.hintQueue[0].x = -2;
+				this.hintQueue[0].y = 18;
+				// I
+				this.hintQueue[1].x = 6;
+				this.hintQueue[1].y = 16;
+				// L
+				this.hintQueue[2].x = 6;
+				this.hintQueue[2].y = 17;
+				this.hintQueue[2].state = this.hintQueue[2].nextState(1);
+				// S
+				this.hintQueue[3].x = 7;
+				this.hintQueue[3].y = 17;
+				this.hintQueue[3].state = this.hintQueue[3].nextState(1);
+				// J
+				this.hintQueue[4].x = 4;
+				this.hintQueue[4].y = 17;
+				this.hintQueue[4].state = this.hintQueue[4].nextState(-1);
+				// Z
+				this.hintQueue[5].x = 3;
+				this.hintQueue[5].y = 17;
+				this.hintQueue[5].state = this.hintQueue[5].nextState(3);
+				// T
+				this.hintQueue[6].x = 3;
+				this.hintQueue[6].y = 15;
+				// O
+				this.hintQueue[7].x = 5;
+				this.hintQueue[7].y = 15;
+				// I
+				this.hintQueue[8].x = 9;
+				this.hintQueue[8].y = 14;
+				// L
+				this.hintQueue[9].x = 2;
+				this.hintQueue[9].y = 13;
+				this.hintQueue[9].state = this.hintQueue[9].nextState(-1);
+				// J
+				this.hintQueue[10].x = -1;
+				this.hintQueue[10].y = 15;
+				this.hintQueue[10].state = this.hintQueue[10].nextState(1);
+				// T
+				this.hintQueue[11].x = 1;
+				this.hintQueue[11].y = 16;
+				this.hintQueue[11].state = this.hintQueue[11].nextState(2);
+				// O
+				this.hintQueue[12].x = 3;
+				this.hintQueue[12].y = 16;
+				this.hintQueue[12].state = this.hintQueue[12].nextState(1);
+				// T
+				this.hintQueue[13].x = 1;
+				this.hintQueue[13].y = 17;
+				this.hintQueue[13].state = this.hintQueue[13].nextState(-1);
+				
+			break;
+			default:
+					return;
+			}
 		
-		// T
-		this.hintQueue[13].x = 1;
-		this.hintQueue[13].y = 17;
-		this.hintQueue[13].state = this.hintQueue[13].nextState(-1);
 		}
 		
 		this.isHintInit = 1;
 		
 		return;
 	},
-	getNextHint(matrix) {
-		this.initHint(matrix);
+	// End initHint
+
+	getNextHint(opener) {
+		this.initHint(opener);
 		var mino = this.hintQueue[this.hintIdx];
 		this.hintIdx++;
 		if(this.hintIdx == this.hintQueue.length) {
@@ -1514,6 +1469,7 @@ var OpenerGenerator = {
 		}
 		return mino;
 	},
+	
 	reset() {
 		this.shapeQueue = [];
 		this.hintQueue = [];
@@ -1521,6 +1477,9 @@ var OpenerGenerator = {
 		this.hintIdx = 0;
 		this.isInit = 0;
 		this.isHintInit = 0;
+	},
+	getLength() {
+		return this.hintQueue.length;
 	}
 };
 
@@ -1528,16 +1487,20 @@ function reset() {
 	OpenerGenerator.reset();
 }
 
-function getNextMino() {
-	var mino = OpenerGenerator.getNextMino();
+function getNextMino(opener) {
+	var mino = OpenerGenerator.getNextMino(opener);
 	return mino;
 }
-function getNextHint(matrix) {
-	var mino = OpenerGenerator.getNextHint(matrix);
+function getNextHint(opener) {
+	var mino = OpenerGenerator.getNextHint(opener);
 	return mino;
+}
+function getLength() {
+	return OpenerGenerator.getLength();
 }
 module.exports.getNextMino = getNextMino;
 module.exports.getNextHint = getNextHint;
+module.exports.getLength = getLength;
 module.exports.reset = reset;
 
 
@@ -1559,21 +1522,18 @@ function ShapeL() {
 		[0, 0, 0, 0],
         [0, 0, 0, 0]
     ];
-
     var state2 = [
         [0, 1, 0, 0],
         [0, 1, 0, 0],
 		[0, 1, 1, 0],
         [0, 0, 0, 0]
     ];
-
     var state3 = [
         [0, 0, 0, 0],
         [1, 1, 1, 0],
 		[1, 0, 0, 0],
         [0, 0, 0, 0]
     ];
-
     var state4 = [
         [1, 1, 0, 0],
         [0, 1, 0, 0],
@@ -1581,6 +1541,38 @@ function ShapeL() {
         [0, 0, 0, 0]
     ];
 
+	// Rotation point offsets: clockwise<point1, point2>, counterclockwise<point3, point4>, <newline>
+	// In guidline Tetris each piece has 5 possible rotation points with respect to each state/orientation. Iterate through all every rotation.
+	var state1RotationPointsOffset = [ 
+		0,  0,  0,  0,
+		1,  0, -1,  0,
+		1,  1, -1,  1,
+		0, -2,  0, -2,
+		1, -2, -1, -2
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,
+		1,  0,  1,  0,
+		1, -1,  1, -1,
+		0,  2,  0,  2,
+		1,  2,  1,  2
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,
+		-1,  0,  1,  0,
+		-1,  1,  1,  1,
+		0, -2,  0, -2,
+		-1, -2,  1, -2
+	];
+	var state4RotationPointsOffset = [
+		 0,  0,  0,  0,
+		 -1,  0, -1,  0,
+		 -1, -1, -1, -1,
+		 0,  2,  0,  2,
+		 -1,  2, -1,  2
+	];
+
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -3;
@@ -1616,7 +1608,37 @@ function ShapeLR() {
 		[1, 1, 0, 0],
         [0, 0, 0, 0]
     ];
+	
+	var state1RotationPointsOffset = [ 
+		0,  0,  0,  0,
+		1,  0, -1,  0,
+		1,  1, -1,  1,
+		0, -2,  0, -2,
+		1, -2, -1, -2
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,
+		1,  0,  1,  0,
+		1, -1,  1, -1,
+		0,  2,  0,  2,
+		1,  2,  1,  2
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,
+		-1,  0,  1,  0,
+		-1,  1,  1,  1,
+		0, -2,  0, -2,
+		-1, -2,  1, -2
+	];
+	var state4RotationPointsOffset = [
+		 0,  0,  0,  0,
+		 -1,  0, -1,  0,
+		 -1, -1, -1, -1,
+		 0,  2,  0,  2,
+		 -1,  2, -1,  2,
+	];
 
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -3;
@@ -1650,9 +1672,39 @@ function ShapeO() {
 		[0, 0, 0, 0],
 		[0, 0, 0, 0]
     ];
+	
+	var state1RotationPointsOffset = [ 
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0
+	];
+	var state4RotationPointsOffset = [
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0
+	];
 
-    this.states = [state1];
-    this.x = 4;
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
+    this.states = [state1, state2, state3, state4];
+    this.x = 2;
     this.y = -2;
 	this.originY = -2;
     this.flag = 'O';
@@ -1689,8 +1741,39 @@ function ShapeI() {
         [1, 1, 1, 1],
 		[0, 0, 0, 0],
         [0, 0, 0, 0]
-    ];1
+    ];
 	
+		var state1RotationPointsOffset = [ 
+		0, 0, 0, 0,
+		-1, 0, -2,  0,
+		2,  0,  1,  0,
+		-1,  2, -2, -1,
+		2, -1,  1,  2
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,
+		2,  0, -1,  0,
+		-1,  0,  2,  0,
+		2,  1, -1,  2,
+		-1, -2,  2, -1
+
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,
+		1,  0,  2,  0,
+		-2,  0, -1,  0,
+		1, -2,  2,  1,
+		-2,  1, -1, -2
+	];
+	var state4RotationPointsOffset = [
+		0,  0,  0,  0,
+		-2,  0,  1,  0,
+		1,  0, -2,  0,
+		-2, -1,  1, -2,
+		1,  2, -2,  1
+	];
+
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
     this.states = [state1, state2, state3, state4];
 
     this.x = 5;
@@ -1755,34 +1838,8 @@ function ShapeT() {
 		-1,  2, -1,  2
 	];
 	
-	var side1 = [
-		[1, 0, 1, 0],
-        [0, 0, 0, 0],
-		[1, 0, 1, 0],
-		[0, 0, 0, 0]
-	];
-	var side2 = [
-		[1, 0, 1, 0],
-        [0, 0, 0, 0],
-		[1, 0, 1, 0],
-		[0, 0, 0, 0]
-	];
-	var side3 = [
-		[1, 0, 1, 0],
-        [0, 0, 0, 0],
-		[1, 0, 1, 0],
-		[0, 0, 0, 0]
-	];
-	var side4 = [
-		[1, 0, 1, 0],
-        [0, 0, 0, 0],
-		[1, 0, 1, 0],
-		[0, 0, 0, 0]
-	];
-	
 	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
 	this.states = [state1, state2, state3, state4];
-	this.sides = [side1, side2, side4, side4];
 	
     this.x = 4;
     this.y = -2;
@@ -1804,9 +1861,9 @@ function ShapeZ() {
 		[0, 0, 0, 0]
     ];
 	var state3 = [
-        [0, 1, 0, 0],
+        [0, 0, 0, 0],
         [1, 1, 0, 0],
-		[1, 0, 0, 0],
+		[0, 1, 1, 0],
 		[0, 0, 0, 0]
     ];
 	var state4 = [
@@ -1816,6 +1873,38 @@ function ShapeZ() {
 		[0, 0, 0, 0]
     ];
 
+	// Rotation point offsets: clockwise<point1, point2>, counterclockwise<point3, point4>, <newline>
+	// In guidline Tetris each piece has 5 possible rotation points with respect to each state/orientation. Iterate through all every rotation.
+	var state1RotationPointsOffset = [ 
+		0,  0,  0,  0,
+		1,  0, -1,  0,
+		1,  1, -1,  1,
+		0, -2,  0, -2,
+		1, -2, -1, -2
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,
+		1,  0,  1,  0,
+		1, -1,  1, -1,
+		0,  2,  0,  2,
+		1,  2,  1,  2
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,
+		-1,  0,  1,  0,
+		-1,  1,  1,  1,
+		0, -2,  0, -2,
+		-1, -2,  1, -2
+	];
+	var state4RotationPointsOffset = [
+		0,  0,  0,  0,
+		-1,  0, -1,  0,
+		-1, -1, -1, -1,
+		0,  2,  0,  2,
+		-1,  2, -1,  2
+	];
+
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -2;
@@ -1849,6 +1938,38 @@ function ShapeZR() {
 		[0, 0, 0, 0]
     ];
 
+	// Rotation point offsets: clockwise<point1, point2>, counterclockwise<point3, point4>, <newline>
+	// In guidline Tetris each piece has 5 possible rotation points with respect to each state/orientation. Iterate through all every rotation.
+	var state1RotationPointsOffset = [ 
+		0,  0,  0,  0,
+		1,  0, -1,  0,
+		1,  1, -1,  1,
+		0, -2,  0, -2,
+		1, -2, -1, -2
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,
+		1,  0,  1,  0,
+		1, -1,  1, -1,
+		0,  2,  0,  2,
+		1,  2,  1,  2
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,
+		-1,  0,  1,  0,
+		-1,  1,  1,  1,
+		0, -2,  0, -2,
+		-1, -2,  1, -2
+	];
+	var state4RotationPointsOffset = [
+		0,  0,  0,  0,
+		-1,  0, -1,  0,
+		-1, -1, -1, -1,
+		0,  2,  0,  2,
+		-1,  2, -1,  2
+	];
+
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -2
@@ -2071,32 +2192,32 @@ ShapeZR.prototype = {
 	//Rotate shape
 	rotate: function(matrix) {
 		//  TODO: rest of pieces
-		if(this.flag == 'T')
+		//if(this.flag == 'T' || this.flag == 'L')
 			this.kickShape(matrix, -1);
-		else if (isShapeCanMove(this, matrix, 'rotate')){
-			this.state = this.nextState(-1);
+		//else if (isShapeCanMove(this, matrix, 'rotate')){
+			//this.state = this.nextState(-1);
 			//fix position if shape is out of right border
-			var right = this.getRight();
-			if ( right >= COLUMN_COUNT){
-				this.x -= right - COLUMN_COUNT + 1;
-			}
+			//var right = this.getRight();
+			//if ( right >= COLUMN_COUNT){
+			//	this.x -= right - COLUMN_COUNT + 1;
+			//}
 			/*var left = this.getLeft();
 			if(left <= 0)
 				this.x += 1;*/
-		}
+		//}
 	},
 	//Rotate shape clockwise
 	rotateClockwise: function(matrix) {
-		if(this.flag == 'T')
+		//if(this.flag == 'T')
 			this.kickShape(matrix, 1);
-		else if (isShapeCanMove(this, matrix, 'rotateclockwise')) {
-			this.state = this.nextState(1);
+		//else if (isShapeCanMove(this, matrix, 'rotateclockwise')) {
+			//this.state = this.nextState(1);
 			//fix position if shape is out of right border
-			var right = this.getRight();
-			if (right >= COLUMN_COUNT) {
-				this.x -= right - COLUMN_COUNT + 1;
-			}
-		}
+			//var right = this.getRight();
+			//if (right >= COLUMN_COUNT) {
+			//	this.x -= right - COLUMN_COUNT + 1;
+			//}
+		//}
 	},
 	//Caculate the max column of the shape
 	getColumnCount: function() {

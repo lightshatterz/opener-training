@@ -15,21 +15,18 @@ function ShapeL() {
 		[0, 0, 0, 0],
         [0, 0, 0, 0]
     ];
-
     var state2 = [
         [0, 1, 0, 0],
         [0, 1, 0, 0],
 		[0, 1, 1, 0],
         [0, 0, 0, 0]
     ];
-
     var state3 = [
         [0, 0, 0, 0],
         [1, 1, 1, 0],
 		[1, 0, 0, 0],
         [0, 0, 0, 0]
     ];
-
     var state4 = [
         [1, 1, 0, 0],
         [0, 1, 0, 0],
@@ -37,6 +34,38 @@ function ShapeL() {
         [0, 0, 0, 0]
     ];
 
+	// Rotation point offsets: clockwise<point1, point2>, counterclockwise<point3, point4>, <newline>
+	// In guidline Tetris each piece has 5 possible rotation points with respect to each state/orientation. Iterate through all every rotation.
+	var state1RotationPointsOffset = [ 
+		0,  0,  0,  0,
+		1,  0, -1,  0,
+		1,  1, -1,  1,
+		0, -2,  0, -2,
+		1, -2, -1, -2
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,
+		1,  0,  1,  0,
+		1, -1,  1, -1,
+		0,  2,  0,  2,
+		1,  2,  1,  2
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,
+		-1,  0,  1,  0,
+		-1,  1,  1,  1,
+		0, -2,  0, -2,
+		-1, -2,  1, -2
+	];
+	var state4RotationPointsOffset = [
+		 0,  0,  0,  0,
+		 -1,  0, -1,  0,
+		 -1, -1, -1, -1,
+		 0,  2,  0,  2,
+		 -1,  2, -1,  2
+	];
+
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -3;
@@ -72,7 +101,37 @@ function ShapeLR() {
 		[1, 1, 0, 0],
         [0, 0, 0, 0]
     ];
+	
+	var state1RotationPointsOffset = [ 
+		0,  0,  0,  0,
+		1,  0, -1,  0,
+		1,  1, -1,  1,
+		0, -2,  0, -2,
+		1, -2, -1, -2
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,
+		1,  0,  1,  0,
+		1, -1,  1, -1,
+		0,  2,  0,  2,
+		1,  2,  1,  2
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,
+		-1,  0,  1,  0,
+		-1,  1,  1,  1,
+		0, -2,  0, -2,
+		-1, -2,  1, -2
+	];
+	var state4RotationPointsOffset = [
+		 0,  0,  0,  0,
+		 -1,  0, -1,  0,
+		 -1, -1, -1, -1,
+		 0,  2,  0,  2,
+		 -1,  2, -1,  2,
+	];
 
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -3;
@@ -106,9 +165,39 @@ function ShapeO() {
 		[0, 0, 0, 0],
 		[0, 0, 0, 0]
     ];
+	
+	var state1RotationPointsOffset = [ 
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0
+	];
+	var state4RotationPointsOffset = [
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0,
+		0,  0,  0,  0
+	];
 
-    this.states = [state1];
-    this.x = 4;
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
+    this.states = [state1, state2, state3, state4];
+    this.x = 2;
     this.y = -2;
 	this.originY = -2;
     this.flag = 'O';
@@ -145,8 +234,39 @@ function ShapeI() {
         [1, 1, 1, 1],
 		[0, 0, 0, 0],
         [0, 0, 0, 0]
-    ];1
+    ];
 	
+		var state1RotationPointsOffset = [ 
+		0, 0, 0, 0,
+		-1, 0, -2,  0,
+		2,  0,  1,  0,
+		-1,  2, -2, -1,
+		2, -1,  1,  2
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,
+		2,  0, -1,  0,
+		-1,  0,  2,  0,
+		2,  1, -1,  2,
+		-1, -2,  2, -1
+
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,
+		1,  0,  2,  0,
+		-2,  0, -1,  0,
+		1, -2,  2,  1,
+		-2,  1, -1, -2
+	];
+	var state4RotationPointsOffset = [
+		0,  0,  0,  0,
+		-2,  0,  1,  0,
+		1,  0, -2,  0,
+		-2, -1,  1, -2,
+		1,  2, -2,  1
+	];
+
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
     this.states = [state1, state2, state3, state4];
 
     this.x = 5;
@@ -211,34 +331,8 @@ function ShapeT() {
 		-1,  2, -1,  2
 	];
 	
-	var side1 = [
-		[1, 0, 1, 0],
-        [0, 0, 0, 0],
-		[1, 0, 1, 0],
-		[0, 0, 0, 0]
-	];
-	var side2 = [
-		[1, 0, 1, 0],
-        [0, 0, 0, 0],
-		[1, 0, 1, 0],
-		[0, 0, 0, 0]
-	];
-	var side3 = [
-		[1, 0, 1, 0],
-        [0, 0, 0, 0],
-		[1, 0, 1, 0],
-		[0, 0, 0, 0]
-	];
-	var side4 = [
-		[1, 0, 1, 0],
-        [0, 0, 0, 0],
-		[1, 0, 1, 0],
-		[0, 0, 0, 0]
-	];
-	
 	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
 	this.states = [state1, state2, state3, state4];
-	this.sides = [side1, side2, side4, side4];
 	
     this.x = 4;
     this.y = -2;
@@ -260,9 +354,9 @@ function ShapeZ() {
 		[0, 0, 0, 0]
     ];
 	var state3 = [
-        [0, 1, 0, 0],
+        [0, 0, 0, 0],
         [1, 1, 0, 0],
-		[1, 0, 0, 0],
+		[0, 1, 1, 0],
 		[0, 0, 0, 0]
     ];
 	var state4 = [
@@ -272,6 +366,38 @@ function ShapeZ() {
 		[0, 0, 0, 0]
     ];
 
+	// Rotation point offsets: clockwise<point1, point2>, counterclockwise<point3, point4>, <newline>
+	// In guidline Tetris each piece has 5 possible rotation points with respect to each state/orientation. Iterate through all every rotation.
+	var state1RotationPointsOffset = [ 
+		0,  0,  0,  0,
+		1,  0, -1,  0,
+		1,  1, -1,  1,
+		0, -2,  0, -2,
+		1, -2, -1, -2
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,
+		1,  0,  1,  0,
+		1, -1,  1, -1,
+		0,  2,  0,  2,
+		1,  2,  1,  2
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,
+		-1,  0,  1,  0,
+		-1,  1,  1,  1,
+		0, -2,  0, -2,
+		-1, -2,  1, -2
+	];
+	var state4RotationPointsOffset = [
+		0,  0,  0,  0,
+		-1,  0, -1,  0,
+		-1, -1, -1, -1,
+		0,  2,  0,  2,
+		-1,  2, -1,  2
+	];
+
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -2;
@@ -305,6 +431,38 @@ function ShapeZR() {
 		[0, 0, 0, 0]
     ];
 
+	// Rotation point offsets: clockwise<point1, point2>, counterclockwise<point3, point4>, <newline>
+	// In guidline Tetris each piece has 5 possible rotation points with respect to each state/orientation. Iterate through all every rotation.
+	var state1RotationPointsOffset = [ 
+		0,  0,  0,  0,
+		1,  0, -1,  0,
+		1,  1, -1,  1,
+		0, -2,  0, -2,
+		1, -2, -1, -2
+	];
+	var state2RotationPointsOffset = [
+		0,  0,  0,  0,
+		1,  0,  1,  0,
+		1, -1,  1, -1,
+		0,  2,  0,  2,
+		1,  2,  1,  2
+	];
+	var state3RotationPointsOffset = [
+		0,  0,  0,  0,
+		-1,  0,  1,  0,
+		-1,  1,  1,  1,
+		0, -2,  0, -2,
+		-1, -2,  1, -2
+	];
+	var state4RotationPointsOffset = [
+		0,  0,  0,  0,
+		-1,  0, -1,  0,
+		-1, -1, -1, -1,
+		0,  2,  0,  2,
+		-1,  2, -1,  2
+	];
+
+	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
     this.states = [state1, state2, state3, state4];
     this.x = 4;
     this.y = -2
@@ -527,32 +685,32 @@ ShapeZR.prototype = {
 	//Rotate shape
 	rotate: function(matrix) {
 		//  TODO: rest of pieces
-		if(this.flag == 'T')
+		//if(this.flag == 'T' || this.flag == 'L')
 			this.kickShape(matrix, -1);
-		else if (isShapeCanMove(this, matrix, 'rotate')){
-			this.state = this.nextState(-1);
+		//else if (isShapeCanMove(this, matrix, 'rotate')){
+			//this.state = this.nextState(-1);
 			//fix position if shape is out of right border
-			var right = this.getRight();
-			if ( right >= COLUMN_COUNT){
-				this.x -= right - COLUMN_COUNT + 1;
-			}
+			//var right = this.getRight();
+			//if ( right >= COLUMN_COUNT){
+			//	this.x -= right - COLUMN_COUNT + 1;
+			//}
 			/*var left = this.getLeft();
 			if(left <= 0)
 				this.x += 1;*/
-		}
+		//}
 	},
 	//Rotate shape clockwise
 	rotateClockwise: function(matrix) {
-		if(this.flag == 'T')
+		//if(this.flag == 'T')
 			this.kickShape(matrix, 1);
-		else if (isShapeCanMove(this, matrix, 'rotateclockwise')) {
-			this.state = this.nextState(1);
+		//else if (isShapeCanMove(this, matrix, 'rotateclockwise')) {
+			//this.state = this.nextState(1);
 			//fix position if shape is out of right border
-			var right = this.getRight();
-			if (right >= COLUMN_COUNT) {
-				this.x -= right - COLUMN_COUNT + 1;
-			}
-		}
+			//var right = this.getRight();
+			//if (right >= COLUMN_COUNT) {
+			//	this.x -= right - COLUMN_COUNT + 1;
+			//}
+		//}
 	},
 	//Caculate the max column of the shape
 	getColumnCount: function() {

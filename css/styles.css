@@ -2,25 +2,27 @@ html,body{
 	height:100%;
 }
 
-nav ul{height:200px; width:80%;}
-nav ul{overflow:hidden; overflow-y:scroll;}
-
 body{
 	background: #000000;
 	margin:0;
 	padding:0;
 	position: relative;
-	font-family: 'American Typewriter','Marker Felt';
+	font-family: Arial, Helvetica, sans-serif;
 	overflow-x: hidden;
 	overflow-y: hidden;
 }
-
+#divbg {
+	pointer-events: none;
+}
+#bg {
+	pointer-events: none;
+}
 #tetris{
-	left:50%;
+	left:42%;
 	top:50%;
 	position: absolute;
 	background: #555;
-	background:rgba(.9,.9,.9,.60);
+	background:rgba(1,1,1,.10);
 	
 }
 
@@ -29,7 +31,7 @@ body{
 	position: absolute;
 	background: #2f2f2f;
 	left:210px;
-	background:rgba(.9,.9,.9,.80);
+	background:rgba(1,1,1,.10);
 }
 
 
@@ -40,15 +42,19 @@ body{
 	left:0px;
 	width:210px;
 	text-align: center;
-	background:rgba(.9,.9,.9,.60);
+	background:rgba(1,1,1,.20);
 }
 
 #leftInfo{
-	height:100%;
-	width:210px;
+	overflow:hidden;
+	overflow-y:scroll;
+	height:200px;
+	width:200px;
 	margin:0 auto;
-	background:rgba(.9,.9,.9,.60);
+	background:rgba(255,255,255,.20);
 }
+
+#leftInfo ul {padding:2%;}
 
 #hold{
 	position:relative;
@@ -56,7 +62,7 @@ body{
 	height:435px;
 	background: #2f2f2f;
 	margin:10px auto;
-	background:rgba(.9,.9,.9,.60);
+	background:rgba(5,5,5,.60);
 }
 
 #gameOver{
