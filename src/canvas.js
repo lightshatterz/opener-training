@@ -1,7 +1,8 @@
 
 var utils = require('./utils.js');
 var consts = require('./consts.js');
-
+// import * as utils from './utils.js';
+// import * as consts from './const.js';
 
 var lineColor =  consts.GRID_LINE_COLOR;
 
@@ -255,3 +256,5 @@ var tetrisCanvas = {
 
 
 module.exports = tetrisCanvas;
+// export tetrisCanvas;
+ 

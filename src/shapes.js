@@ -1,4 +1,5 @@
 var consts = require('./consts.js');
+// import * as consts from './const.js';
 var COLORS = consts.COLORS;
 var COLUMN_COUNT = consts.COLUMN_COUNT;
 
@@ -128,7 +129,7 @@ function ShapeLR() {
 		 -1,  0, -1,  0,
 		 -1, -1, -1, -1,
 		 0,  2,  0,  2,
-		 -1,  2, -1,  2,
+		 -1,  2, -1,  2
 	];
 
 	this.rotationPoints = [state1RotationPointsOffset, state2RotationPointsOffset, state3RotationPointsOffset, state4RotationPointsOffset];
@@ -236,7 +237,7 @@ function ShapeI() {
         [0, 0, 0, 0]
     ];
 	
-		var state1RotationPointsOffset = [ 
+	var state1RotationPointsOffset = [ 
 		0, 0, 0, 0,
 		-1, 0, -2,  0,
 		2,  0,  1,  0,
@@ -905,6 +906,8 @@ function getShape(shapei) {
     shape.init(result);
     return shape;
 }
+
 module.exports.randomShape = randomShape;
 module.exports.getShape = getShape;
-//module.exports.newOpenerShapeQueue = newOpenerShapeQueue;		queue.push(new ShapeL());
+// export randomShape;
+// export getShape;

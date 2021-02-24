@@ -56,27 +56,33 @@ document.getElementById("divbg").removeAttribute("tabIndex");
 	<div id="leftSide">
 		<div id="leftInfo">
 			
+			<style>
+			a:link {
+			  color: powderblue;
+			  /*background-color: transparent;
+			  text-decoration: none;*/
+			}</style>
 			<ul style="font-size:16px;color:dodgerblue;text-align:left;" id="Openers">Openers:
-			
-				<ul style="font-size:14px;color:powderblue;text-align:left;" id="TSpinOpeners">T-Spin Openers:	
-					<ul style="font-size:13px;color:powderblue;text-align:left;padding-left:1em;" id="EarlyIPiece">Early I Piece:
+			<li style="font-size:12px;color:powderblue;"><a href="#" id="setFreePlay">No Opener </a></li>
+				<ul style="font-size:14px;color:dodgerblue;text-align:left;" id="TSpinOpeners">T-Spin Openers:	
+					<ul style="font-size:13px;color:dodgerblue;text-align:left;padding-left:1em;" id="EarlyIPiece">Early I Piece:
 						<li style="font-size:12px;padding-left:1em;"><a href="#" id="setTKIFonzieVar">TKI 3 (Fonzie variation) </a></li>
-						<li style="font-size:12px;padding-left:1em;";><a href="#" id="setTKIFTVar">TKI 3 (Flat Top variation) </a></li>
+						<!--<li style="font-size:12px;padding-left:1em;";><a href="#" id="setTKIFTVar">TKI 3 (Flat Top variation) </a></li>
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setTKICTVar">TKI 3 (Castle Top variation) </a></li>
-						<li style="font-size:12px;padding-left:1em";><a href="#" id="setAjanbaTSDVar">Ajanba TSD </a></li>
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setAjanbaTSDVar">Ajanba TSD </a></li>-->
 					</ul>
-					<ul style="font-size:13px;color:powderblue;text-align:left;padding-left:1em;" id="EarlyLOrJPiece">Early L or J Piece:
+					<ul style="font-size:13px;color:dodgerblue;text-align:left;padding-left:1em;" id="EarlyLOrJPiece">Early L or J Piece:
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setDTCannonVar">DT Cannon (LS / JZ base)</a></li> 
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setMKOStackingVar">MKO Stacking</a></li> 
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setPokeminosSTD Var">Pokemino's STD </a></li> 
 					</ul>
-					<ul style="font-size:13px;color:powderblue;text-align:left;padding-left:1em;" id="EarlyLOrJPiece">Early O Piece:
+					<ul style="font-size:13px;color:dodgerblue;text-align:left;padding-left:1em;" id="EarlyLOrJPiece">Early O Piece:
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setMrTSpinsSTDreversedVar">Mr. T-Spin's STD (reversed) </a></li>
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setHachispinVar">Hachispin</a></li>
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setAlbatrossVar">Albatross</a></li>
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setNumberOneVar">Number One </a></li>
 					</ul>
-					<ul style="font-size:13px;color:powderblue;text-align:left;padding-left:1em;" id="EarlySZOrJPiece">Early S, Z, or T Piece:
+					<ul style="font-size:13px;color:dodgerblue;text-align:left;padding-left:1em;" id="EarlySZOrJPiece">Early S, Z, or T Piece:
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setPelicanVar">Pelican</a></li>
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setDTCannonTSZbaseVar">DT Cannon (TSZ base) </a></li>
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setBTCannonVar">BT Cannon </a></li>
@@ -132,7 +138,7 @@ document.getElementById("divbg").removeAttribute("tabIndex");
 <script>
 	(function(){
 		var tetrion = new Tetris('tetris');
-		
+		document.getElementById("setFreePlay").addEventListener("click", function() { tetrion.setFreePlay(); } );
 		document.getElementById("setTKIFonzieVar").addEventListener("click", function() { tetrion.setTKIFonzieVar(); } );
 		document.getElementById("setDTCannonVar").addEventListener("click", function() { tetrion.setDTCannonVar(); } );
 		

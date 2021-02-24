@@ -1,4 +1,5 @@
 var shapes = require("./shapes.js");
+// import * as shapes from './shapes.js';
 
 var OpenerGenerator = {
 	shapeQueue: [],
@@ -80,7 +81,6 @@ var OpenerGenerator = {
 				shapes.getShape(2),
 				shapes.getShape(4),
 				shapes.getShape(3));
-				
 				// L
 				this.hintQueue[0].x = -1;
 				this.hintQueue[0].y = 17;
@@ -236,4 +236,9 @@ module.exports.getNextMino = getNextMino;
 module.exports.getNextHint = getNextHint;
 module.exports.getLength = getLength;
 module.exports.reset = reset;
+// export getNextMino;
+// export getNextHint;
+// export getLength;
+// export reset;
+
 

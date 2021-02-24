@@ -82,3 +82,4 @@ window.addEventListener("gamepadconnected", gamepadAPI.connect);
 window.addEventListener("gamepaddisconnected", gamepadAPI.disconnect);
 
 module.exports = gamepadAPI;
+// export gamepadAPI;

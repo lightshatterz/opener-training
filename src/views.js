@@ -3,6 +3,8 @@
 */
 var utils = require('./utils.js');
 var consts = require('./consts.js');
+// import * as utils from './utils.js';
+// import * as consts from './const.js';
 
 var $ = utils.$;
 
@@ -142,3 +144,4 @@ var tetrisView = {
 };
 
 module.exports = tetrisView;
+// export tetrisView;

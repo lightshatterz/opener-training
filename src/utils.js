@@ -108,3 +108,7 @@ window.requestAnimationFrame = aniFrame;
 exports.$ = $;
 exports.extend = extend;
 exports.proxy = proxy;
+
+// export $;
+// export extend;
+// export proxy;

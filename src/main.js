@@ -5,7 +5,14 @@ var views = require('./views.js');
 var canvas = require('./canvas.js');
 var inputs = require('./input.js');
 var openers = require('./openers.js');
-
+// import * as utils from './utils.js';
+// import * as consts from './const.js';
+// import * as shapes from './shapes.js';
+// import * as views from './views.js';
+// import * as canvas from './canvas.js';
+// import * as inputs from './input.js';
+// import * as openers from './openers.js';
+//import * as THREE from 'https://threejsfundamentals.org/threejs/resources/threejs/r125/build/three.module.js';
 
 /**
 	Init game matrix
@@ -141,9 +148,6 @@ function Tetris(id) {
 Tetris.prototype = {
 
     init: function(options) {
-
-		// Initialize function calls
-		//document.getElementById("TKIFonzieVar").onclick = function() { this._restartHandler() };
 		
         var cfg = this.config = utils.extend(options, defaults);
         this.interval = consts.DEFAULT_INTERVAL;
@@ -153,30 +157,40 @@ Tetris.prototype = {
         canvas.init(views.scene, views.preview, views.hold);
 		inputs.init();
 		
+		// if true no openers.  just random tetrinos
+		this.isFreePlay = true;
 		this.currentOpener = 0;
         this.matrix = initMatrix(consts.ROW_COUNT, consts.COLUMN_COUNT);
         this.reset();
-		setInterval(() => {this._processInput();}, 1);
+		setInterval(() => {this._processTick();}, 1);
 
         this._initEvents();
         this._fireShape();
 
     },
+	setFreePlay: function()
+	{
+		this.isFreePlay = true;
+		this.hintQueue = [];
+		this.shapeQueue = [];
+		this.hintMino = 0;
+		this._restartHandler();
+		this.currentOpener = 0;
+		this._fireShape();
+	},
 	setTKIFonzieVar: function()
 	{
+		this.isFreePlay = false;
 		this._restartHandler();
 		this.currentOpener = 1;
 		this._fireShape();
-		
-		//this._update();
 	},	
 	setDTCannonVar: function()
 	{
+		this.isFreePlay = false;
 		this._restartHandler();
 		this.currentOpener = 2;
 		this._fireShape();
-		
-		//this._update();
 	},
     //Reset game
     reset: function() {
@@ -185,16 +199,24 @@ Tetris.prototype = {
         this.level = 1;
         this.score = 0;
 		this.lines = 0;
+		// beginning of frame
         this.startTime = new Date().getTime();
         this.currentTime = this.startTime;
         this.prevTime = this.startTime;
+		//todo:get rid of extra
         this.levelTime = this.startTime;
 		this.prevInputTime = this.startTime;
+		// current tetrino index gets set to 0 at the end of opener sequence
 		this.currentMinoInx = 0;
 		this.shapeQueue = [];
 		this.hintQueue = [];
 		this.holdQueue = [];
+		// gets set to false after mino has been popped from hold stack; set back to true on mino dropped
 		this.canPullFromHoldQueue = false;
+		// rotation counter for srs extended piece lockdown
+		this.rotationCounter = 0;
+		// timer for srs extened piece lockdown
+		this.pieceTimer = 0;
         clearMatrix(this.matrix);
         views.setLevel(this.level);
         views.setScore(this.score);
@@ -238,14 +260,7 @@ Tetris.prototype = {
 			this._draw();
 		}
 	},
-    //Game over
-    gamveOver: function() {
 
-    },
-	  
-    // All key event handlers
-    _keydownHandler: function(e) {
-    },
     // Restart game
     _restartHandler: function() {
         this.reset();
@@ -253,38 +268,45 @@ Tetris.prototype = {
     },
     // Bind game events
     _initEvents: function() {
-        //window.addEventListener('keydown', utils.proxy(this._keydownHandler, this), false);
         views.btnRestart.addEventListener('click', utils.proxy(this._restartHandler, this), false);
     },
 
     // Fire a new random shape
     _fireShape: function() {
-		//this.shape = this.shapeQueue.shift() || shapes.randomShape();
-
-	
-
-			
-		while(this.shapeQueue.length <= 4)
-		{
-			this.preparedShape = openers.getNextMino(this.currentOpener);
-			this.shapeQueue.push(this.preparedShape);
-		}
-		while(this.hintQueue.length <= 4)
-		{
-			this.preparedShape = openers.getNextHint(this.currentOpener);
-			this.hintQueue.push(this.preparedShape);
-		}
 		
-		this.hintMino = this.hintQueue.shift();
-		this.shape = this.shapeQueue.shift();// shapes.randomShape();
-       
-	   this.currentMinoInx++;
-	   
-		if(this.currentMinoInx > openers.getLength()) {
-			this.hintQueue = [];
-			this.shapeQueue = [];
-			this._restartHandler();
-			this._fireShape();
+	
+		if(this.isFreePlay == false) {
+			while(this.shapeQueue.length <= 4)
+			{
+				this.preparedShape = openers.getNextMino(this.currentOpener);
+				this.shapeQueue.push(this.preparedShape);
+			}
+			while(this.hintQueue.length <= 4)
+			{
+				this.preparedShape = openers.getNextHint(this.currentOpener);
+				this.hintQueue.push(this.preparedShape);
+			}
+			
+			this.hintMino = this.hintQueue.shift();
+			this.shape = this.shapeQueue.shift();// shapes.randomShape();
+		   
+		   this.currentMinoInx++;
+		   
+			if(this.currentMinoInx > openers.getLength()) {
+				this.hintQueue = [];
+				this.shapeQueue = [];
+				this._restartHandler();
+				this._fireShape();
+			}
+		} else {
+			while(this.shapeQueue.length <= 4)
+			{
+				this.preparedShape = shapes.randomShape();
+				this.shapeQueue.push(this.preparedShape);
+			}
+			
+			this.shape = this.shapeQueue.shift() || randomShape();
+			this.currentMinoInx++;
 		}
 		
 		// Reset matrix at successful end of opener
@@ -313,12 +335,8 @@ Tetris.prototype = {
 		}
         canvas.drawMatrix(this.matrix);
     },
-	// Render Shape
-	_renderShape: function()
-	{
-		this._draw();
-	},
-	_processInput: async function() {
+
+	_processTick: async function() {
 	
 		var deltaTime = 1.0; // 1 millisecond
 		var tenthOfFrame = 1.0//1;//1.6; // 1.6ms = 1 fram
@@ -343,26 +361,25 @@ Tetris.prototype = {
 				var curkey = inputs.gamepadQueue.shift();
 				if(curkey == "DPad-Left") {
 					this.shape.goLeft(this.matrix);
-					this._renderShape();
+					this._draw();
 				}
 				if(curkey == "DPad-Right") {
 					this.shape.goRight(this.matrix);
-					this._renderShape();
+					this._draw();
 				}
 				if(curkey == "A") {
+					this.rotationCounter++;
 					this.shape.rotate(this.matrix);
-					this._renderShape();
-					//this._draw();
+					this._draw();
 				}
 				if(curkey == "B") {
+					this.rotationCounter++;
 					this.shape.rotateClockwise(this.matrix);
-					this._renderShape();
-					//this._draw();
+					this._draw();
 				}
 				if(curkey == "DPad-Down") {
 					 this.shape.goDown(this.matrix);
-					 this._renderShape();
-					 //this._draw();
+					 this._draw();
 				}
 				if(curkey == "RB") {
 					this.shape.goBottom(this.matrix);
@@ -370,17 +387,13 @@ Tetris.prototype = {
 				}
 				if(curkey == "LB") {
 					this.pushHoldStack();
-					//this._renderShape();
 					this._update();
 				}				
 				if(curkey == "DPad-Up") {
 					this.popHoldStack();
-					//this._renderShape();
 					this._update();
 				}
 				if(curkey == "Back") {
-					// this.hintMino = [] ?
-					// this.shape = []
 					this._restartHandler();
 					return;
 				}
@@ -403,47 +416,45 @@ Tetris.prototype = {
 				var curkey = inputs.inputqueue.shift();
 				if(curkey == 37) {
 					this.shape.goLeft(this.matrix);
-					this._renderShape();
+					this._draw();
 				}
 				if(curkey == 39){
 					this.shape.goRight(this.matrix);
-					this._renderShape();
+					this._draw();
 				}
 				if(curkey == 40) {
 					 this.shape.goDown(this.matrix);
-					 this._renderShape();
+					 this._draw();
 				}
 				if(curkey == 90) {
+					this.rotationCounter++;
 					this.shape.rotate(this.matrix);
-					this._renderShape();
+					this._draw();
 				}
 				if(curkey == 88){
+					this.rotationCounter++;
 					this.shape.rotateClockwise(this.matrix);;
-					this._renderShape();
+					this._draw();
 				}
 				if(curkey == 32) {
 					this.shape.goBottom(this.matrix);
-					//this._renderShape();
 					this._update();
 				}
 				if(curkey == 16) {
 					this.pushHoldStack();
-					//this._renderShape();
 					this._update();
 				}
 				if(curkey == 17) {
 					this.popHoldStack();
-					//this._renderShape();
 					this._update();
 				}
 				if(curkey == 81) {
-					if(document.getElementById("bg").style.display == "none")
-						document.getElementById("bg").style.display =  "initial";
+					if(document.getElementById("divbg").style.display == "none")
+						document.getElementById("divbg").style.display =  "initial";
 					else
-						document.getElementById("bg").style.display="none";
+						document.getElementById("divbg").style.display="none";
 				}
 				if(curkey == 82) {
-					views.setGameOver(true);
 					this._restartHandler();
 					return;
 				}
@@ -492,6 +503,8 @@ Tetris.prototype = {
     },
 	_checkHint: function() {
 		
+		if(this.isFreePlay)
+			return;
 		if(!this.shape.isSameSRS(this.hintMino))
 		{
 			new Audio('./dist/Failed.ogg').play();
@@ -566,8 +579,8 @@ Tetris.prototype = {
         var rows = checkFullRows(this.matrix);
         if (rows.length) {
 			var tspinType;
-			if(rows.length >= 4)
-				new Audio('./dist/Tetris.ogg').play();
+			// if(rows.length >= 4)
+				// new Audio('./dist/Tetris.ogg').play();
 			if(this.shape.flag === 'T')
 				tspinType = this._tSpinType(this.shape, this.matrix);
 			
@@ -599,3 +612,4 @@ Tetris.prototype = {
 
 
 window.Tetris = Tetris;
+// export {Tetris};

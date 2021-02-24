@@ -1,4 +1,5 @@
 var gamepad = require('./gamepad.js');
+// import * as gamepad from './gamepad.js';
 
 var UserInputs = {
     init() {
@@ -81,7 +82,7 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDPadDown(finds) {
-		var DAS = 80.0;
+		var DAS = 65.0;
 		var ARR = 20.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
@@ -161,7 +162,7 @@ var UserInputs = {
 	},
 	// Direction arrows
     processKeyboardArrowKeys(key) {		
-		var DAS = 80.0;
+		var DAS = 65.0;
 		var ARR = 20.0;
 
 	
@@ -241,3 +242,4 @@ var UserInputs = {
 };
 
 module.exports = UserInputs;
+// export UserInputs;
