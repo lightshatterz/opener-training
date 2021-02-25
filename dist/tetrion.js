@@ -517,7 +517,7 @@ var UserInputs = {
 			if(isContained)
 				this.gamepadQueue.push(finds);
 		}
-		var gamepadDirectionDasFrames = this.gamepadDirectionPadDeciFrames / 1.0;
+		var gamepadDirectionDasFrames = this.gamepadDirectionPadDeciFrames;
 			if (!this.isGamepadDown) {
 					if (gamepadDirectionDasFrames >= DAS) {
 						this.gamepadDirectionPadDeciFrames = 0;
@@ -544,6 +544,7 @@ var UserInputs = {
 		this.processKeyDown(17);  // ctrl
 		this.processKeyDown(81);  // q
 		this.processKeyDown(82);  // r
+		this.processKeyDown(67);  // c
 	},
 
 	// keyboard keys z,x,space
@@ -597,7 +598,7 @@ var UserInputs = {
 		}
 		
 		
-		var keyboardDASFrames = this.keyboardDirectionArrowsDeciframes / 1.0; // why isnt this 10?
+		var keyboardDASFrames = this.keyboardDirectionArrowsDeciframes;
 		
             if (!this.isDirectionArrowDown) {
 				
@@ -616,9 +617,7 @@ var UserInputs = {
     keyDown(event) {
 		
 		// Disable space scrolling etc
-		//if (event.keyCode === 32) {
-			event.preventDefault();
-		//}
+		event.preventDefault();
 		
 		this.keyboardKeys[event.keyCode] = true;
 		this.isKeyBoardKeyDown = true;
@@ -832,7 +831,6 @@ Tetris.prototype = {
 		this.currentOpener = 0;
         this.matrix = initMatrix(consts.ROW_COUNT, consts.COLUMN_COUNT);
         this.reset();
-		setInterval(() => {this._processTick();}, 1);
 
         this._initEvents();
         this._fireShape();
@@ -846,21 +844,21 @@ Tetris.prototype = {
 		this.hintMino = 0;
 		this._restartHandler();
 		this.currentOpener = 0;
-		this._fireShape();
+
 	},
 	setTKIFonzieVar: function()
 	{
 		this.isFreePlay = false;
-		this._restartHandler();
 		this.currentOpener = 1;
-		this._fireShape();
+		this._restartHandler();
+
 	},	
 	setDTCannonVar: function()
 	{
 		this.isFreePlay = false;
-		this._restartHandler();
 		this.currentOpener = 2;
-		this._fireShape();
+		this._restartHandler();
+
 	},
     //Reset game
     reset: function() {
@@ -880,13 +878,15 @@ Tetris.prototype = {
 		this.currentMinoInx = 0;
 		this.shapeQueue = [];
 		this.hintQueue = [];
-		this.holdQueue = [];
+		this.holdStack = [];
 		// gets set to false after mino has been popped from hold stack; set back to true on mino dropped
-		this.canPullFromHoldQueue = false;
-		// rotation counter for srs extended piece lockdown
-		this.rotationCounter = 0;
+		this.canPopFromHoldStack = false;
+		// manipulation counter for srs extended piece lockdown
+		this.manipulationCounter = 0;
 		// timer for srs extened piece lockdown
-		this.pieceTimer = 0;
+		this.lockdownTimer = 0;
+		this.landed = false;
+		
         clearMatrix(this.matrix);
         views.setLevel(this.level);
         views.setScore(this.score);
@@ -909,24 +909,24 @@ Tetris.prototype = {
     },
 	pushHoldStack: function()
 	{
-		if(this.holdQueue.length < 4) {
-			this.holdQueue.push(this.shape);
+		if(this.holdStack.length < 4) {
+			this.holdStack.push(utils.deepClone(this.shape));
 			this.shape = this.shapeQueue.shift();
-			this.canPullFromHoldQueue = false;
+			this.canPopFromHoldStack = false;
 			this.shape.resetOrigin();
-			//canvas.drawHoldShape(this.holdQueue);
+			//canvas.drawHoldShape(this.holdStack);
 			this._draw(); // update?
 		}
 	},
 	popHoldStack: function()
 	{
-		if(this.holdQueue.length >= 1 && this.canPullFromHoldQueue)
+		if(this.holdStack.length >= 1 && this.canPopFromHoldStack)
 		{
-			this.canPullFromHoldQueue = false;
-			this.shapeQueue.unshift(this.shape);
-			this.shape = this.holdQueue.pop();
+			this.canPopFromHoldStack = false;
+			this.shapeQueue.unshift(utils.deepClone(this.shape));
+			this.shape = this.holdStack.pop();
 			this.shape.resetOrigin();
-			//canvas.drawHoldShape(this.holdQueue);
+			//canvas.drawHoldShape(this.holdStack);
 			this._draw();
 		}
 	},
@@ -935,13 +935,16 @@ Tetris.prototype = {
     _restartHandler: function() {
         this.reset();
         this.start();
+		this._fireShape();
     },
     // Bind game events
     _initEvents: function() {
+		setInterval(() => {this._processTick();}, 1);
+		setInterval(() => {this.lockDownTimer++;}, 100 );
         views.btnRestart.addEventListener('click', utils.proxy(this._restartHandler, this), false);
     },
 
-    // Fire a new random shape
+    // Fill next queue and set next shape
     _fireShape: function() {
 		
 	
@@ -966,7 +969,6 @@ Tetris.prototype = {
 				this.hintQueue = [];
 				this.shapeQueue = [];
 				this._restartHandler();
-				this._fireShape();
 			}
 		} else {
 			while(this.shapeQueue.length <= 4)
@@ -979,6 +981,9 @@ Tetris.prototype = {
 			this.currentMinoInx++;
 		}
 		
+		//todo:should be in shapes.js
+		this.landed = false;
+		this.manipulationCounter = 0;
 		// Reset matrix at successful end of opener
 		//if(this.shapeQueue.length == openers.length) {
 		//	this.matrix = [];
@@ -988,24 +993,42 @@ Tetris.prototype = {
 		this._draw();
         
     },
+	// lockdown timer with centisecond resolution
+	resetLockdown: function() {
+
+		if(this.shape.canDown(this.matrix) == false)	
+			this.landed = true;
+			
+		this.lockDownTimer = 0;
+		
+		if(this.landed)
+			this.manipulationCounter++;		
+	},
+	// Return if the piece can be shifted or rotated
+	isPieceLocked: function() {
+		
+		if(this.manipulationCounter > 15) return true;
+		if(this.lockDownTimer >= 5) return true;
+		
+		return false;
+	},
     // Draw game data
     _draw: function() {
         canvas.drawScene();
         canvas.drawShape(this.shape);
-		canvas.drawHoldShape(this.holdQueue);
+		canvas.drawHoldShape(this.holdStack);
 		canvas.drawPreviewShape(this.shapeQueue);
 		canvas.drawHintShape(this.hintMino);
 		
 		if(this.shape != undefined) {
 		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
 		
-		//todo: put in collision detsction
 		var bottomY = clone.bottomAt(this.matrix);
 		canvas.drawGhostShape(clone, bottomY);
 		}
         canvas.drawMatrix(this.matrix);
     },
-
+	// tick input data
 	_processTick: async function() {
 	
 		var deltaTime = 1.0; // 1 millisecond
@@ -1024,6 +1047,10 @@ Tetris.prototype = {
 			inputs.processGamepadInput();
 		}
 		
+		
+		// Don't process game related events if game over
+		if(this.isGameOver) return;
+		
 		// drain gamepad queue
 		if(inputs.getTickCounter() > halfFrame)  // 8 millisecons
 		{
@@ -1031,20 +1058,24 @@ Tetris.prototype = {
 				var curkey = inputs.gamepadQueue.shift();
 				if(curkey == "DPad-Left") {
 					this.shape.goLeft(this.matrix);
+					this.resetLockdown();
 					this._draw();
 				}
 				if(curkey == "DPad-Right") {
 					this.shape.goRight(this.matrix);
+					this.resetLockdown();
 					this._draw();
 				}
 				if(curkey == "A") {
 					this.rotationCounter++;
 					this.shape.rotate(this.matrix);
+					this.resetLockdown();
 					this._draw();
 				}
 				if(curkey == "B") {
 					this.rotationCounter++;
 					this.shape.rotateClockwise(this.matrix);
+					this.resetLockdown();
 					this._draw();
 				}
 				if(curkey == "DPad-Down") {
@@ -1053,15 +1084,16 @@ Tetris.prototype = {
 				}
 				if(curkey == "RB") {
 					this.shape.goBottom(this.matrix);
+					this.lockDownTimer = 5000;
 					this._update();
 				}
 				if(curkey == "LB") {
 					this.pushHoldStack();
-					this._update();
+					this._draw();
 				}				
 				if(curkey == "DPad-Up") {
 					this.popHoldStack();
-					this._update();
+					this._draw();
 				}
 				if(curkey == "Back") {
 					this._restartHandler();
@@ -1086,10 +1118,12 @@ Tetris.prototype = {
 				var curkey = inputs.inputqueue.shift();
 				if(curkey == 37) {
 					this.shape.goLeft(this.matrix);
+					this.resetLockdown();
 					this._draw();
 				}
 				if(curkey == 39){
 					this.shape.goRight(this.matrix);
+					this.resetLockdown();
 					this._draw();
 				}
 				if(curkey == 40) {
@@ -1099,24 +1133,29 @@ Tetris.prototype = {
 				if(curkey == 90) {
 					this.rotationCounter++;
 					this.shape.rotate(this.matrix);
+					this.resetLockdown();
 					this._draw();
 				}
 				if(curkey == 88){
 					this.rotationCounter++;
-					this.shape.rotateClockwise(this.matrix);;
+					this.shape.rotateClockwise(this.matrix);
+					this.resetLockdown();
 					this._draw();
 				}
 				if(curkey == 32) {
 					this.shape.goBottom(this.matrix);
+					this.lockDownTimer = 5000;
 					this._update();
 				}
 				if(curkey == 16) {
 					this.pushHoldStack();
-					this._update();
+					//this._update();
+					this._draw();
 				}
-				if(curkey == 17) {
+				if(curkey == 17 || curkey == 67) {
 					this.popHoldStack();
-					this._update();
+					//this._update();
+					this._draw();
 				}
 				if(curkey == 81) {
 					if(document.getElementById("divbg").style.display == "none")
@@ -1141,9 +1180,6 @@ Tetris.prototype = {
 			inputs.saveButtons();
 		
 	},		
-	sleep: function(ms) {
-	  return new Promise(resolve => setTimeout(resolve, ms));
-	},
     // Refresh game canvas
     _refresh: async function() {
 
@@ -1171,6 +1207,7 @@ Tetris.prototype = {
 		
 
     },
+	// check if the current piece is in the same location as the hint piece
 	_checkHint: function() {
 		
 		if(this.isFreePlay)
@@ -1179,6 +1216,8 @@ Tetris.prototype = {
 		{
 			new Audio('./dist/Failed.ogg').play();
 			this._restartHandler();
+			// Restart
+			return 1;
 		}
 	},
     // Update game data
@@ -1186,11 +1225,11 @@ Tetris.prototype = {
 		
         if (this.shape.canDown(this.matrix)) {
             this.shape.goDown(this.matrix);
-        } else {
-			this.canPullFromHoldQueue = true;
+        } else if(this.isPieceLocked()){
+			this.canPopFromHoldStack = true;
             this.shape.copyTo(this.matrix);
             this._check();
-			this._checkHint();
+			if(this._checkHint()) return;
             this._fireShape();
 			new Audio('./dist/Blop2.ogg').play();
         }
@@ -1205,7 +1244,6 @@ Tetris.prototype = {
 
     },
 	// 0 - none, 1 - mini, 2 - tspin
-	
 	_tSpinType: function(tPiece, matrix) {
 		
 		var side1 = 0;
@@ -2024,6 +2062,8 @@ var doesShapeOverlap = function(shape, matrix) {
 		if(x < 0) return true;
 		if(x > matrix.cols)return true;
 		if(y > rows) return true;
+		// todo: why is matrix not defined when piece popped from hold stack
+		if(matrix[y] == undefined) return true;
         //console.log("matrix X Y: " + " " + x + " "+ y);
 		return (matrix[y][x] != 0)
     };
@@ -2471,6 +2511,12 @@ var _isPlainObject = function(obj) {
     // |obj| is a plain object, created by {} or constructed with new Object
     return true;
 };
+
+// Deeper clone
+var deepClone = function(copyObject) {
+	return Object.assign(Object.create(Object.getPrototypeOf(copyObject)), copyObject);
+};
+
 // this method source code is from jquery 2.0.x
 // merge object's value and return
 var extend = function() {
@@ -2555,7 +2601,7 @@ window.requestAnimationFrame = aniFrame;
 exports.$ = $;
 exports.extend = extend;
 exports.proxy = proxy;
-
+exports.deepClone = deepClone;
 // export $;
 // export extend;
 // export proxy;

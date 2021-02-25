@@ -492,6 +492,8 @@ var doesShapeOverlap = function(shape, matrix) {
 		if(x < 0) return true;
 		if(x > matrix.cols)return true;
 		if(y > rows) return true;
+		// todo: why is matrix not defined when piece popped from hold stack
+		if(matrix[y] == undefined) return true;
         //console.log("matrix X Y: " + " " + x + " "+ y);
 		return (matrix[y][x] != 0)
     };

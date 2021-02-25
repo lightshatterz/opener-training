@@ -24,6 +24,12 @@ var _isPlainObject = function(obj) {
     // |obj| is a plain object, created by {} or constructed with new Object
     return true;
 };
+
+// Deeper clone
+var deepClone = function(copyObject) {
+	return Object.assign(Object.create(Object.getPrototypeOf(copyObject)), copyObject);
+};
+
 // this method source code is from jquery 2.0.x
 // merge object's value and return
 var extend = function() {
@@ -108,7 +114,7 @@ window.requestAnimationFrame = aniFrame;
 exports.$ = $;
 exports.extend = extend;
 exports.proxy = proxy;
-
+exports.deepClone = deepClone;
 // export $;
 // export extend;
 // export proxy;

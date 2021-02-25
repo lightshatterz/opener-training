@@ -93,7 +93,7 @@ var UserInputs = {
 			if(isContained)
 				this.gamepadQueue.push(finds);
 		}
-		var gamepadDirectionDasFrames = this.gamepadDirectionPadDeciFrames / 1.0;
+		var gamepadDirectionDasFrames = this.gamepadDirectionPadDeciFrames;
 			if (!this.isGamepadDown) {
 					if (gamepadDirectionDasFrames >= DAS) {
 						this.gamepadDirectionPadDeciFrames = 0;
@@ -120,6 +120,7 @@ var UserInputs = {
 		this.processKeyDown(17);  // ctrl
 		this.processKeyDown(81);  // q
 		this.processKeyDown(82);  // r
+		this.processKeyDown(67);  // c
 	},
 
 	// keyboard keys z,x,space
@@ -173,7 +174,7 @@ var UserInputs = {
 		}
 		
 		
-		var keyboardDASFrames = this.keyboardDirectionArrowsDeciframes / 1.0; // why isnt this 10?
+		var keyboardDASFrames = this.keyboardDirectionArrowsDeciframes;
 		
             if (!this.isDirectionArrowDown) {
 				
@@ -192,9 +193,7 @@ var UserInputs = {
     keyDown(event) {
 		
 		// Disable space scrolling etc
-		//if (event.keyCode === 32) {
-			event.preventDefault();
-		//}
+		event.preventDefault();
 		
 		this.keyboardKeys[event.keyCode] = true;
 		this.isKeyBoardKeyDown = true;
