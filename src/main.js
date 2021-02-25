@@ -156,7 +156,7 @@ Tetris.prototype = {
         views.init(this.id, cfg.maxWidth, cfg.maxHeight);
         canvas.init(views.scene, views.preview, views.hold);
 		inputs.init();
-		
+		this.createSettings();
 		// if true no openers.  just random tetrinos
 		this.isFreePlay = true;
 		this.currentOpener = 0;
@@ -190,6 +190,30 @@ Tetris.prototype = {
 		this.currentOpener = 2;
 		this._restartHandler();
 
+	}, 
+	createSettings: function () {
+		var list = document.getElementById("settings");
+		var settings = inputs.settingsList;
+		
+		settings.forEach(function(item) {
+			var option = document.createElement('option');
+	
+			option.text = item;
+			option.id = item;
+
+			list.add(option);
+		});
+	},	
+	updateSettingTextBox: function() {
+		console.log(document.getElementById("setting_value").value = inputs.settingsDefault[document.getElementById("settings").selectedIndex-1]);
+	},
+	setSettings: function() {
+		//inputs.settingsDefault[document.getElementById("settings").selectedIndex-1] = document.getElementById("setting_value").value;
+		
+		var newVal = document.getElementById("setting_value").value;
+		utils.setCookie(inputs.settingsList[document.getElementById("settings").selectedIndex-1], newVal, 30);
+		inputs.settingsMap.set(inputs.settingsList[document.getElementById("settings").selectedIndex-1], newVal);
+		//console.log("settings " + inputs.settingsList[document.getElementById("settings").selectedIndex-1] + " " + newVal);
 	},
     //Reset game
     reset: function() {

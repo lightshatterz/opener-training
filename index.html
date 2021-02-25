@@ -36,7 +36,7 @@
 <!--insert shadertoy background-->
 <!--https://www.shadertoy.com/embed/wttfW2?gui=&t=10&paused=false&muted=false-->
 
-
+<!--
 <div id="divbg">
 <iframe id="bg" width="640" height="360" frameborder="0" src="https://www.shadertoy.com/embed/WldfWX?gui=&paused=false&muted=false" ></iframe>
 <script>
@@ -48,7 +48,7 @@ document.getElementById("bg").removeAttribute("tabIndex");
 document.getElementById("divbg").removeAttribute("tabIndex");
 </script>
 </div>
-
+-->
 
 <div id="tetris">
 	<canvas id="scene"></canvas>
@@ -99,7 +99,7 @@ document.getElementById("divbg").removeAttribute("tabIndex");
 				</ul>
 				-->
 				<ul style="font-size:16px;color:dodgerblue;text-align:left;" > 
-					<ul style="font-size:13px;color:powderblue;text-align:left;padding-left:1em;" id="setPCOpenersVar">Perfect Clear Openers:
+					<ul style="font-size:13px;color:dodgerblue;text-align:left;padding-left:1em;" id="setPCOpenersVar">Perfect Clear Openers:
 						<li style="font-size:12px;padding-left:1em;"><a href="#" id="setStdPCOpenerVar">The Standard PC Opener </a></li>
 						<li style="font-size:12px;padding-left:1em;"><a href="#" id="setSecondPCVar">Second Perfect Clear </a></li>
 						<li style="font-size:12px;padding-left:1em;"><a href="#" id="setLoJVar">Either L or J </a></li>
@@ -128,6 +128,16 @@ document.getElementById("divbg").removeAttribute("tabIndex");
 			<h1 id="linesInfo">Lines: <br><span id="lines" >0</span></h1>
 			<div id="rewardInfo" class="invisible">+<span id="reward">0</span></div>
 			<canvas id="preview"></canvas>
+			
+			<br>
+			<select style="width:80px;font-size:13px;background:black;color:dodgerblue;text-align:left;" id="settings" name="setting">
+			  <option selected="">Settings:</option>
+				
+			</select>
+			<input style="width:80px;font-size:13px;background:black;color:dodgerblue;text-align:left;" type="text" id="setting_value">
+			<input id="submitsetting" type="submit">
+
+			
 		</div>
 	</div>
 </div>
@@ -141,7 +151,8 @@ document.getElementById("divbg").removeAttribute("tabIndex");
 		document.getElementById("setFreePlay").addEventListener("click", function() { tetrion.setFreePlay(); } );
 		document.getElementById("setTKIFonzieVar").addEventListener("click", function() { tetrion.setTKIFonzieVar(); } );
 		document.getElementById("setDTCannonVar").addEventListener("click", function() { tetrion.setDTCannonVar(); } );
-		
+		document.getElementById("settings").addEventListener("change", function() { tetrion.updateSettingTextBox(); } );
+		document.getElementById("submitsetting").addEventListener("click", function() { tetrion.setSettings(); } );
 		tetrion.start();
 	})();
 </script>

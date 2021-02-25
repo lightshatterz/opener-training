@@ -1,8 +1,29 @@
 var gamepad = require('./gamepad.js');
+var utils = require('./utils.js');
 // import * as gamepad from './gamepad.js';
 
 var UserInputs = {
-    init() {
+	init() {
+		this.settingsMap = new Map();		
+		var options = "";
+		// var init = utils.getCookie("init");
+		// if(init == "") 
+			for(var i in this.settingsList) 
+				utils.setCookie(this.settingsList[i], this.settingsDefault[i], 30); //  cookies expire in 30 days
+				
+			
+			
+		// else
+			// for(var i in this.settingsList)
+				// this.settingsDefault[i] = utils.getCookie(this.settingsList[i]);
+			
+		 for(var i in this.settingsList)
+			 this.settingsMap.set(this.settingsList[i], this.settingsDefault[i]);
+		 
+
+		
+		//document.getElementById("setting").innerHTML = settings;
+		
         document.addEventListener('keydown', this.keyDown.bind(this));
         document.addEventListener('keyup', this.keyUp.bind(this));
     },
@@ -25,15 +46,21 @@ var UserInputs = {
 	},
 	
 	processGamepadInput() {
-		this.gamepadButtonsDown("RB");
-		this.gamepadButtonsDown("LB");
-		this.gamepadButtonsDown("A");
-		this.gamepadButtonsDown("B");
-		this.gamepadButtonsDown("DPad-Up");
-		this.gamepadButtonsDown("Back");
+		// this.gamepadButtonsDown("RB");	// hard drop
+		// this.gamepadButtonsDown("LB");	// hold
+		// this.gamepadButtonsDown("A");	// rotate counter
+		// this.gamepadButtonsDown("B");	// rotate cwise
+		// this.gamepadButtonsDown("DPad-Up"); // Pop hold stack
+		// this.gamepadButtonsDown("Back");	// reset
 		//this.gamepadButtonsDown("X");
 		//this.gamepadButtonsDown("Y");
 		
+		this.gamepadButtonsDown(this.settingsMap.get("gamepad_harddrop"));	// hard drop
+		this.gamepadButtonsDown(this.settingsMap.get("gamepad_hold"));	// hold
+		this.gamepadButtonsDown(this.settingsMap.get("gamepad_rotateccw"));	// rotate counter
+		this.gamepadButtonsDown(this.settingsMap.get("gamepad_rotate"));	// rotate cwise
+		this.gamepadButtonsDown(this.settingsMap.get("gamepad_pophold")); // Pop hold stack
+		this.gamepadButtonsDown(this.settingsMap.get("gamepad_reset"));	// reset
 
 		
 		return;
@@ -41,9 +68,9 @@ var UserInputs = {
 	
 	processGamepadDPad() 
 	{
-		this.gamepadDPadDown("DPad-Left");
-		this.gamepadDPadDown("DPad-Right");
-		this.gamepadDPadDown("DPad-Down");
+		this.gamepadDPadDown(this.settingsMap.get("gamepad_left"));	// shift left
+		this.gamepadDPadDown(this.settingsMap.get("gamepad_right"));	// shift right
+		this.gamepadDPadDown(this.settingsMap.get("gamepad_down"));	// down
 		
 		return;
 	},
@@ -82,8 +109,8 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDPadDown(finds) {
-		var DAS = 65.0;
-		var ARR = 20.0;
+		var DAS = parseInt(this.settingsMap.get("gamepad_das"));	//65.0;
+		var ARR = parseInt(this.settingsMap.get("gamepad_arr"));	//20.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
 		
@@ -113,14 +140,14 @@ var UserInputs = {
 		return;
 	},
 	processKeys() {
-		this.processKeyDown(32);  // Space
-		this.processKeyDown(88);  // X
-		this.processKeyDown(90);  // Z
-		this.processKeyDown(16);  // shift
-		this.processKeyDown(17);  // ctrl
-		this.processKeyDown(81);  // q
-		this.processKeyDown(82);  // r
-		this.processKeyDown(67);  // c
+		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_harddrop")));		 //32);  // Space	- hard drop
+		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_rotate")));		//88);  // X		- rotate
+		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_rotateccw")));		//90);  // Z		- rotateccw
+		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_hold")));		//16);  // shift	- push hold stack
+		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_pophold")));	// ctrl	- pop hold stack
+		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_background")));  // q		- turn off background
+		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_reset"))); 		 // r		- reset
+		//this.processKeyDown(this.settingsMap.get("keyboard_hold")));  // c		- pop hold stack
 	},
 
 	// keyboard keys z,x,space
@@ -157,14 +184,14 @@ var UserInputs = {
 	},
 	
 	processKeyShift() {
-		this.processKeyboardArrowKeys(39);  // right
-		this.processKeyboardArrowKeys(37);	// left
-		this.processKeyboardArrowKeys(40);  // down
+		this.processKeyboardArrowKeys(parseInt(this.settingsMap.get("keyboard_left")));		//39);  // right
+		this.processKeyboardArrowKeys(parseInt(this.settingsMap.get("keyboard_right")));		//37);	// left
+		this.processKeyboardArrowKeys(parseInt(this.settingsMap.get("keyboard_down")));  // down
 	},
 	// Direction arrows
     processKeyboardArrowKeys(key) {		
-		var DAS = 65.0;
-		var ARR = 20.0;
+		var DAS = parseInt(this.settingsMap.get("keyboard_das"));	//65.0;
+		var ARR = parseInt(this.settingsMap.get("keyboard_arr"));	//20.0;
 
 	
 		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
@@ -192,8 +219,8 @@ var UserInputs = {
     },
     keyDown(event) {
 		
-		// Disable space scrolling etc
-		event.preventDefault();
+		if (! ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105) || event.keyCode == 8)) 
+			event.preventDefault();
 		
 		this.keyboardKeys[event.keyCode] = true;
 		this.isKeyBoardKeyDown = true;
@@ -237,7 +264,28 @@ var UserInputs = {
 	inputqueue: [],
 	gamepadQueue: [],
 	
-	ticks: 0
+	ticks: 0,
+	// todo: change to human readable
+	settingsList: ["init", 
+					"keyboard_das", "keyboard_arr", "keyboard_harddrop", "keyboard_hold", 
+					"keyboard_left", "keyboard_right", "keyboard_rotateccw", "keyboard_rotate", 
+					"keyboard_down", "keyboard_pophold", "keyboard_reset", "keyboard_background",
+					
+					"gamepad_das", "gamepad_arr", "gamepad_harddrop", "gamepad_hold",
+					"gamepad_left", "gamepad_right", "gamepad_rotateccw", "gamepad_rotate", 
+					"gamepad_down","gamepad_pophold", "gamepad_reset", "gamepad_background", 
+					"path", "SameSite"],
+	
+	settingsDefault: ["true", 
+						"65.0", "20.0", "32", "16",
+						"37", "39", "90", "88",
+						"40", "17", "82", "81",
+						
+						"65.0", "10.0", "RB", "LB",
+						"DPad-Left", "DPad-Right", "A", "B",
+						"DPad-Down", "DPad-Up", "Back", "", 
+						"=/", "Strict"],
+	settingsMap: []
 };
 
 module.exports = UserInputs;
