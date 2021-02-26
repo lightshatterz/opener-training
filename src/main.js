@@ -205,7 +205,7 @@ Tetris.prototype = {
 	setDoTest: function()
 	{
 		if(this.isFreePlay) return;
-		this.doTest = true;//!this.doTest;
+		this.doTest = true;
 		this._restartHandler();
 	},
 	createSettings: function () {
@@ -225,8 +225,6 @@ Tetris.prototype = {
 		console.log(document.getElementById("setting_value").value = inputs.settingsDefault[document.getElementById("settings").selectedIndex-1]);
 	},
 	setSettings: function() {
-		//inputs.settingsDefault[document.getElementById("settings").selectedIndex-1] = document.getElementById("setting_value").value;
-		
 		var newVal = document.getElementById("setting_value").value;
 		var key = inputs.settingsList[document.getElementById("settings").selectedIndex-1];
 		utils.setCookie(key, newVal, 30);
@@ -286,8 +284,7 @@ Tetris.prototype = {
 			this.shape = this.shapeQueue.shift();
 			this.canPopFromHoldStack = false;
 			this.shape.resetOrigin();
-			//canvas.drawHoldShape(this.holdStack);
-			this._draw(); // update?
+			this._draw(); 
 		}
 	},
 	popHoldStack: function()
@@ -298,7 +295,6 @@ Tetris.prototype = {
 			this.shapeQueue.unshift(utils.deepClone(this.shape));
 			this.shape = this.holdStack.pop();
 			this.shape.resetOrigin();
-			//canvas.drawHoldShape(this.holdStack);
 			this._draw();
 		}
 	},
@@ -318,8 +314,6 @@ Tetris.prototype = {
 
     // Fill next queue and set next shape
     _fireShape: function() {
-		
-	
 		if(this.isFreePlay == false) {
 			while(this.shapeQueue.length <= 4)
 			{
@@ -333,13 +327,14 @@ Tetris.prototype = {
 			}
 			
 			this.hintMino = this.hintQueue.shift();
-			this.shape = this.shapeQueue.shift();// shapes.randomShape();
+			this.shape = this.shapeQueue.shift();
 		   
 		   this.currentMinoInx++;
 		   
 			if(this.currentMinoInx > openers.getLength()) {
 				this.hintQueue = [];
 				this.shapeQueue = [];
+				// Recursion warning
 				this._restartHandler();
 			}
 		} else {

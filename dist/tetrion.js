@@ -429,24 +429,17 @@ var utils = require('./utils.js');
 var UserInputs = {
 	init() {
 		this.settingsMap = new Map();		
-		var options = "";
+		
 		// var init = utils.getCookie("init");
 		// if(init == "") 
 			for(var i in this.settingsList) 
 				utils.setCookie(this.settingsList[i], this.settingsDefault[i], 30); //  cookies expire in 30 days
-				
-			
-			
 		// else
 			// for(var i in this.settingsList)
 				// this.settingsDefault[i] = utils.getCookie(this.settingsList[i]);
 			
 		 for(var i in this.settingsList)
 			 this.settingsMap.set(this.settingsList[i], this.settingsDefault[i]);
-		 
-
-		
-		//document.getElementById("setting").innerHTML = settings;
 		
         document.addEventListener('keydown', this.keyDown.bind(this));
         document.addEventListener('keyup', this.keyUp.bind(this));
@@ -470,31 +463,21 @@ var UserInputs = {
 	},
 	
 	processGamepadInput() {
-		// this.gamepadButtonsDown("RB");	// hard drop
-		// this.gamepadButtonsDown("LB");	// hold
-		// this.gamepadButtonsDown("A");	// rotate counter
-		// this.gamepadButtonsDown("B");	// rotate cwise
-		// this.gamepadButtonsDown("DPad-Up"); // Pop hold stack
-		// this.gamepadButtonsDown("Back");	// reset
-		//this.gamepadButtonsDown("X");
-		//this.gamepadButtonsDown("Y");
-		
-		this.gamepadButtonsDown(this.settingsMap.get("gamepad_harddrop"));	// hard drop
-		this.gamepadButtonsDown(this.settingsMap.get("gamepad_hold"));	// hold
-		this.gamepadButtonsDown(this.settingsMap.get("gamepad_rotateccw"));	// rotate counter
-		this.gamepadButtonsDown(this.settingsMap.get("gamepad_rotate"));	// rotate cwise
-		this.gamepadButtonsDown(this.settingsMap.get("gamepad_pophold")); // Pop hold stack
-		this.gamepadButtonsDown(this.settingsMap.get("gamepad_reset"));	// reset
+		this.gamepadButtonsDown(this.settingsMap.get("Gamepad Harddrop"));	// hard drop
+		this.gamepadButtonsDown(this.settingsMap.get("Gamepad Hold"));	// hold
+		this.gamepadButtonsDown(this.settingsMap.get("Gamepad Rotateccw"));	// rotate counter
+		this.gamepadButtonsDown(this.settingsMap.get("Gamepad Rotate"));	// rotate cwise
+		this.gamepadButtonsDown(this.settingsMap.get("Gamepad Pophold")); // Pop hold stack
+		this.gamepadButtonsDown(this.settingsMap.get("Gamepad Reset"));	// reset
 
 		
 		return;
 	},
 	
-	processGamepadDPad() 
-	{
-		this.gamepadDPadDown(this.settingsMap.get("gamepad_left"));	// shift left
-		this.gamepadDPadDown(this.settingsMap.get("gamepad_right"));	// shift right
-		this.gamepadDPadDown(this.settingsMap.get("gamepad_down"));	// down
+	processGamepadDPad()  {
+		this.gamepadDPadDown(this.settingsMap.get("Gamepad Left"));	// shift left
+		this.gamepadDPadDown(this.settingsMap.get("Gamepad Right"));	// shift right
+		this.gamepadDPadDown(this.settingsMap.get("Gamepad Down"));	// down
 		
 		return;
 	},
@@ -533,8 +516,8 @@ var UserInputs = {
 	
 	// Direction Pad
 	gamepadDPadDown(finds) {
-		var DAS = parseInt(this.settingsMap.get("gamepad_das"));	//65.0;
-		var ARR = parseInt(this.settingsMap.get("gamepad_arr"));	//20.0;
+		var DAS = parseInt(this.settingsMap.get("Gamepad DAS"));	//65.0;
+		var ARR = parseInt(this.settingsMap.get("Gamepad ARR"));	//20.0;
 		var isContained = this.gpButtons.includes(finds);
 		var isPrevContained = this.prevGpButtons.includes(finds);
 		
@@ -563,15 +546,16 @@ var UserInputs = {
 		
 		return;
 	},
+	// doing a lot of back and forth between strings and integers to represtent the same thing -- todo: fix
 	processKeys() {
-		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_harddrop")));		 //32);  // Space	- hard drop
-		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_rotate")));		//88);  // X		- rotate
-		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_rotateccw")));		//90);  // Z		- rotateccw
-		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_hold")));		//16);  // shift	- push hold stack
-		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_pophold")));	// ctrl	- pop hold stack
-		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_background")));  // q		- turn off background
-		this.processKeyDown(parseInt(this.settingsMap.get("keyboard_reset"))); 		 // r		- reset
-		//this.processKeyDown(this.settingsMap.get("keyboard_hold")));  // c		- pop hold stack
+		this.processKeyDown(parseInt(this.settingsMap.get("Keyboard Harddrop")));		 //32);  // Space	- hard drop
+		this.processKeyDown(parseInt(this.settingsMap.get("Keyboard Rotate")));		//88);  // X		- rotate
+		this.processKeyDown(parseInt(this.settingsMap.get("Keyboard Rotateccw")));		//90);  // Z		- rotateccw
+		this.processKeyDown(parseInt(this.settingsMap.get("Keyboard Hold")));		//16);  // shift	- push hold stack
+		this.processKeyDown(parseInt(this.settingsMap.get("Keyboard Pophold")));	// ctrl	- pop hold stack
+		this.processKeyDown(parseInt(this.settingsMap.get("Keyboard Background")));  // q		- turn off background
+		this.processKeyDown(parseInt(this.settingsMap.get("Keyboard Reset"))); 		 // r		- reset
+		//this.processKeyDown(this.settingsMap.get("Keyboard hold")));  // c		- pop hold stack
 	},
 
 	// keyboard keys z,x,space
@@ -608,14 +592,14 @@ var UserInputs = {
 	},
 	
 	processKeyShift() {
-		this.processKeyboardArrowKeys(parseInt(this.settingsMap.get("keyboard_left")));		//39);  // right
-		this.processKeyboardArrowKeys(parseInt(this.settingsMap.get("keyboard_right")));		//37);	// left
-		this.processKeyboardArrowKeys(parseInt(this.settingsMap.get("keyboard_down")));  // down
+		this.processKeyboardArrowKeys(parseInt(this.settingsMap.get("Keyboard Left")));		//39);  // right
+		this.processKeyboardArrowKeys(parseInt(this.settingsMap.get("Keyboard Right")));		//37);	// left
+		this.processKeyboardArrowKeys(parseInt(this.settingsMap.get("Keyboard Down")));  // down
 	},
 	// Direction arrows
     processKeyboardArrowKeys(key) {		
-		var DAS = parseInt(this.settingsMap.get("keyboard_das"));	//65.0;
-		var ARR = parseInt(this.settingsMap.get("keyboard_arr"));	//20.0;
+		var DAS = parseInt(this.settingsMap.get("Keyboard DAS"));	//65.0;
+		var ARR = parseInt(this.settingsMap.get("Keyboard ARR"));	//20.0;
 
 	
 		if(this.prevKeyboardKeys[key] != this.keyboardKeys[key]) {
@@ -689,15 +673,15 @@ var UserInputs = {
 	gamepadQueue: [],
 	
 	ticks: 0,
-	// todo: change to human readable
+	
 	settingsList: ["init", 
-					"keyboard_das", "keyboard_arr", "keyboard_harddrop", "keyboard_hold", 
-					"keyboard_left", "keyboard_right", "keyboard_rotateccw", "keyboard_rotate", 
-					"keyboard_down", "keyboard_pophold", "keyboard_reset", "keyboard_background",
+					"Keyboard DAS", "Keyboard ARR", "Keyboard Harddrop", "Keyboard Hold", 
+					"Keyboard Left", "Keyboard Right", "Keyboard Rotateccw", "Keyboard Rotate", 
+					"Keyboard Down", "Keyboard Pophold", "Keyboard Reset", "Keyboard Background",
 					
-					"gamepad_das", "gamepad_arr", "gamepad_harddrop", "gamepad_hold",
-					"gamepad_left", "gamepad_right", "gamepad_rotateccw", "gamepad_rotate", 
-					"gamepad_down","gamepad_pophold", "gamepad_reset", "gamepad_background", 
+					"Gamepad DAS", "Gamepad ARR", "Gamepad Harddrop", "Gamepad Hold",
+					"Gamepad Left", "Gamepad Right", "Gamepad Rotateccw", "Gamepad Rotate", 
+					"Gamepad Down","Gamepad Pophold", "Gamepad Reset", "Gamepad Background", 
 					"path", "SameSite"],
 	
 	settingsDefault: ["true", 
@@ -922,7 +906,7 @@ Tetris.prototype = {
 	setDoTest: function()
 	{
 		if(this.isFreePlay) return;
-		this.doTest = true;//!this.doTest;
+		this.doTest = true;
 		this._restartHandler();
 	},
 	createSettings: function () {
@@ -942,8 +926,6 @@ Tetris.prototype = {
 		console.log(document.getElementById("setting_value").value = inputs.settingsDefault[document.getElementById("settings").selectedIndex-1]);
 	},
 	setSettings: function() {
-		//inputs.settingsDefault[document.getElementById("settings").selectedIndex-1] = document.getElementById("setting_value").value;
-		
 		var newVal = document.getElementById("setting_value").value;
 		var key = inputs.settingsList[document.getElementById("settings").selectedIndex-1];
 		utils.setCookie(key, newVal, 30);
@@ -1003,8 +985,7 @@ Tetris.prototype = {
 			this.shape = this.shapeQueue.shift();
 			this.canPopFromHoldStack = false;
 			this.shape.resetOrigin();
-			//canvas.drawHoldShape(this.holdStack);
-			this._draw(); // update?
+			this._draw(); 
 		}
 	},
 	popHoldStack: function()
@@ -1015,7 +996,6 @@ Tetris.prototype = {
 			this.shapeQueue.unshift(utils.deepClone(this.shape));
 			this.shape = this.holdStack.pop();
 			this.shape.resetOrigin();
-			//canvas.drawHoldShape(this.holdStack);
 			this._draw();
 		}
 	},
@@ -1035,8 +1015,6 @@ Tetris.prototype = {
 
     // Fill next queue and set next shape
     _fireShape: function() {
-		
-	
 		if(this.isFreePlay == false) {
 			while(this.shapeQueue.length <= 4)
 			{
@@ -1050,13 +1028,14 @@ Tetris.prototype = {
 			}
 			
 			this.hintMino = this.hintQueue.shift();
-			this.shape = this.shapeQueue.shift();// shapes.randomShape();
+			this.shape = this.shapeQueue.shift();
 		   
 		   this.currentMinoInx++;
 		   
 			if(this.currentMinoInx > openers.getLength()) {
 				this.hintQueue = [];
 				this.shapeQueue = [];
+				// Recursion warning
 				this._restartHandler();
 			}
 		} else {
@@ -1443,7 +1422,7 @@ var OpenerGenerator = {
 					shapes.getShape(3));
 				break;
 				case 2:
-					// DTCannon -- O I L S J Z T O I L J T O T
+					// DTCannon
 					this.shapeQueue = new Array(
 					shapes.getShape(1),
 					shapes.getShape(6),
@@ -1461,7 +1440,6 @@ var OpenerGenerator = {
 					shapes.getShape(3));
 				break;
 				case 3:
-				// O - 1, I - 6, L - 0, S - 5, J - 4, Z - 2, T - 3
 					this.shapeQueue = new Array(
 					shapes.getShape(4),
 					shapes.getShape(5),
@@ -1471,6 +1449,8 @@ var OpenerGenerator = {
 					shapes.getShape(1),
 					shapes.getShape(5),
 					shapes.getShape(3),
+					shapes.getShape(1),
+					shapes.getShape(2),
 					shapes.getShape(6),
 					shapes.getShape(0),
 					shapes.getShape(4),
@@ -1504,120 +1484,79 @@ var OpenerGenerator = {
 			switch(opener) {
 			case 0:
 			case 1:
-			// Fonzie Variation
-			this.hintQueue = new Array(
-				shapes.getShape(0),
-				shapes.getShape(6),
-				shapes.getShape(1),
-				shapes.getShape(5),
-				shapes.getShape(2),
-				shapes.getShape(4),
-				shapes.getShape(3));
+				// Fonzie Variation
+				this.hintQueue = new Array(
+					shapes.getShape(0),
+					shapes.getShape(6),
+					shapes.getShape(1),
+					shapes.getShape(5),
+					shapes.getShape(2),
+					shapes.getShape(4),
+					shapes.getShape(3));
 				
 				// position x, position y, orientation, position x,...
 				var hintDataList = [-1,17,1,  3,17,1,  6,18,0,  5,17,1,  3,17,0,  7,16,0,  1,17,2];
 				
 				for(var i = 0; i < this.hintQueue.length; i++) {
-					this.hintQueue[i].x = hintDataList[i*3];
-					this.hintQueue[i].y = hintDataList[i*3 + 1];
-					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i*3 + 2]);
+					this.hintQueue[i].x = hintDataList[i * 3];
+					this.hintQueue[i].y = hintDataList[i * 3 + 1];
+					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i * 3 + 2]);
 				}
 
 			break;
 			case 2:
-				// DT Cannon -- O I L S J Z T O I L J T O T
+				// DT Cannon
 				this.hintQueue = new Array(
-				shapes.getShape(1),
-				shapes.getShape(6),
-				shapes.getShape(0),
-				shapes.getShape(5),
-				shapes.getShape(4),
-				shapes.getShape(2),
-				shapes.getShape(3),
-				shapes.getShape(1),
-				shapes.getShape(6),
-				shapes.getShape(0),
-				shapes.getShape(4),
-				shapes.getShape(3),
-				shapes.getShape(1),
-				shapes.getShape(3));
+					shapes.getShape(1),
+					shapes.getShape(6),
+					shapes.getShape(0),
+					shapes.getShape(5),
+					shapes.getShape(4),
+					shapes.getShape(2),
+					shapes.getShape(3),
+					shapes.getShape(1),
+					shapes.getShape(6),
+					shapes.getShape(0),
+					shapes.getShape(4),
+					shapes.getShape(3),
+					shapes.getShape(1),
+					shapes.getShape(3));
 				
 				// position x, position y, orientation, position x,...
 				var hintDataList = [-2,18,0,  6,16,0,  6,17,1,  7,17,1,  4,17,-1,  3,17,3,  3,15,0, 5,15,0,  9,14,0,  2,13,-1,  -1,15,1,  1,16,2,  3,16,1,  1,17,-1];
 				
 				for(var i = 0; i < this.hintQueue.length; i++) {
-					this.hintQueue[i].x = hintDataList[i*3];
-					this.hintQueue[i].y = hintDataList[i*3 + 1];
-					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i*3 + 2]);
+					this.hintQueue[i].x = hintDataList[i * 3];
+					this.hintQueue[i].y = hintDataList[i * 3 + 1];
+					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i * 3 + 2]);
 				}
-				/*
-				// O
-				this.hintQueue[0].x = -2;
-				this.hintQueue[0].y = 18;
-				// I
-				this.hintQueue[1].x = 6;
-				this.hintQueue[1].y = 16;
-				// L
-				this.hintQueue[2].x = 6;
-				this.hintQueue[2].y = 17;
-				this.hintQueue[2].state = this.hintQueue[2].nextState(1);
-				// S
-				this.hintQueue[3].x = 7;
-				this.hintQueue[3].y = 17;
-				this.hintQueue[3].state = this.hintQueue[3].nextState(1);
-				// J
-				this.hintQueue[4].x = 4;
-				this.hintQueue[4].y = 17;
-				this.hintQueue[4].state = this.hintQueue[4].nextState(-1);
-				// Z
-				this.hintQueue[5].x = 3;
-				this.hintQueue[5].y = 17;
-				this.hintQueue[5].state = this.hintQueue[5].nextState(3);
-				// T
-				this.hintQueue[6].x = 3;
-				this.hintQueue[6].y = 15;
-				// O
-				this.hintQueue[7].x = 5;
-				this.hintQueue[7].y = 15;
-				// I
-				this.hintQueue[8].x = 9;
-				this.hintQueue[8].y = 14;
-				// L
-				this.hintQueue[9].x = 2;
-				this.hintQueue[9].y = 13;
-				this.hintQueue[9].state = this.hintQueue[9].nextState(-1);
-				// J
-				this.hintQueue[10].x = -1;
-				this.hintQueue[10].y = 15;
-				this.hintQueue[10].state = this.hintQueue[10].nextState(1);
-				// T
-				this.hintQueue[11].x = 1;
-				this.hintQueue[11].y = 16;
-				this.hintQueue[11].state = this.hintQueue[11].nextState(2);
-				// O
-				this.hintQueue[12].x = 3;
-				this.hintQueue[12].y = 16;
-				this.hintQueue[12].state = this.hintQueue[12].nextState(1);
-				// T
-				this.hintQueue[13].x = 1;
-				this.hintQueue[13].y = 17;
-				this.hintQueue[13].state = this.hintQueue[13].nextState(-1);
-				*/
 			break;
 			case 3:
-				this.shapeQueue = new Array(
-				shapes.getShape(4),
-				shapes.getShape(5),
-				shapes.getShape(6),
-				shapes.getShape(0),
-				shapes.getShape(2),
-				shapes.getShape(1),
-				shapes.getShape(5),
-				shapes.getShape(3),
-				shapes.getShape(6),
-				shapes.getShape(0),
-				shapes.getShape(4),
-				shapes.getShape(3));
+				//MKO Stacking // O - 1, I - 6, L - 0, S - 5, J - 4, Z - 2, T - 3
+				this.hintQueue = new Array(
+					shapes.getShape(4),
+					shapes.getShape(5),
+					shapes.getShape(6),
+					shapes.getShape(0),
+					shapes.getShape(2),
+					shapes.getShape(1),
+					shapes.getShape(5),
+					shapes.getShape(3),
+					shapes.getShape(1),
+					shapes.getShape(2),
+					shapes.getShape(6),
+					shapes.getShape(0),
+					shapes.getShape(4),
+					shapes.getShape(3));
+					
+				// position x, position y, orientation, position x,...
+				var hintDataList = [0,18,0,  0,16,-1,  9,16,0,  4,18,0,  4,16,1,  5,18,0,  1,15,-1,  2,17,2,  5,18,0,  3,17,1,  6,15,1,  0,15,2,  0,14,0,  2,16,2];
+				
+				for(var i = 0; i < this.hintQueue.length; i++) {
+					this.hintQueue[i].x = hintDataList[i * 3];
+					this.hintQueue[i].y = hintDataList[i * 3 + 1];
+					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i * 3 + 2]);
+				}
 			break;
 			default:
 					return;
