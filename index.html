@@ -74,7 +74,7 @@ document.getElementById("divbg").removeAttribute("tabIndex");
 					<ul style="font-size:13px;color:dodgerblue;text-align:left;padding-left:1em;" id="EarlyLOrJPiece">Early L or J Piece:
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setDTCannonVar">DT Cannon (LS / JZ base)</a></li> 
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setMKOStackingVar">MKO Stacking</a></li> 
-						<li style="font-size:12px;padding-left:1em";><a href="#" id="setPokeminosSTD Var">Pokemino's STD </a></li> 
+						<li style="font-size:12px;padding-left:1em";><a href="#" id="setPokeminosSTDVar">Pokemino's STD </a></li> 
 					</ul>
 					<ul style="font-size:13px;color:dodgerblue;text-align:left;padding-left:1em;" id="EarlyLOrJPiece">Early O Piece:
 						<li style="font-size:12px;padding-left:1em";><a href="#" id="setMrTSpinsSTDreversedVar">Mr. T-Spin's STD (reversed) </a></li>
@@ -136,7 +136,7 @@ document.getElementById("divbg").removeAttribute("tabIndex");
 			</select>
 			<input style="width:80px;font-size:13px;background:black;color:dodgerblue;text-align:left;" type="text" id="setting_value">
 			<input id="submitsetting" type="submit" value="Set Setting">
-			<input id="test" type="submit" value="Test">
+			<input id="test" type="submit" value="Test Yourself">
 
 			
 		</div>
@@ -150,9 +150,10 @@ document.getElementById("divbg").removeAttribute("tabIndex");
 	(function(){
 		var tetrion = new Tetris('tetris');
 		document.getElementById("setFreePlay").addEventListener("click", function() { tetrion.setFreePlay(); } );
-		document.getElementById("setTKIFonzieVar").addEventListener("click", function() { tetrion.setTKIFonzieVar(); } );
-		document.getElementById("setDTCannonVar").addEventListener("click", function() { tetrion.setDTCannonVar(); } );
-		document.getElementById("setMKOStackingVar").addEventListener("click", function() { tetrion.setMKOStackingVar(); } );
+		document.getElementById("setTKIFonzieVar").addEventListener("click", function() { tetrion.setCurrentOpener(1); } );
+		document.getElementById("setDTCannonVar").addEventListener("click", function() { tetrion.setCurrentOpener(2); } );
+		document.getElementById("setMKOStackingVar").addEventListener("click", function() { tetrion.setCurrentOpener(3); } );
+		document.getElementById("setPokeminosSTDVar").addEventListener("click", function() { tetrion.setCurrentOpener(4); } );
 		
 		document.getElementById("test").addEventListener("click", function() { tetrion.setDoTest(); } );
 		document.getElementById("settings").addEventListener("change", function() { tetrion.updateSettingTextBox(); } );

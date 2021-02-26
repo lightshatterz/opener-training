@@ -179,28 +179,13 @@ Tetris.prototype = {
 		this.currentOpener = 0;
 
 	},
-	setTKIFonzieVar: function()
+	setCurrentOpener(opener)
 	{
 		this.isFreePlay = false;
 		this.doTest = false;
-		this.currentOpener = 1;
+		this.currentOpener = opener;
 		this._restartHandler();
 
-	},	
-	setDTCannonVar: function()
-	{
-		this.isFreePlay = false;
-		this.doTest = false;
-		this.currentOpener = 2;
-		this._restartHandler();
-
-	}, 
-	setMKOStackingVar: function ()
-	{
-		this.isFreePlay = false;
-		this.doTest = false;
-		this.currentOpener = 3;
-		this._restartHandler();
 	},
 	setDoTest: function()
 	{

@@ -880,28 +880,13 @@ Tetris.prototype = {
 		this.currentOpener = 0;
 
 	},
-	setTKIFonzieVar: function()
+	setCurrentOpener(opener)
 	{
 		this.isFreePlay = false;
 		this.doTest = false;
-		this.currentOpener = 1;
+		this.currentOpener = opener;
 		this._restartHandler();
 
-	},	
-	setDTCannonVar: function()
-	{
-		this.isFreePlay = false;
-		this.doTest = false;
-		this.currentOpener = 2;
-		this._restartHandler();
-
-	}, 
-	setMKOStackingVar: function ()
-	{
-		this.isFreePlay = false;
-		this.doTest = false;
-		this.currentOpener = 3;
-		this._restartHandler();
 	},
 	setDoTest: function()
 	{
@@ -1456,6 +1441,26 @@ var OpenerGenerator = {
 					shapes.getShape(4),
 					shapes.getShape(3));
 				break;
+				case 4:
+				//Pokemino's STD
+				this.shapeQueue = new Array(
+					shapes.getShape(0),
+					shapes.getShape(6),
+					shapes.getShape(1),
+					shapes.getShape(4),
+					shapes.getShape(2),
+					shapes.getShape(5),
+					shapes.getShape(3),
+					shapes.getShape(1),
+					shapes.getShape(5),
+					shapes.getShape(2),
+					shapes.getShape(0),
+					shapes.getShape(6),
+					shapes.getShape(2),
+					shapes.getShape(4),
+					shapes.getShape(3),
+					shapes.getShape(0),
+					shapes.getShape(3));
 			default:
 				return;
 			}
@@ -1532,7 +1537,7 @@ var OpenerGenerator = {
 				}
 			break;
 			case 3:
-				//MKO Stacking // O - 1, I - 6, L - 0, S - 5, J - 4, Z - 2, T - 3
+				//MKO Stacking
 				this.hintQueue = new Array(
 					shapes.getShape(4),
 					shapes.getShape(5),
@@ -1551,6 +1556,35 @@ var OpenerGenerator = {
 					
 				// position x, position y, orientation, position x,...
 				var hintDataList = [0,18,0,  0,16,-1,  9,16,0,  4,18,0,  4,16,1,  5,18,0,  1,15,-1,  2,17,2,  5,18,0,  3,17,1,  6,15,1,  0,15,2,  0,14,0,  2,16,2];
+				
+				for(var i = 0; i < this.hintQueue.length; i++) {
+					this.hintQueue[i].x = hintDataList[i * 3];
+					this.hintQueue[i].y = hintDataList[i * 3 + 1];
+					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i * 3 + 2]);
+				}
+			break;
+			case 4:
+				//Pokemino's STD  // O - 1, I - 6, L - 0, S - 5, J - 4, Z - 2, T - 3
+				this.hintQueue = new Array(
+					shapes.getShape(0),
+					shapes.getShape(6),
+					shapes.getShape(1),
+					shapes.getShape(4),
+					shapes.getShape(2),
+					shapes.getShape(5),
+					shapes.getShape(3),
+					shapes.getShape(1),
+					shapes.getShape(5),
+					shapes.getShape(2),
+					shapes.getShape(0),
+					shapes.getShape(6),
+					shapes.getShape(2),
+					shapes.getShape(4),
+					shapes.getShape(3),
+					shapes.getShape(0),
+					shapes.getShape(3));
+				
+				var hintDataList = [0,17,1,  0,16,0,  4,18,0,  4,17,-1,  3,15,1,  8,17,-1,  2,17,2,  0,17,0,  0,15,-1,  1,15,0,  8,16,-2,  6,15,0,  3,14,1,  6,12,-1,  6,16,1,  2,16,-1,  7,17,2 ];
 				
 				for(var i = 0; i < this.hintQueue.length; i++) {
 					this.hintQueue[i].x = hintDataList[i * 3];
