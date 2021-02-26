@@ -513,7 +513,7 @@ var UserInputs = {
 			if(isContained)
 				this.gamepadQueue.push(finds);
 		}
-		var gamepadDASFrames = this.gamepadButtonsDeciFrames / 1.0;
+		var gamepadDASFrames = this.gamepadButtonsDeciFrames;
 		
 		if (!this.isGamepadButtonDown) {
 
@@ -705,7 +705,7 @@ var UserInputs = {
 						"37", "39", "90", "88",
 						"40", "17", "82", "81",
 						
-						"65.0", "10.0", "RB", "LB",
+						"65.0", "20.0", "RB", "LB",
 						"DPad-Left", "DPad-Right", "A", "B",
 						"DPad-Down", "DPad-Up", "Back", "", 
 						"=/", "Strict"],
@@ -877,16 +877,18 @@ Tetris.prototype = {
 		// if true no openers.  just random tetrinos
 		this.isFreePlay = true;
 		this.currentOpener = 0;
+		this.doTest = false;
         this.matrix = initMatrix(consts.ROW_COUNT, consts.COLUMN_COUNT);
         this.reset();
-
-        this._initEvents();
+        
+		this._initEvents();
         this._fireShape();
 
     },
 	setFreePlay: function()
 	{
 		this.isFreePlay = true;
+		this.doTest = false;
 		this.hintQueue = [];
 		this.shapeQueue = [];
 		this.hintMino = 0;
@@ -897,6 +899,7 @@ Tetris.prototype = {
 	setTKIFonzieVar: function()
 	{
 		this.isFreePlay = false;
+		this.doTest = false;
 		this.currentOpener = 1;
 		this._restartHandler();
 
@@ -904,10 +907,24 @@ Tetris.prototype = {
 	setDTCannonVar: function()
 	{
 		this.isFreePlay = false;
+		this.doTest = false;
 		this.currentOpener = 2;
 		this._restartHandler();
 
 	}, 
+	setMKOStackingVar: function ()
+	{
+		this.isFreePlay = false;
+		this.doTest = false;
+		this.currentOpener = 3;
+		this._restartHandler();
+	},
+	setDoTest: function()
+	{
+		if(this.isFreePlay) return;
+		this.doTest = true;//!this.doTest;
+		this._restartHandler();
+	},
 	createSettings: function () {
 		var list = document.getElementById("settings");
 		var settings = inputs.settingsList;
@@ -928,9 +945,9 @@ Tetris.prototype = {
 		//inputs.settingsDefault[document.getElementById("settings").selectedIndex-1] = document.getElementById("setting_value").value;
 		
 		var newVal = document.getElementById("setting_value").value;
-		utils.setCookie(inputs.settingsList[document.getElementById("settings").selectedIndex-1], newVal, 30);
-		inputs.settingsMap.set(inputs.settingsList[document.getElementById("settings").selectedIndex-1], newVal);
-		//console.log("settings " + inputs.settingsList[document.getElementById("settings").selectedIndex-1] + " " + newVal);
+		var key = inputs.settingsList[document.getElementById("settings").selectedIndex-1];
+		utils.setCookie(key, newVal, 30);
+		inputs.settingsMap.set(key, newVal);
 	},
     //Reset game
     reset: function() {
@@ -1049,7 +1066,7 @@ Tetris.prototype = {
 				this.shapeQueue.push(this.preparedShape);
 			}
 			
-			this.shape = this.shapeQueue.shift() || randomShape();
+			this.shape = this.shapeQueue.shift() || shapes.randomShape();
 			this.currentMinoInx++;
 		}
 		
@@ -1090,7 +1107,8 @@ Tetris.prototype = {
         canvas.drawShape(this.shape);
 		canvas.drawHoldShape(this.holdStack);
 		canvas.drawPreviewShape(this.shapeQueue);
-		canvas.drawHintShape(this.hintMino);
+		if(this.doTest != true)
+			canvas.drawHintShape(this.hintMino);
 		
 		if(this.shape != undefined) {
 		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);
@@ -1397,6 +1415,8 @@ window.Tetris = Tetris;
 var shapes = require("./shapes.js");
 // import * as shapes from './shapes.js';
 
+// https://harddrop.com/wiki/Opener
+// https://four.lol/
 var OpenerGenerator = {
 	shapeQueue: [],
 	hintQueue: [],
@@ -1405,6 +1425,7 @@ var OpenerGenerator = {
 	isInit: 0,
 	isHintInit: 0,
 	
+	// O - 1, I - 6, L - 0, S - 5, J - 4, Z - 2, T - 3
 	// Current Tetriminos
 	init(opener) {
 		if(!this.isInit || this.shapeQueue == undefined) {
@@ -1439,7 +1460,22 @@ var OpenerGenerator = {
 					shapes.getShape(1),
 					shapes.getShape(3));
 				break;
-					
+				case 3:
+				// O - 1, I - 6, L - 0, S - 5, J - 4, Z - 2, T - 3
+					this.shapeQueue = new Array(
+					shapes.getShape(4),
+					shapes.getShape(5),
+					shapes.getShape(6),
+					shapes.getShape(0),
+					shapes.getShape(2),
+					shapes.getShape(1),
+					shapes.getShape(5),
+					shapes.getShape(3),
+					shapes.getShape(6),
+					shapes.getShape(0),
+					shapes.getShape(4),
+					shapes.getShape(3));
+				break;
 			default:
 				return;
 			}
@@ -1477,37 +1513,20 @@ var OpenerGenerator = {
 				shapes.getShape(2),
 				shapes.getShape(4),
 				shapes.getShape(3));
-				// L
-				this.hintQueue[0].x = -1;
-				this.hintQueue[0].y = 17;
-				this.hintQueue[0].state = this.hintQueue[0].nextState(1);
-				// I
-				this.hintQueue[1].x = 3;
-				this.hintQueue[1].y = 17;
-				this.hintQueue[1].state = this.hintQueue[1].nextState(1);
-				// O
-				this.hintQueue[2].x = 6;
-				this.hintQueue[2].y = 18;
-				// S
-				this.hintQueue[3].x = 5;
-				this.hintQueue[3].y = 17;
-				this.hintQueue[3].state = this.hintQueue[3].nextState(1);
-				// Z
-				this.hintQueue[4].x = 3;
-				this.hintQueue[4].y = 17;
-				// J
-				this.hintQueue[5].x = 7;
-				this.hintQueue[5].y = 16;
 				
-				// T
-				this.hintQueue[6].x = 1;
-				this.hintQueue[6].y = 17;
-				this.hintQueue[6].state = this.hintQueue[6].nextState(2);
+				// position x, position y, orientation, position x,...
+				var hintDataList = [-1,17,1,  3,17,1,  6,18,0,  5,17,1,  3,17,0,  7,16,0,  1,17,2];
 				
+				for(var i = 0; i < this.hintQueue.length; i++) {
+					this.hintQueue[i].x = hintDataList[i*3];
+					this.hintQueue[i].y = hintDataList[i*3 + 1];
+					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i*3 + 2]);
+				}
+
 			break;
 			case 2:
+				// DT Cannon -- O I L S J Z T O I L J T O T
 				this.hintQueue = new Array(
-
 				shapes.getShape(1),
 				shapes.getShape(6),
 				shapes.getShape(0),
@@ -1523,7 +1542,15 @@ var OpenerGenerator = {
 				shapes.getShape(1),
 				shapes.getShape(3));
 				
-				// DT Cannon -- O I L S J Z T O I L J T O T
+				// position x, position y, orientation, position x,...
+				var hintDataList = [-2,18,0,  6,16,0,  6,17,1,  7,17,1,  4,17,-1,  3,17,3,  3,15,0, 5,15,0,  9,14,0,  2,13,-1,  -1,15,1,  1,16,2,  3,16,1,  1,17,-1];
+				
+				for(var i = 0; i < this.hintQueue.length; i++) {
+					this.hintQueue[i].x = hintDataList[i*3];
+					this.hintQueue[i].y = hintDataList[i*3 + 1];
+					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i*3 + 2]);
+				}
+				/*
 				// O
 				this.hintQueue[0].x = -2;
 				this.hintQueue[0].y = 18;
@@ -1575,7 +1602,22 @@ var OpenerGenerator = {
 				this.hintQueue[13].x = 1;
 				this.hintQueue[13].y = 17;
 				this.hintQueue[13].state = this.hintQueue[13].nextState(-1);
-				
+				*/
+			break;
+			case 3:
+				this.shapeQueue = new Array(
+				shapes.getShape(4),
+				shapes.getShape(5),
+				shapes.getShape(6),
+				shapes.getShape(0),
+				shapes.getShape(2),
+				shapes.getShape(1),
+				shapes.getShape(5),
+				shapes.getShape(3),
+				shapes.getShape(6),
+				shapes.getShape(0),
+				shapes.getShape(4),
+				shapes.getShape(3));
 			break;
 			default:
 					return;
@@ -2383,6 +2425,7 @@ ShapeZR.prototype = {
 
 	//Return the next state of the shape
 	nextState: function(direction) {
+		if(direction == 0) return this.state;
 		var rotate = this.state;
 		rotate += direction;
 		if(rotate < 0)

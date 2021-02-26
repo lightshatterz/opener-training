@@ -160,16 +160,18 @@ Tetris.prototype = {
 		// if true no openers.  just random tetrinos
 		this.isFreePlay = true;
 		this.currentOpener = 0;
+		this.doTest = false;
         this.matrix = initMatrix(consts.ROW_COUNT, consts.COLUMN_COUNT);
         this.reset();
-
-        this._initEvents();
+        
+		this._initEvents();
         this._fireShape();
 
     },
 	setFreePlay: function()
 	{
 		this.isFreePlay = true;
+		this.doTest = false;
 		this.hintQueue = [];
 		this.shapeQueue = [];
 		this.hintMino = 0;
@@ -180,6 +182,7 @@ Tetris.prototype = {
 	setTKIFonzieVar: function()
 	{
 		this.isFreePlay = false;
+		this.doTest = false;
 		this.currentOpener = 1;
 		this._restartHandler();
 
@@ -187,10 +190,24 @@ Tetris.prototype = {
 	setDTCannonVar: function()
 	{
 		this.isFreePlay = false;
+		this.doTest = false;
 		this.currentOpener = 2;
 		this._restartHandler();
 
 	}, 
+	setMKOStackingVar: function ()
+	{
+		this.isFreePlay = false;
+		this.doTest = false;
+		this.currentOpener = 3;
+		this._restartHandler();
+	},
+	setDoTest: function()
+	{
+		if(this.isFreePlay) return;
+		this.doTest = true;//!this.doTest;
+		this._restartHandler();
+	},
 	createSettings: function () {
 		var list = document.getElementById("settings");
 		var settings = inputs.settingsList;
@@ -211,9 +228,9 @@ Tetris.prototype = {
 		//inputs.settingsDefault[document.getElementById("settings").selectedIndex-1] = document.getElementById("setting_value").value;
 		
 		var newVal = document.getElementById("setting_value").value;
-		utils.setCookie(inputs.settingsList[document.getElementById("settings").selectedIndex-1], newVal, 30);
-		inputs.settingsMap.set(inputs.settingsList[document.getElementById("settings").selectedIndex-1], newVal);
-		//console.log("settings " + inputs.settingsList[document.getElementById("settings").selectedIndex-1] + " " + newVal);
+		var key = inputs.settingsList[document.getElementById("settings").selectedIndex-1];
+		utils.setCookie(key, newVal, 30);
+		inputs.settingsMap.set(key, newVal);
 	},
     //Reset game
     reset: function() {
@@ -332,7 +349,7 @@ Tetris.prototype = {
 				this.shapeQueue.push(this.preparedShape);
 			}
 			
-			this.shape = this.shapeQueue.shift() || randomShape();
+			this.shape = this.shapeQueue.shift() || shapes.randomShape();
 			this.currentMinoInx++;
 		}
 		
@@ -373,7 +390,8 @@ Tetris.prototype = {
         canvas.drawShape(this.shape);
 		canvas.drawHoldShape(this.holdStack);
 		canvas.drawPreviewShape(this.shapeQueue);
-		canvas.drawHintShape(this.hintMino);
+		if(this.doTest != true)
+			canvas.drawHintShape(this.hintMino);
 		
 		if(this.shape != undefined) {
 		let clone = Object.assign(Object.create(Object.getPrototypeOf(this.shape)), this.shape);

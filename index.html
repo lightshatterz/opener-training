@@ -135,7 +135,8 @@ document.getElementById("divbg").removeAttribute("tabIndex");
 				
 			</select>
 			<input style="width:80px;font-size:13px;background:black;color:dodgerblue;text-align:left;" type="text" id="setting_value">
-			<input id="submitsetting" type="submit">
+			<input id="submitsetting" type="submit" value="Set Setting">
+			<input id="test" type="submit" value="Test">
 
 			
 		</div>
@@ -151,6 +152,9 @@ document.getElementById("divbg").removeAttribute("tabIndex");
 		document.getElementById("setFreePlay").addEventListener("click", function() { tetrion.setFreePlay(); } );
 		document.getElementById("setTKIFonzieVar").addEventListener("click", function() { tetrion.setTKIFonzieVar(); } );
 		document.getElementById("setDTCannonVar").addEventListener("click", function() { tetrion.setDTCannonVar(); } );
+		document.getElementById("setMKOStackingVar").addEventListener("click", function() { tetrion.setMKOStackingVar(); } );
+		
+		document.getElementById("test").addEventListener("click", function() { tetrion.setDoTest(); } );
 		document.getElementById("settings").addEventListener("change", function() { tetrion.updateSettingTextBox(); } );
 		document.getElementById("submitsetting").addEventListener("click", function() { tetrion.setSettings(); } );
 		tetrion.start();

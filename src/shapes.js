@@ -741,6 +741,7 @@ ShapeZR.prototype = {
 
 	//Return the next state of the shape
 	nextState: function(direction) {
+		if(direction == 0) return this.state;
 		var rotate = this.state;
 		rotate += direction;
 		if(rotate < 0)

@@ -89,7 +89,7 @@ var UserInputs = {
 			if(isContained)
 				this.gamepadQueue.push(finds);
 		}
-		var gamepadDASFrames = this.gamepadButtonsDeciFrames / 1.0;
+		var gamepadDASFrames = this.gamepadButtonsDeciFrames;
 		
 		if (!this.isGamepadButtonDown) {
 
@@ -281,7 +281,7 @@ var UserInputs = {
 						"37", "39", "90", "88",
 						"40", "17", "82", "81",
 						
-						"65.0", "10.0", "RB", "LB",
+						"65.0", "20.0", "RB", "LB",
 						"DPad-Left", "DPad-Right", "A", "B",
 						"DPad-Down", "DPad-Up", "Back", "", 
 						"=/", "Strict"],

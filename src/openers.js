@@ -1,6 +1,8 @@
 var shapes = require("./shapes.js");
 // import * as shapes from './shapes.js';
 
+// https://harddrop.com/wiki/Opener
+// https://four.lol/
 var OpenerGenerator = {
 	shapeQueue: [],
 	hintQueue: [],
@@ -9,6 +11,7 @@ var OpenerGenerator = {
 	isInit: 0,
 	isHintInit: 0,
 	
+	// O - 1, I - 6, L - 0, S - 5, J - 4, Z - 2, T - 3
 	// Current Tetriminos
 	init(opener) {
 		if(!this.isInit || this.shapeQueue == undefined) {
@@ -43,7 +46,22 @@ var OpenerGenerator = {
 					shapes.getShape(1),
 					shapes.getShape(3));
 				break;
-					
+				case 3:
+				// O - 1, I - 6, L - 0, S - 5, J - 4, Z - 2, T - 3
+					this.shapeQueue = new Array(
+					shapes.getShape(4),
+					shapes.getShape(5),
+					shapes.getShape(6),
+					shapes.getShape(0),
+					shapes.getShape(2),
+					shapes.getShape(1),
+					shapes.getShape(5),
+					shapes.getShape(3),
+					shapes.getShape(6),
+					shapes.getShape(0),
+					shapes.getShape(4),
+					shapes.getShape(3));
+				break;
 			default:
 				return;
 			}
@@ -81,37 +99,20 @@ var OpenerGenerator = {
 				shapes.getShape(2),
 				shapes.getShape(4),
 				shapes.getShape(3));
-				// L
-				this.hintQueue[0].x = -1;
-				this.hintQueue[0].y = 17;
-				this.hintQueue[0].state = this.hintQueue[0].nextState(1);
-				// I
-				this.hintQueue[1].x = 3;
-				this.hintQueue[1].y = 17;
-				this.hintQueue[1].state = this.hintQueue[1].nextState(1);
-				// O
-				this.hintQueue[2].x = 6;
-				this.hintQueue[2].y = 18;
-				// S
-				this.hintQueue[3].x = 5;
-				this.hintQueue[3].y = 17;
-				this.hintQueue[3].state = this.hintQueue[3].nextState(1);
-				// Z
-				this.hintQueue[4].x = 3;
-				this.hintQueue[4].y = 17;
-				// J
-				this.hintQueue[5].x = 7;
-				this.hintQueue[5].y = 16;
 				
-				// T
-				this.hintQueue[6].x = 1;
-				this.hintQueue[6].y = 17;
-				this.hintQueue[6].state = this.hintQueue[6].nextState(2);
+				// position x, position y, orientation, position x,...
+				var hintDataList = [-1,17,1,  3,17,1,  6,18,0,  5,17,1,  3,17,0,  7,16,0,  1,17,2];
 				
+				for(var i = 0; i < this.hintQueue.length; i++) {
+					this.hintQueue[i].x = hintDataList[i*3];
+					this.hintQueue[i].y = hintDataList[i*3 + 1];
+					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i*3 + 2]);
+				}
+
 			break;
 			case 2:
+				// DT Cannon -- O I L S J Z T O I L J T O T
 				this.hintQueue = new Array(
-
 				shapes.getShape(1),
 				shapes.getShape(6),
 				shapes.getShape(0),
@@ -127,7 +128,15 @@ var OpenerGenerator = {
 				shapes.getShape(1),
 				shapes.getShape(3));
 				
-				// DT Cannon -- O I L S J Z T O I L J T O T
+				// position x, position y, orientation, position x,...
+				var hintDataList = [-2,18,0,  6,16,0,  6,17,1,  7,17,1,  4,17,-1,  3,17,3,  3,15,0, 5,15,0,  9,14,0,  2,13,-1,  -1,15,1,  1,16,2,  3,16,1,  1,17,-1];
+				
+				for(var i = 0; i < this.hintQueue.length; i++) {
+					this.hintQueue[i].x = hintDataList[i*3];
+					this.hintQueue[i].y = hintDataList[i*3 + 1];
+					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i*3 + 2]);
+				}
+				/*
 				// O
 				this.hintQueue[0].x = -2;
 				this.hintQueue[0].y = 18;
@@ -179,7 +188,22 @@ var OpenerGenerator = {
 				this.hintQueue[13].x = 1;
 				this.hintQueue[13].y = 17;
 				this.hintQueue[13].state = this.hintQueue[13].nextState(-1);
-				
+				*/
+			break;
+			case 3:
+				this.shapeQueue = new Array(
+				shapes.getShape(4),
+				shapes.getShape(5),
+				shapes.getShape(6),
+				shapes.getShape(0),
+				shapes.getShape(2),
+				shapes.getShape(1),
+				shapes.getShape(5),
+				shapes.getShape(3),
+				shapes.getShape(6),
+				shapes.getShape(0),
+				shapes.getShape(4),
+				shapes.getShape(3));
 			break;
 			default:
 					return;
