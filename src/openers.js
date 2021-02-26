@@ -83,6 +83,45 @@ var OpenerGenerator = {
 					shapes.getShape(3),
 					shapes.getShape(0),
 					shapes.getShape(3));
+				break;
+				case 5:
+					// Mr TSpins STD reversed 
+					this.shapeQueue = new Array(
+					shapes.getShape(1),
+					shapes.getShape(2),
+					shapes.getShape(5),
+					shapes.getShape(0),
+					shapes.getShape(4),
+					shapes.getShape(6),
+					shapes.getShape(3),
+					shapes.getShape(1),
+					shapes.getShape(6),
+					shapes.getShape(2),
+					shapes.getShape(4),
+					shapes.getShape(5),
+					shapes.getShape(0),
+					shapes.getShape(0),
+					shapes.getShape(3),
+					shapes.getShape(3));
+				break;
+				case 6:
+					// Hachispin
+					this.shapeQueue = new Array(
+					shapes.getShape(1),
+					shapes.getShape(2),
+					shapes.getShape(6),
+					shapes.getShape(5),
+					shapes.getShape(4),
+					shapes.getShape(0),
+					shapes.getShape(3),
+					shapes.getShape(6),
+					shapes.getShape(1),
+					shapes.getShape(5),
+					shapes.getShape(4),
+					shapes.getShape(2),
+					shapes.getShape(0),
+					shapes.getShape(3));
+				break;
 			default:
 				return;
 			}
@@ -186,7 +225,7 @@ var OpenerGenerator = {
 				}
 			break;
 			case 4:
-				//Pokemino's STD  // O - 1, I - 6, L - 0, S - 5, J - 4, Z - 2, T - 3
+				//Pokemino's STD  
 				this.hintQueue = new Array(
 					shapes.getShape(0),
 					shapes.getShape(6),
@@ -206,7 +245,65 @@ var OpenerGenerator = {
 					shapes.getShape(0),
 					shapes.getShape(3));
 				
-				var hintDataList = [0,17,1,  0,16,0,  4,18,0,  4,17,-1,  3,15,1,  8,17,-1,  2,17,2,  0,17,0,  0,15,-1,  1,15,0,  8,16,-2,  6,15,0,  3,14,1,  6,12,-1,  6,16,1,  2,16,-1,  7,17,2 ];
+				var hintDataList = [0,17,1,  0,16,0,  4,18,0,  4,17,-1,  3,15,1,  8,17,-1,  2,17,2,  0,17,0,  0,15,-1,  
+									1,15,0,  8,16,-2,  6,15,0,  3,14,1,  6,12,-1,  6,16,1,  2,16,-1,  7,17,2 ];
+				
+				for(var i = 0; i < this.hintQueue.length; i++) {
+					this.hintQueue[i].x = hintDataList[i * 3];
+					this.hintQueue[i].y = hintDataList[i * 3 + 1];
+					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i * 3 + 2]);
+				}
+			break;
+			case 5:
+				// Mr TSpins STD reversed    
+				this.hintQueue = new Array(
+					shapes.getShape(1),
+					shapes.getShape(2),
+					shapes.getShape(5),
+					shapes.getShape(0),
+					shapes.getShape(4),
+					shapes.getShape(6),
+					shapes.getShape(3),
+					shapes.getShape(1),
+					shapes.getShape(6),
+					shapes.getShape(2),
+					shapes.getShape(4),
+					shapes.getShape(5),
+					shapes.getShape(0),
+					shapes.getShape(0),
+					shapes.getShape(3),
+					shapes.getShape(3));
+				
+				var hintDataList = [4,18,0,  0,18,0,  7,17,1,  0,15,1,  4,17,-1,  6,14,0,  2,17,2,  1,17,0,  0,16,0,  2,15,-1,  
+									0,14,0,  3,15,1,  8,16,-1,  5,13,2,  6,16,1,  7,17,2 ];
+				
+				for(var i = 0; i < this.hintQueue.length; i++) {
+					this.hintQueue[i].x = hintDataList[i * 3];
+					this.hintQueue[i].y = hintDataList[i * 3 + 1];
+					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i * 3 + 2]);
+				}
+				
+			break;
+			case 6:
+				// Hachispin   // O - 1, I - 6, L - 0, S - 5, J - 4, Z - 2, T - 3
+				this.hintQueue = new Array(
+				shapes.getShape(1),
+				shapes.getShape(2),
+				shapes.getShape(6),
+				shapes.getShape(5),
+				shapes.getShape(4),
+				shapes.getShape(0),
+				shapes.getShape(3),
+				
+				shapes.getShape(6),
+				shapes.getShape(1),
+				shapes.getShape(5),
+				shapes.getShape(4),
+				shapes.getShape(2),
+				shapes.getShape(0),
+				shapes.getShape(3));
+				
+				var hintDataList = [1,18,0,  0,18,0,  9,16,0,  2,15,1,  6,17,2,  5,16,2,  1,16,2,  0,16,0,  -1,16,0,  5,16,0,  0,14,0,  3,15,0,  8,14,-1,  0,0,0];
 				
 				for(var i = 0; i < this.hintQueue.length; i++) {
 					this.hintQueue[i].x = hintDataList[i * 3];

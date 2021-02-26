@@ -309,6 +309,11 @@ function ShapeT() {
 		1,  1, -1,  1,   
 		NaN, NaN,  NaN,  NaN,   
 		1, -2, -1, -2
+		// 0, 0, 0, 0,
+		// -1, 0, 1, 0,
+		// -1, 1, 1, 1,
+		// NaN, NaN,  NaN,  NaN,
+		// -1, -2, 1, -2
 	];
 	var state2RotationPointsOffset = [
 		0,  0,  0,  0,   
@@ -661,18 +666,17 @@ ShapeZR.prototype = {
 		if(this.state == j) {
 			clone.state = this.nextState(rotationDirection);
 			var i = 0;
-			if(rotationDirection == -1)
-				i = 2;
-			for(; i < this.rotationPoints[j].length; i+=2)
+			if(rotationDirection == 1)
+				i = 4;
+			for(; i < 5*4; i+=4)
 			{
 				var shiftX = this.rotationPoints[j][i];
 				var shiftY = this.rotationPoints[j][i+1];
 				if(!isNaN(shiftY) && !isNaN(shiftX)) {
-					//console.log("shiftxy: " + shiftX + " " + shiftY);
 					clone.x = this.x + shiftX;
 					clone.y = this.y - shiftY;
 					if(this.canMoveTo(clone, matrix) == true) {
-						this.state = clone.state;// = Object.assign(Object.create(Object.getPrototypeOf(clone)), clone);
+						this.state = clone.state;
 						this.x = clone.x;
 						this.y = clone.y;
 						return;
