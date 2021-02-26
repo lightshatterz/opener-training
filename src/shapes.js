@@ -667,7 +667,7 @@ ShapeZR.prototype = {
 			clone.state = this.nextState(rotationDirection);
 			var i = 0;
 			if(rotationDirection == 1)
-				i = 4;
+				i = 2;
 			for(; i < 5*4; i+=4)
 			{
 				var shiftX = this.rotationPoints[j][i];
@@ -691,33 +691,15 @@ ShapeZR.prototype = {
 	},
 	//Rotate shape
 	rotate: function(matrix) {
-		//  TODO: rest of pieces
-		//if(this.flag == 'T' || this.flag == 'L')
+
 			this.kickShape(matrix, -1);
-		//else if (isShapeCanMove(this, matrix, 'rotate')){
-			//this.state = this.nextState(-1);
-			//fix position if shape is out of right border
-			//var right = this.getRight();
-			//if ( right >= COLUMN_COUNT){
-			//	this.x -= right - COLUMN_COUNT + 1;
-			//}
-			/*var left = this.getLeft();
-			if(left <= 0)
-				this.x += 1;*/
-		//}
+
 	},
 	//Rotate shape clockwise
 	rotateClockwise: function(matrix) {
-		//if(this.flag == 'T')
+		
 			this.kickShape(matrix, 1);
-		//else if (isShapeCanMove(this, matrix, 'rotateclockwise')) {
-			//this.state = this.nextState(1);
-			//fix position if shape is out of right border
-			//var right = this.getRight();
-			//if (right >= COLUMN_COUNT) {
-			//	this.x -= right - COLUMN_COUNT + 1;
-			//}
-		//}
+
 	},
 	//Caculate the max column of the shape
 	getColumnCount: function() {
