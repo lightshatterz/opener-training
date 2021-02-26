@@ -36,7 +36,7 @@
 <!--insert shadertoy background-->
 <!--https://www.shadertoy.com/embed/wttfW2?gui=&t=10&paused=false&muted=false-->
 
-<!--
+
 <div id="divbg">
 <iframe id="bg" width="640" height="360" frameborder="0" src="https://www.shadertoy.com/embed/WldfWX?gui=&paused=false&muted=false" ></iframe>
 <script>
@@ -48,7 +48,7 @@ document.getElementById("bg").removeAttribute("tabIndex");
 document.getElementById("divbg").removeAttribute("tabIndex");
 </script>
 </div>
--->
+
 
 <div id="tetris">
 	<canvas id="scene"></canvas>
@@ -156,6 +156,9 @@ document.getElementById("divbg").removeAttribute("tabIndex");
 		document.getElementById("setPokeminosSTDVar").addEventListener("click", function() { tetrion.setCurrentOpener(4); } );
 		document.getElementById("setMrTSpinsSTDreversedVar").addEventListener("click", function() { tetrion.setCurrentOpener(5); } );
 		document.getElementById("setHachispinVar").addEventListener("click", function() { tetrion.setCurrentOpener(6); } );
+		document.getElementById("setAlbatrossVar").addEventListener("click", function() { tetrion.setCurrentOpener(7); } );
+		document.getElementById("setNumberOneVar").addEventListener("click", function() { tetrion.setCurrentOpener(8); } );
+		
 		
 		document.getElementById("test").addEventListener("click", function() { tetrion.setDoTest(); } );
 		document.getElementById("settings").addEventListener("change", function() { tetrion.updateSettingTextBox(); } );

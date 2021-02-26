@@ -122,6 +122,28 @@ var OpenerGenerator = {
 					shapes.getShape(0),
 					shapes.getShape(3));
 				break;
+				case 7:
+					// Albatross
+					this.shapeQueue = new Array(
+					shapes.getShape(1),
+					shapes.getShape(5),
+					shapes.getShape(6),
+					shapes.getShape(0),
+					shapes.getShape(4),
+					shapes.getShape(2),
+					shapes.getShape(3));
+			break;
+				case 8:
+				// Number One
+				this.shapeQueue = new Array(
+				shapes.getShape(1),
+				shapes.getShape(4),
+				shapes.getShape(6),
+				shapes.getShape(0),
+				shapes.getShape(2),
+				shapes.getShape(5),
+				shapes.getShape(3));
+			break;
 			default:
 				return;
 			}
@@ -285,7 +307,7 @@ var OpenerGenerator = {
 				
 			break;
 			case 6:
-				// Hachispin   // O - 1, I - 6, L - 0, S - 5, J - 4, Z - 2, T - 3
+				// Hachispin   
 				this.hintQueue = new Array(
 				shapes.getShape(1),
 				shapes.getShape(2),
@@ -294,7 +316,6 @@ var OpenerGenerator = {
 				shapes.getShape(4),
 				shapes.getShape(0),
 				shapes.getShape(3),
-				
 				shapes.getShape(6),
 				shapes.getShape(1),
 				shapes.getShape(5),
@@ -303,7 +324,45 @@ var OpenerGenerator = {
 				shapes.getShape(0),
 				shapes.getShape(3));
 				
-				var hintDataList = [1,18,0,  0,18,0,  9,16,0,  2,15,1,  6,17,2,  5,16,2,  1,16,2,  0,16,0,  -1,16,0,  5,16,0,  0,14,0,  3,15,0,  8,14,-1,  0,0,0];
+				var hintDataList = [1,18,0,  0,18,0,  9,16,0,  2,15,1,  6,17,2,  5,16,2,  1,16,2,  0,16,0,  -1,16,0,  5,16,0,  0,14,0,  3,15,0,  8,14,-1,  7,16,-1];
+				
+				for(var i = 0; i < this.hintQueue.length; i++) {
+					this.hintQueue[i].x = hintDataList[i * 3];
+					this.hintQueue[i].y = hintDataList[i * 3 + 1];
+					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i * 3 + 2]);
+				}
+			break;
+			case 7:
+				// Albatross
+				this.hintQueue = new Array(
+				shapes.getShape(1),
+				shapes.getShape(5),
+				shapes.getShape(6),
+				shapes.getShape(0),
+				shapes.getShape(4),
+				shapes.getShape(2),
+				shapes.getShape(3));
+				
+				var hintDataList = [1,18,0,  0,17,-1,  9,16,0,  5,17,2,  6,16,2,  3,16,0,  1,16,2];
+				
+				for(var i = 0; i < this.hintQueue.length; i++) {
+					this.hintQueue[i].x = hintDataList[i * 3];
+					this.hintQueue[i].y = hintDataList[i * 3 + 1];
+					this.hintQueue[i].state = this.hintQueue[i].nextState(hintDataList[i * 3 + 2]);
+				}
+			break;
+			case 8:
+				// Number One  // O - 1, I - 6, L - 0, S - 5, J - 4, Z - 2, T - 3
+				this.hintQueue = new Array(
+				shapes.getShape(1),
+				shapes.getShape(4),
+				shapes.getShape(6),
+				shapes.getShape(0),
+				shapes.getShape(2),
+				shapes.getShape(5),
+				shapes.getShape(3));
+				
+				var hintDataList = [3,18,0,  0,17,2,  0,15,1,  4,15,-1,  6,17,0,  8,16,-1,  3,17,-1];
 				
 				for(var i = 0; i < this.hintQueue.length; i++) {
 					this.hintQueue[i].x = hintDataList[i * 3];
